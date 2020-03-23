@@ -22,6 +22,9 @@ public class SMEReflect
 	public final Class c_EnchantmentParry;
 	public final Method m_EnchantmentParry_handler;
 	
+	public final Class c_EnchantmentFrenzy;
+	public final Method m_EnchantmentFrenzy_handler;
+	
 	public final Class c_EnchantmentUpgradedPotentials;
 	public final Method m_EnchantmentUpgradedPotentials_handler;
 	
@@ -41,6 +44,9 @@ public class SMEReflect
 		
 		c_EnchantmentParry = Class.forName("com.Shultrea.Rin.Ench0_2_0.EnchantmentParry");
 		m_EnchantmentParry_handler = ReflectUtil.findMethod(c_EnchantmentParry, "HandleEnchant");
+		
+		c_EnchantmentFrenzy = Class.forName("com.Shultrea.Rin.Ench0_4_5.EnchantmentFrenzy");
+		m_EnchantmentFrenzy_handler = ReflectUtil.findMethod(c_EnchantmentFrenzy, "onAttack");
 		
 		c_EnchantmentUpgradedPotentials = Class.forName("com.Shultrea.Rin.Ench0_4_0.EnchantmentUpgradedPotentials");
 		m_EnchantmentUpgradedPotentials_handler = ReflectUtil.findMethod(c_EnchantmentUpgradedPotentials, "onAnvilAttach");

@@ -1,12 +1,10 @@
 package com.charles445.rltweaker.handler;
 
 import java.lang.reflect.Method;
-import java.util.Collection;
 import java.util.Map;
 
 import com.charles445.rltweaker.RLTweaker;
 import com.charles445.rltweaker.config.ModConfig;
-import com.charles445.rltweaker.debug.DebugUtil;
 import com.charles445.rltweaker.reflect.SMEReflect;
 import com.charles445.rltweaker.util.CompatUtil;
 import com.charles445.rltweaker.util.ErrorUtil;
@@ -15,12 +13,14 @@ import com.charles445.rltweaker.util.ModNames;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
@@ -58,6 +58,9 @@ public class SMEHandler
 			
 			//Parry
 			tryRegister(Parry.class, "parry", reflector.c_EnchantmentParry, reflector.m_EnchantmentParry_handler, ModConfig.server.somanyenchantments.manageParry);
+			
+			//Unreasonable
+			tryRegister(Unreasonable.class, "frenzy", reflector.c_EnchantmentFrenzy, reflector.m_EnchantmentFrenzy_handler, ModConfig.server.somanyenchantments.manageUnreasonable);
 			
 			//Upgraded Potentials
 			tryRegister(UpgradedPotentials.class, "upgrade", reflector.c_EnchantmentUpgradedPotentials, reflector.m_EnchantmentUpgradedPotentials_handler, ModConfig.server.somanyenchantments.manageUpgradedPotentials);
@@ -287,6 +290,92 @@ public class SMEHandler
 				RLTweaker.logger.error("Error in Parry Invoke");
 				ErrorUtil.logEnchantmentHandlerError(enchantment);
 			}
+		}
+	}
+	
+	public class Unreasonable extends Wrapper
+	{
+		public Unreasonable(Object handler, String ench, Method original) { super(handler, ench, original); }
+		
+		@SubscribeEvent(priority = EventPriority.LOWEST)
+		public void unreasonableEnchant(LivingAttackEvent event)
+		{
+			//Note: unreasonable enchantment's handler sets a revenge target, cancels the event, and only works on creatures with full health
+			try
+			{
+				//Check attacker and enchantment
+				if(!(event.getSource().getTrueSource() instanceof EntityLivingBase))
+					return;
+				EntityLivingBase attacker = (EntityLivingBase)event.getSource().getTrueSource();
+				ItemStack weapon = attacker.getHeldItemMainhand();
+				if(weapon.isEmpty())
+					return;
+				if(EnchantmentHelper.getEnchantmentLevel(enchantment, weapon)<=0)
+					return;
+				
+				//Run Handler
+				invokeOriginal(event);
+				
+				//Un-Cancel
+				if(event.isCanceled())
+				{
+					event.setCanceled(false);
+					//Criterion has been met, however the victim's health and revenge target must be checked first before scheduling the revenge target change
+					EntityLivingBase victim = event.getEntityLiving();
+					
+					if (victim.getMaxHealth() > victim.getHealth())
+						return;
+					
+					EntityLivingBase revenge = victim.getRevengeTarget();
+					if(revenge==null)
+						return;
+					
+					//All the pieces are in place, schedule the revenge target change
+					
+					//RLTweaker.logger.debug("Current Revenge: "+revenge.getName());
+					
+					//This seems a bit jank, is there a better way to handle this?
+					World world = victim.getEntityWorld();
+					if(world instanceof WorldServer)
+					{
+						((WorldServer)world).addScheduledTask(() -> 
+						{
+							try
+							{
+								if(victim!=null && attacker!=null && revenge != null)
+								{
+									if(!victim.isDead)
+									{
+										//RLTweaker.logger.debug("Executed Revenge: "+revenge.getName());
+										if(victim instanceof EntityLiving)
+										{
+											//Prevent monsters from targeting themselves
+											if(!victim.getUniqueID().equals(revenge.getUniqueID()))
+											{
+												
+												EntityLiving victimLiving = (EntityCreature)victim;
+												victimLiving.setRevengeTarget(revenge);
+												victimLiving.setAttackTarget(revenge);
+											}
+										}
+									}
+								}
+							}
+							catch(Exception e)
+							{
+								RLTweaker.logger.error("Error in scheduled Unreasonable task",e);
+								ErrorUtil.logSilent("Unreasonable Scheduled");
+							}
+						});
+					}
+				}
+			}
+			catch(Exception e)
+			{
+				RLTweaker.logger.error("Error in Unreasonable Invoke");
+				ErrorUtil.logEnchantmentHandlerError(enchantment);
+			}
+			
 		}
 	}
 	

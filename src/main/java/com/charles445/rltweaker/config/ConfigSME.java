@@ -29,6 +29,11 @@ public class ConfigSME
 	@Config.RequiresMcRestart
 	public boolean manageParry = true;
 	
+	@Config.Comment("Unreasonable fixes")
+	@Config.Name("Manage Unreasonable")
+	@Config.RequiresMcRestart
+	public boolean manageUnreasonable = true;
+	
 	@Config.Comment("Upgraded Potentials fixes")
 	@Config.Name("Manage Upgraded Potentials")
 	public boolean manageUpgradedPotentials = true;

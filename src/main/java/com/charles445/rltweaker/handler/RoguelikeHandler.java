@@ -26,6 +26,7 @@ public class RoguelikeHandler
 	}
 	
 	//Run before Roguelike Dungeons'
+	//There is currently no need to wrap the existing handler
 	@SubscribeEvent(priority=EventPriority.HIGH)
 	public void onEntityJoinWorld(EntityJoinWorldEvent event)
 	{

@@ -22,14 +22,16 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 	modid = RLTweaker.MODID, 
 	name = RLTweaker.NAME, 
 	version = RLTweaker.VERSION,
-	acceptedMinecraftVersions = "[1.12]"
-	//acceptableRemoteVersions = "*"
+	acceptedMinecraftVersions = "[1.12]",
+	acceptableRemoteVersions = "*"
 	//updateJSON = "https://raw.githubusercontent.com/Charles445/SimpleDifficulty/master/modupdatechecker.json"
 	
 )
 public class RLTweaker
 {
 	//TODO Is it feasible to make this server side only?
+	//Will be running this as acceptableRemoteVersions "*" for now
+	//Although I imagine there may be some trouble with some of the handlers
 	
     public static final String MODID = "rltweaker";
     public static final String NAME = "RLTweaker";

@@ -353,7 +353,7 @@ public class SMEHandler
 											if(!victim.getUniqueID().equals(revenge.getUniqueID()))
 											{
 												
-												EntityLiving victimLiving = (EntityCreature)victim;
+												EntityLiving victimLiving = (EntityLiving)victim;
 												victimLiving.setRevengeTarget(revenge);
 												victimLiving.setAttackTarget(revenge);
 											}

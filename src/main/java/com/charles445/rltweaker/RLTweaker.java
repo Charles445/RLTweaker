@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.charles445.rltweaker.command.CommandErrorReport;
+import com.charles445.rltweaker.handler.MotionCheckHandler;
 import com.charles445.rltweaker.handler.RoguelikeHandler;
 import com.charles445.rltweaker.handler.SMEHandler;
 import com.charles445.rltweaker.handler.WaystonesHandler;
@@ -22,8 +23,8 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 	modid = RLTweaker.MODID, 
 	name = RLTweaker.NAME, 
 	version = RLTweaker.VERSION,
-	acceptedMinecraftVersions = "[1.12]"
-	//acceptableRemoteVersions = "*"
+	acceptedMinecraftVersions = "[1.12]",
+	acceptableRemoteVersions = "[0.1.0,)" //Last update - Upgraded Potentials in Anvil
 	//updateJSON = "https://raw.githubusercontent.com/Charles445/SimpleDifficulty/master/modupdatechecker.json"
 	
 )
@@ -33,7 +34,7 @@ public class RLTweaker
 	
     public static final String MODID = "rltweaker";
     public static final String NAME = "RLTweaker";
-    public static final String VERSION = "0.1.0";
+    public static final String VERSION = "0.1.1";
     
     @Mod.Instance(RLTweaker.MODID)
 	public static RLTweaker instance;
@@ -69,6 +70,9 @@ public class RLTweaker
     @Mod.EventHandler
     public void loadComplete(FMLLoadCompleteEvent event)
     {
+    	//Motion Check Handler runs after everything else, that way the priority listed will always be after
+		new MotionCheckHandler();
+    	
     	if(Loader.isModLoaded(ModNames.SOMANYENCHANTMENTS))
     	{
     		new SMEHandler();

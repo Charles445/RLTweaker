@@ -19,6 +19,10 @@ public class ModConfig
 	
 	public static class ServerConfig
 	{
+		@Config.Comment("Minecraft tweaks, or anything that isn't mod specific")
+		@Config.Name("Minecraft")
+		public ConfigMinecraft minecraft = new ConfigMinecraft();
+		
 		@Config.Comment("Roguelike Dungeons tweaks")
 		@Config.Name("Roguelike Dungeons")
 		public ConfigRoguelike roguelike = new ConfigRoguelike();

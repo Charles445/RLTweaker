@@ -1,10 +1,12 @@
 package com.charles445.rltweaker.handler;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.charles445.rltweaker.RLTweaker;
 import com.charles445.rltweaker.config.ModConfig;
+import com.charles445.rltweaker.debug.DebugUtil;
 import com.charles445.rltweaker.reflect.SMEReflect;
 import com.charles445.rltweaker.util.CompatUtil;
 import com.charles445.rltweaker.util.ErrorUtil;
@@ -13,9 +15,10 @@ import com.charles445.rltweaker.util.ModNames;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityXPOrb;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -23,11 +26,14 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AnvilUpdateEvent;
+import net.minecraftforge.event.entity.item.ItemTossEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
+import net.minecraftforge.event.entity.player.PlayerPickupXpEvent;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 public class SMEHandler
@@ -44,8 +50,15 @@ public class SMEHandler
 		try
 		{
 			this.reflector = new SMEReflect();
+			
+			//Advanced Mending
+			tryRegister(AdvancedMending.class, "advancedmending", reflector.c_Enchantmentadvancedmending, reflector.m_Enchantmentadvancedmending_handler, ModConfig.server.somanyenchantments.manageAdvancedMending);
+			
 			//Arc Slash
 			tryRegister(ArcSlash.class, "swiper", reflector.c_EnchantmentSwiper, reflector.m_EnchantmentSwiper_handler, ModConfig.server.somanyenchantments.manageArcSlash);
+			
+			//Curse of Possession
+			tryRegister(CurseOfPossession.class, "CurseofPossession", reflector.c_EnchantmentCurseofPossession, reflector.m_EnchantmentCurseofPossession_onExist, ModConfig.server.somanyenchantments.manageCurseOfPossession);
 			
 			//Empowered Defence
 			tryRegister(EmpoweredDefence.class, "empowereddefence", reflector.c_EnchantmentEmpoweredDefence, reflector.m_EnchantmentEmpoweredDefence_handler, ModConfig.server.somanyenchantments.manageEmpoweredDefence);
@@ -69,6 +82,7 @@ public class SMEHandler
 		catch (Exception e)
 		{
 			RLTweaker.logger.error("Failed to setup SMEHandler!", e);
+			ErrorUtil.logSilent("SME Critical Setup Failure");
 		}
 	}
 	
@@ -86,6 +100,52 @@ public class SMEHandler
 	//(optional pre-handling)
 	//Invoking the initial handler
 	//(optional post-handling
+	
+	public class AdvancedMending extends Wrapper
+	{
+		public AdvancedMending(Object handler, String ench, Method original) { super(handler, ench, original); }
+		
+		@SubscribeEvent
+		public void advancedMendingEnchant(PlayerPickupXpEvent event)
+		{
+			//Not using the original
+			
+			//Taken from vanilla, but with constant values
+			
+			//Double the XP for the player
+			//This appears to be an oversight in SME, but has been left in for consistency.
+			//It will be run first now to make sure that the presence of advanced mending does not reduce XP gain
+			
+			EntityPlayer player = event.getEntityPlayer();
+			EntityXPOrb orb = event.getOrb();
+			
+			//DebugUtil.messageAll("XP: "+orb.xpValue);
+			
+			if(orb.xpValue > 0)
+			{
+				player.addExperience(orb.xpValue);
+			}
+			
+			//Get a random item on the player that has advanced mending
+			ItemStack itemstack = EnchantmentHelper.getEnchantedItem(enchantment, player);
+			
+			//Attempt to repair it using some of the XP from the orb itself
+			if(!itemstack.isEmpty() && itemstack.isItemDamaged())
+			{
+				int value = Math.min(orb.xpValue * 3, itemstack.getItemDamage());
+				//DebugUtil.messageAll("Value: "+value);
+				//DebugUtil.messageAll("Task: "+itemstack.getItemDamage()+" -> "+(itemstack.getItemDamage() - value));
+				itemstack.setItemDamage(itemstack.getItemDamage() - value);
+				
+				orb.xpValue -= value/2;
+				//There is a chance that the orb.xpValue has become negative (for example, an orb.xpValue of 2 can become -1)
+				if(orb.xpValue < 0)
+					orb.xpValue = 0;
+				
+				//DebugUtil.messageAll("New XP: "+orb.xpValue);
+			}
+		}
+	}
 	
 	public class ArcSlash extends Wrapper
 	{
@@ -119,6 +179,72 @@ public class SMEHandler
 				RLTweaker.logger.error("Error in ArcSlash Invoke", e);
 				ErrorUtil.logEnchantmentHandlerError(enchantment);
 			}
+		}
+	}
+	
+	public class CurseOfPossession extends Wrapper
+	{
+		private final Method onExist;
+		private final Method toss;
+		private final Map<Integer, Integer> dimensionMap;
+		
+		public CurseOfPossession(Object handler, String ench, Method original)
+		{
+			super(handler, ench, original);
+			onExist = reflector.m_EnchantmentCurseofPossession_onExist;
+			toss = reflector.m_EnchantmentCurseofPossession_toss;
+			dimensionMap = new HashMap<Integer,Integer>();
+		}
+		
+		@SubscribeEvent
+		public void onExist(TickEvent.WorldTickEvent event)
+		{
+			//Check tick phase
+			if(event.phase == TickEvent.Phase.START)
+				return;
+			
+			//Use separate timers for separate dimensions
+			int dimension = event.world.provider.getDimension();
+			Integer dimensionCounterObj = dimensionMap.get(dimension);
+			int dimCount = dimensionCounterObj==null? 0 : dimensionCounterObj.intValue();
+			dimCount++;
+			
+			//Timer check
+			if(dimCount >= ModConfig.server.somanyenchantments.curseOfPossessionDelay)
+			{
+				//Timer is up, reset timer
+				dimensionMap.put(dimension, 0);
+				
+				try
+				{
+					onExist.invoke(handler, event);
+				}
+				catch (Exception e)
+				{
+					RLTweaker.logger.error("Error in CurseOfPossession onExist Invoke", e);
+					ErrorUtil.logEnchantmentHandlerError(enchantment);
+				}
+			}
+			else
+			{
+				//Increment timer
+				dimensionMap.put(dimension, dimCount);
+			}
+		}
+		
+		@SubscribeEvent(priority = EventPriority.HIGHEST)
+		public void toss(ItemTossEvent event)
+		{
+			try
+			{
+				toss.invoke(handler, event);
+			}
+			catch (Exception e)
+			{
+				RLTweaker.logger.error("Error in CurseOfPossession toss Invoke", e);
+				ErrorUtil.logEnchantmentHandlerError(enchantment);
+			}
+			
 		}
 	}
 	

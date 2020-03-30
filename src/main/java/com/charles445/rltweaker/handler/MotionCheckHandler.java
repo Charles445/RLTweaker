@@ -21,6 +21,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 public class MotionCheckHandler
 {
 	public Set<UUID> rotationErrors = new HashSet<UUID>();
+	public Set<UUID> motionErrors = new HashSet<UUID>();
 	
 	public MotionCheckHandler()
 	{
@@ -142,11 +143,17 @@ public class MotionCheckHandler
 	{
 		if(motion > ModConfig.server.minecraft.motionCheckerSpeedCap || motion < (-ModConfig.server.minecraft.motionCheckerSpeedCap) || !Double.isFinite(motion))
 		{
-			RLTweaker.logger.error("Entity moving too fast! "+priority.name()+" "+motion+" "+dumpEntity(entity));
-			ErrorUtil.logSilent("Motion Checker Speed "+priority.name());
-			
-			if(ModConfig.server.minecraft.debug)
-				DebugUtil.messageAll("Entity moving too fast! "+priority.name()+" "+motion);
+			//Log only if not in the set
+			if(!motionErrors.contains(entity.getUniqueID()))
+			{
+				motionErrors.add(entity.getUniqueID());
+				
+				RLTweaker.logger.error("Entity moving too fast! "+priority.name()+" "+motion+" "+dumpEntity(entity));
+				ErrorUtil.logSilent("Motion Checker Speed "+priority.name());
+				
+				if(ModConfig.server.minecraft.debug)
+					DebugUtil.messageAll("Entity moving too fast! "+priority.name()+" "+motion);
+			}
 			
 			return true;
 		}

@@ -7,11 +7,18 @@ import com.charles445.rltweaker.util.ReflectUtil;
 public class SMEReflect
 {
 
+	public final Class c_Enchantmentadvancedmending;
+	public final Method m_Enchantmentadvancedmending_handler;
+	
 	public final Class c_EnchantmentSwiper;
 	public final Method m_EnchantmentSwiper_handler;
-	
+
 	public final Class c_EnchantmentEmpoweredDefence;
 	public final Method m_EnchantmentEmpoweredDefence_handler;
+	
+	public final Class c_EnchantmentCurseofPossession;
+	public final Method m_EnchantmentCurseofPossession_onExist;
+	public final Method m_EnchantmentCurseofPossession_toss;
 	
 	public final Class c_EnchantmentEvasion;
 	public final Method m_EnchantmentEvasion_handler;
@@ -30,8 +37,15 @@ public class SMEReflect
 	
 	public SMEReflect() throws Exception
 	{
+		c_Enchantmentadvancedmending = Class.forName("com.Shultrea.Rin.Ench0_4_0.Enchantmentadvancedmending");
+		m_Enchantmentadvancedmending_handler = ReflectUtil.findMethod(c_Enchantmentadvancedmending, "onXP");
+		
 		c_EnchantmentSwiper = Class.forName("com.Shultrea.Rin.Ench0_4_0.EnchantmentSwiper");
 		m_EnchantmentSwiper_handler = ReflectUtil.findMethod(c_EnchantmentSwiper, "HandleEnchant");
+		
+		c_EnchantmentCurseofPossession = Class.forName("com.Shultrea.Rin.Ench0_4_0.EnchantmentCurseofPossession");
+		m_EnchantmentCurseofPossession_onExist = ReflectUtil.findMethod(c_EnchantmentCurseofPossession,"onExist");
+		m_EnchantmentCurseofPossession_toss = ReflectUtil.findMethod(c_EnchantmentCurseofPossession,"toss");
 		
 		c_EnchantmentEmpoweredDefence = Class.forName("com.Shultrea.Rin.Ench0_3_0.EnchantmentEmpoweredDefence");
 		m_EnchantmentEmpoweredDefence_handler = ReflectUtil.findMethod(c_EnchantmentEmpoweredDefence, "EmpoweredDefenceEvent");

@@ -34,7 +34,7 @@ public class RLTweaker
 	
     public static final String MODID = "rltweaker";
     public static final String NAME = "RLTweaker";
-    public static final String VERSION = "0.1.2";
+    public static final String VERSION = "0.1.3";
     
     @Mod.Instance(RLTweaker.MODID)
 	public static RLTweaker instance;

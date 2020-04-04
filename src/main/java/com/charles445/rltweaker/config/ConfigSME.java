@@ -9,6 +9,10 @@ public class ConfigSME
 	@Config.RequiresMcRestart
 	public boolean manageAdvancedMending = true;
 	
+	@Config.Comment("Leaves in the double XP advanced mending bug. RLCraft vanilla is true")
+	@Config.Name("Advanced Mending Double XP")
+	public boolean advancedMendingDoubleXP = true;
+	
 	@Config.Comment("Arc Slash fixes")
 	@Config.Name("Manage Arc Slash")
 	@Config.RequiresMcRestart

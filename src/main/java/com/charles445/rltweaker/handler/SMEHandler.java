@@ -121,7 +121,7 @@ public class SMEHandler
 			
 			//DebugUtil.messageAll("XP: "+orb.xpValue);
 			
-			if(orb.xpValue > 0)
+			if(ModConfig.server.somanyenchantments.advancedMendingDoubleXP && orb.xpValue > 0)
 			{
 				player.addExperience(orb.xpValue);
 			}

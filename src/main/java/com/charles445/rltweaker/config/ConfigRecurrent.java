@@ -19,7 +19,7 @@ public class ConfigRecurrent
 	@Config.RequiresMcRestart
 	public boolean cleanStructureData = true;
 	
-	@Config.Comment("How many structures need to generate before the dat is cleaned. Changing this is not recommended.")
+	@Config.Comment("How many structures need to generate before the dat is cleaned")
 	@Config.Name("Clean Structure Threshold")
 	@Config.RangeInt(min=1)
 	public int cleanStructureThreshold = 100;

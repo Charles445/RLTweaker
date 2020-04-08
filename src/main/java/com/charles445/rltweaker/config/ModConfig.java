@@ -23,6 +23,10 @@ public class ModConfig
 		@Config.Name("Minecraft")
 		public ConfigMinecraft minecraft = new ConfigMinecraft();
 		
+		@Config.Comment("Recurrent Complex tweaks")
+		@Config.Name("Recurrent Complex")
+		public ConfigRecurrent recurrentcomplex = new ConfigRecurrent();
+		
 		@Config.Comment("Roguelike Dungeons tweaks")
 		@Config.Name("Roguelike Dungeons")
 		public ConfigRoguelike roguelike = new ConfigRoguelike();

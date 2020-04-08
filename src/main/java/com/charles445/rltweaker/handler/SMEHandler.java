@@ -9,6 +9,7 @@ import com.charles445.rltweaker.config.ModConfig;
 import com.charles445.rltweaker.debug.DebugUtil;
 import com.charles445.rltweaker.reflect.SMEReflect;
 import com.charles445.rltweaker.util.CompatUtil;
+import com.charles445.rltweaker.util.CriticalException;
 import com.charles445.rltweaker.util.ErrorUtil;
 import com.charles445.rltweaker.util.ModNames;
 
@@ -36,6 +37,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
+/** Handler for SoManyEnchantments! <br>
+ * Wraps around or replaces some enchantment handlers in order to fix bugs.
+*/
 public class SMEHandler
 {
 	public static long protectCounter = 0L;
@@ -83,6 +87,10 @@ public class SMEHandler
 		{
 			RLTweaker.logger.error("Failed to setup SMEHandler!", e);
 			ErrorUtil.logSilent("SME Critical Setup Failure");
+			
+			//Crash on Critical
+			if(e instanceof CriticalException)
+				throw new RuntimeException(e);
 		}
 	}
 	

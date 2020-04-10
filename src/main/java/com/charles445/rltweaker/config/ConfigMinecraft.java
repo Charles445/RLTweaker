@@ -16,4 +16,8 @@ public class ConfigMinecraft
 	@Config.Name("Motion Checker Speed Cap")
 	@Config.RangeDouble(min=1.0D)
 	public double motionCheckerSpeedCap = 48.0D;
+	
+	@Config.Comment("Synchronizes arrows with players more aggressively")
+	@Config.Name("Player Arrow Sync")
+	public boolean playerArrowSync = true;
 }

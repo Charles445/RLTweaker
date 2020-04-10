@@ -41,6 +41,9 @@ public class RecurrentHandler
 	private RecurrentReflect reflector;
 	private boolean reflector_enabled = true;
 	
+	//TODO Does checkedChunks actually get used by anything? Might be worth blocking entirely
+	//Cleanup doesn't seem to affect checkedChunks. Shouldn't be a problem I don't think, but it's worth noting.
+	
 	public RecurrentHandler()
 	{
 		//Currently created during INIT

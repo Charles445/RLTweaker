@@ -4,6 +4,11 @@ import net.minecraftforge.common.config.Config;
 
 public class ConfigRecurrent
 {
+	@Config.Comment("Master switch for this mod compatibility")
+	@Config.Name("ENABLED")
+	@Config.RequiresMcRestart
+	public boolean enabled = true;
+	
 	@Config.Comment("Allows for some recurrent complex event configuration")
 	@Config.Name("Manage Recurrent Complex Events")
 	@Config.RequiresMcRestart

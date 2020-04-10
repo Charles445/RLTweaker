@@ -6,6 +6,8 @@ import com.charles445.rltweaker.RLTweaker;
 import com.charles445.rltweaker.config.ModConfig;
 import com.charles445.rltweaker.reflect.WaystoneReflect;
 import com.charles445.rltweaker.util.CompatUtil;
+import com.charles445.rltweaker.util.CriticalException;
+import com.charles445.rltweaker.util.ErrorUtil;
 import com.charles445.rltweaker.util.ReflectUtil;
 
 import net.minecraft.block.Block;
@@ -32,6 +34,11 @@ public class WaystonesHandler
 		catch (Exception e)
 		{
 			RLTweaker.logger.error("Failed to setup WaystonesHandler!", e);
+			ErrorUtil.logSilent("Waystones Critical Setup Failure");
+			
+			//Crash on Critical
+			if(e instanceof CriticalException)
+				throw new RuntimeException(e);
 		}
 	}
 	

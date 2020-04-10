@@ -4,6 +4,11 @@ import net.minecraftforge.common.config.Config;
 
 public class ConfigSME
 {
+	@Config.Comment("Master switch for this mod compatibility")
+	@Config.Name("ENABLED")
+	@Config.RequiresMcRestart
+	public boolean enabled = true;
+	
 	@Config.Comment("Advanced Mending fixes")
 	@Config.Name("Manage Advanced Mending")
 	@Config.RequiresMcRestart

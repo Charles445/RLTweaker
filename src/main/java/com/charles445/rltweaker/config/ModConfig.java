@@ -35,6 +35,10 @@ public class ModConfig
 		@Config.Name("So Many Enchantments")
 		public ConfigSME somanyenchantments = new ConfigSME();
 		
+		@Config.Comment("Tough As Nails tweaks")
+		@Config.Name("Tough As Nails")
+		public ConfigTAN toughasnails = new ConfigTAN();
+		
 		@Config.Comment("Waystones tweaks")
 		@Config.Name("Waystones")
 		public ConfigWaystones waystones = new ConfigWaystones();

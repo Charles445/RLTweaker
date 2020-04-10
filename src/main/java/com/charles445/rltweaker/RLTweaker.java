@@ -3,14 +3,22 @@ package com.charles445.rltweaker;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.charles445.rltweaker.capability.ITweakerCapability;
+import com.charles445.rltweaker.capability.TweakerCapability;
+import com.charles445.rltweaker.capability.TweakerStorage;
 import com.charles445.rltweaker.command.CommandErrorReport;
+import com.charles445.rltweaker.config.ModConfig;
+import com.charles445.rltweaker.handler.MinecraftHandler;
 import com.charles445.rltweaker.handler.MotionCheckHandler;
 import com.charles445.rltweaker.handler.RecurrentHandler;
 import com.charles445.rltweaker.handler.RoguelikeHandler;
 import com.charles445.rltweaker.handler.SMEHandler;
+import com.charles445.rltweaker.handler.TANHandler;
 import com.charles445.rltweaker.handler.WaystonesHandler;
+import com.charles445.rltweaker.network.PacketHandler;
 import com.charles445.rltweaker.util.ModNames;
 
+import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -25,7 +33,7 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 	name = RLTweaker.NAME, 
 	version = RLTweaker.VERSION,
 	acceptedMinecraftVersions = "[1.12]",
-	acceptableRemoteVersions = "[0.1.0,)" //Last update - Upgraded Potentials in Anvil //TODO is this even needed?
+	acceptableRemoteVersions = "[0.2.0,)" //Last update - Arrow Sync, Teleport Thirst
 	//updateJSON = "https://raw.githubusercontent.com/Charles445/SimpleDifficulty/master/modupdatechecker.json"
 	
 )
@@ -35,7 +43,7 @@ public class RLTweaker
 	
     public static final String MODID = "rltweaker";
     public static final String NAME = "RLTweaker";
-    public static final String VERSION = "0.1.4";
+    public static final String VERSION = "0.2.0";
     
     @Mod.Instance(RLTweaker.MODID)
 	public static RLTweaker instance;
@@ -45,12 +53,18 @@ public class RLTweaker
 	@Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
-		if(Loader.isModLoaded(ModNames.ROGUELIKEDUNGEONS))
+		PacketHandler.init();
+		
+		CapabilityManager.INSTANCE.register(ITweakerCapability.class, new TweakerStorage(), TweakerCapability::new);
+		
+    	new MinecraftHandler();
+		
+		if(Loader.isModLoaded(ModNames.ROGUELIKEDUNGEONS) && ModConfig.server.roguelike.enabled)
 		{
 			new RoguelikeHandler();
 		}
 		
-    	if(Loader.isModLoaded(ModNames.WAYSTONES))
+    	if(Loader.isModLoaded(ModNames.WAYSTONES) && ModConfig.server.waystones.enabled)
     	{
     		new WaystonesHandler();
     	}
@@ -59,9 +73,14 @@ public class RLTweaker
 	@Mod.EventHandler
     public void init(FMLInitializationEvent event)
     {
-		if(Loader.isModLoaded(ModNames.RECURRENTCOMPLEX))
+		if(Loader.isModLoaded(ModNames.RECURRENTCOMPLEX) && ModConfig.server.recurrentcomplex.enabled)
 		{
 			new RecurrentHandler();
+		}
+		
+		if(Loader.isModLoaded(ModNames.TOUGHASNAILS) && ModConfig.server.toughasnails.enabled)
+		{
+			new TANHandler();
 		}
     }
 	
@@ -77,7 +96,7 @@ public class RLTweaker
     	//Motion Check Handler runs after everything else, that way the priority listed will always be after
 		new MotionCheckHandler();
     	
-    	if(Loader.isModLoaded(ModNames.SOMANYENCHANTMENTS))
+    	if(Loader.isModLoaded(ModNames.SOMANYENCHANTMENTS) && ModConfig.server.somanyenchantments.enabled)
     	{
     		new SMEHandler();
     	}

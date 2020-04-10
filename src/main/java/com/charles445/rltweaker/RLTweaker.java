@@ -33,7 +33,7 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 	name = RLTweaker.NAME, 
 	version = RLTweaker.VERSION,
 	acceptedMinecraftVersions = "[1.12]",
-	acceptableRemoteVersions = "[0.2.0,)" //Last update - Arrow Sync, Teleport Thirst
+	acceptableRemoteVersions = "[0.2.0,)" //Last update - Arrow Sync, Teleport Thirst, Thirst Packets
 	//updateJSON = "https://raw.githubusercontent.com/Charles445/SimpleDifficulty/master/modupdatechecker.json"
 	
 )

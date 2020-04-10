@@ -18,5 +18,13 @@ public class ConfigTAN
 	@Config.RangeDouble(min=1.0D, max=40.0D)
 	public double teleportThirstThreshold = 8.0D;
 	
+	@Config.Comment("Regularly send players extra Thirst packets")
+	@Config.Name("Send Extra Thirst Packets")
+	public boolean sendExtraThirstPackets = true;
+	
+	@Config.Comment("How often extra Thirst packets get sent out, in ticks")
+	@Config.Name("Thirst Packet Frequency")
+	@Config.RangeInt(min=1)
+	public int extraThirstPacketFrequency = 20;
 	
 }

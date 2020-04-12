@@ -12,6 +12,7 @@ import com.charles445.rltweaker.handler.MinecraftHandler;
 import com.charles445.rltweaker.handler.MotionCheckHandler;
 import com.charles445.rltweaker.handler.RecurrentHandler;
 import com.charles445.rltweaker.handler.RoguelikeHandler;
+import com.charles445.rltweaker.handler.RuinsHandler;
 import com.charles445.rltweaker.handler.SMEHandler;
 import com.charles445.rltweaker.handler.TANHandler;
 import com.charles445.rltweaker.handler.WaystonesHandler;
@@ -43,7 +44,7 @@ public class RLTweaker
 	
     public static final String MODID = "rltweaker";
     public static final String NAME = "RLTweaker";
-    public static final String VERSION = "0.2.0";
+    public static final String VERSION = "0.2.1";
     
     @Mod.Instance(RLTweaker.MODID)
 	public static RLTweaker instance;
@@ -62,6 +63,11 @@ public class RLTweaker
 		if(Loader.isModLoaded(ModNames.ROGUELIKEDUNGEONS) && ModConfig.server.roguelike.enabled)
 		{
 			new RoguelikeHandler();
+		}
+		
+		if(Loader.isModLoaded(ModNames.RUINS) && ModConfig.server.ruins.enabled)
+		{
+			new RuinsHandler();
 		}
 		
     	if(Loader.isModLoaded(ModNames.WAYSTONES) && ModConfig.server.waystones.enabled)

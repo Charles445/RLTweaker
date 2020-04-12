@@ -65,6 +65,22 @@ public class CompatUtil
 	}
 	
 	@Nullable
+	public static Object getModInstance(String modid)
+	{
+		for(ModContainer modContainer : Loader.instance().getModList())
+		{
+			if(modContainer.getModId().equals(modid))
+			{
+				return modContainer.getMod();
+			}
+		}
+		
+		RLTweaker.logger.warn("Asked to find mod instance "+modid+", but could not find it!");
+		
+		return null;
+	}
+	
+	@Nullable
 	public static Object findAndRemoveHandlerFromEventBus(Class clazz) throws Exception
 	{
 		return findAndRemoveHandlerFromEventBus(clazz.getName());

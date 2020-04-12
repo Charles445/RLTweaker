@@ -31,6 +31,10 @@ public class ModConfig
 		@Config.Name("Roguelike Dungeons")
 		public ConfigRoguelike roguelike = new ConfigRoguelike();
 		
+		@Config.Comment("Ruins tweaks")
+		@Config.Name("Ruins")
+		public ConfigRuins ruins = new ConfigRuins();
+		
 		@Config.Comment("So Many Enchantments tweaks")
 		@Config.Name("So Many Enchantments")
 		public ConfigSME somanyenchantments = new ConfigSME();

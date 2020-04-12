@@ -7,4 +7,9 @@ public class CriticalException extends RuntimeException
 	{
 		super(t);
 	}
+
+	public CriticalException(String string)
+	{
+		super(string);
+	}
 }

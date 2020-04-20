@@ -72,6 +72,10 @@ public class MessageUpdateDismountStatus implements IMessage
 		{
 			EntityPlayer player = Minecraft.getMinecraft().player;
 			
+			//Safety check...
+			if(player==null)
+				return;
+			
 			//Try the clientside dismount
 			player.dismountRidingEntity();
 			

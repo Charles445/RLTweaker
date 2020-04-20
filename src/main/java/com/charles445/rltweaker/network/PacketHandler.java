@@ -13,6 +13,7 @@ public class PacketHandler
 	public static void init()
 	{
 		instance.registerMessage(MessageUpdateEntityMovement.Handler.class, MessageUpdateEntityMovement.class, 0, Side.CLIENT);
+		instance.registerMessage(MessageUpdateDismountStatus.Handler.class, MessageUpdateDismountStatus.class, 1, Side.CLIENT);
 		/*
 		instance.registerMessage(MessageUpdateThirst.Handler.class, MessageUpdateThirst.class, 0, Side.CLIENT);
 		instance.registerMessage(MessageDrinkWater.Handler.class, MessageDrinkWater.class, 1, Side.SERVER);

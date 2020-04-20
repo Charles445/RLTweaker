@@ -27,6 +27,10 @@ public class ModConfig
 		@Config.Name("Recurrent Complex")
 		public ConfigRecurrent recurrentcomplex = new ConfigRecurrent();
 		
+		@Config.Comment("Reskillable tweaks")
+		@Config.Name("Reskillable")
+		public ConfigReskillable reskillable = new ConfigReskillable();
+		
 		@Config.Comment("Roguelike Dungeons tweaks")
 		@Config.Name("Roguelike Dungeons")
 		public ConfigRoguelike roguelike = new ConfigRoguelike();

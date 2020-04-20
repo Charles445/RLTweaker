@@ -17,6 +17,10 @@ public class ConfigMinecraft
 	@Config.RangeDouble(min=1.0D)
 	public double motionCheckerSpeedCap = 48.0D;
 	
+	@Config.Comment("Synchronizes dismounts with players more aggressively")
+	@Config.Name("Player Dismount Sync")
+	public boolean playerDismountSync = true;
+	
 	@Config.Comment("Synchronizes arrows with players more aggressively")
 	@Config.Name("Player Arrow Sync")
 	public boolean playerArrowSync = true;

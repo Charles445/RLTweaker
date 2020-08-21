@@ -2,6 +2,7 @@ package com.charles445.rltweaker.util;
 
 public class ModNames
 {
+	public static final String BATTLETOWERS = "battletowers";
 	public static final String MINECRAFT = "minecraft";
 	public static final String RECURRENTCOMPLEX = "reccomplex";
 	public static final String RESKILLABLE = "reskillable";

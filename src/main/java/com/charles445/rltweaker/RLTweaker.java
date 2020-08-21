@@ -13,6 +13,7 @@ import com.charles445.rltweaker.capability.TweakerStorage;
 import com.charles445.rltweaker.command.CommandErrorReport;
 import com.charles445.rltweaker.config.JsonConfig;
 import com.charles445.rltweaker.config.ModConfig;
+import com.charles445.rltweaker.handler.BattleTowersHandler;
 import com.charles445.rltweaker.handler.MinecraftHandler;
 import com.charles445.rltweaker.handler.MotionCheckHandler;
 import com.charles445.rltweaker.handler.RecurrentHandler;
@@ -50,7 +51,7 @@ public class RLTweaker
 	
     public static final String MODID = "rltweaker";
     public static final String NAME = "RLTweaker";
-    public static final String VERSION = "0.3.0";
+    public static final String VERSION = "0.3.1";
     
     @Mod.Instance(RLTweaker.MODID)
 	public static RLTweaker instance;
@@ -122,6 +123,11 @@ public class RLTweaker
     	if(Loader.isModLoaded(ModNames.SOMANYENCHANTMENTS) && ModConfig.server.somanyenchantments.enabled)
     	{
     		handlers.put(ModNames.SOMANYENCHANTMENTS, new SMEHandler());
+    	}
+    	
+    	if(Loader.isModLoaded(ModNames.BATTLETOWERS) && ModConfig.server.battletowers.enabled)
+    	{
+    		handlers.put(ModNames.BATTLETOWERS, new BattleTowersHandler());
     	}
     }
     

@@ -23,6 +23,10 @@ public class ModConfig
 		@Config.Name("Minecraft")
 		public ConfigMinecraft minecraft = new ConfigMinecraft();
 		
+		@Config.Comment("Battle Towers tweaks")
+		@Config.Name("Battle Towers")
+		public ConfigBattleTowers battletowers = new ConfigBattleTowers();
+		
 		@Config.Comment("Recurrent Complex tweaks")
 		@Config.Name("Recurrent Complex")
 		public ConfigRecurrent recurrentcomplex = new ConfigRecurrent();

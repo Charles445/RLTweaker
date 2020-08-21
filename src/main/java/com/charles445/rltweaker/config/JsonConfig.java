@@ -33,7 +33,7 @@ public class JsonConfig
 	
 	public static void init()
 	{
-		if(Loader.isModLoaded(ModNames.RESKILLABLE) && ModConfig.server.reskillable.enabled)
+		if(Loader.isModLoaded(ModNames.RESKILLABLE) && ModConfig.server.reskillable.enabled && ModConfig.server.reskillable.customTransmutation)
 		{
 			JsonConfig.reskillableTransmutation.clear();
 			JsonConfig.reskillableTransmutation.put("minecraft:stick", Arrays.asList(new JsonDoubleBlockState[]{JsonDoubleBlockState.AIR}));

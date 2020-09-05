@@ -75,3 +75,11 @@ processResources {
         exclude 'mcmod.info'
     }
 }
+
+jar {
+    manifest 
+	{
+        attributes "FMLCorePlugin": "com.charles445.rltweaker.asm.CoreLoader"
+		attributes "FMLCorePluginContainsFMLMod": "com.charles445.rltweaker.RLTweaker"
+    }
+}

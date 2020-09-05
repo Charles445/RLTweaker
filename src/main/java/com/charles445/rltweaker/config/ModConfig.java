@@ -13,6 +13,14 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @Config(modid = RLTweaker.MODID)
 public class ModConfig
 {
+	//Keeping these lower case and uniform to avoid unexpected parsing issues
+	//Fun fact, categories get run through toLowerCase(Locale.ENGLISH)
+	//But properties do not. Okay...
+	
+	@Config.Comment("Patch options for the coremod")
+	@Config.Name("patches")
+	public static PatchConfig patches = new PatchConfig();
+	
 	@Config.Comment("Server options")
 	@Config.Name("Server")
 	public static ServerConfig server = new ServerConfig();

@@ -7,7 +7,7 @@ public class ConfigSME
 	@Config.Comment("Master switch for this mod compatibility")
 	@Config.Name("ENABLED")
 	@Config.RequiresMcRestart
-	public boolean enabled = true;
+	public boolean enabled = false;
 	
 	@Config.Comment("Advanced Mending fixes")
 	@Config.Name("Manage Advanced Mending")

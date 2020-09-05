@@ -24,11 +24,13 @@ import com.charles445.rltweaker.handler.SMEHandler;
 import com.charles445.rltweaker.handler.TANHandler;
 import com.charles445.rltweaker.handler.WaystonesHandler;
 import com.charles445.rltweaker.network.PacketHandler;
+import com.charles445.rltweaker.proxy.CommonProxy;
 import com.charles445.rltweaker.util.ModNames;
 
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -41,7 +43,7 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 	name = RLTweaker.NAME, 
 	version = RLTweaker.VERSION,
 	acceptedMinecraftVersions = "[1.12]",
-	acceptableRemoteVersions = "[0.3.0,)" //Last update - Dismount Sync
+	acceptableRemoteVersions = "[0.4.0,)" //Last update - Damage Tilt
 	//updateJSON = "https://raw.githubusercontent.com/Charles445/SimpleDifficulty/master/modupdatechecker.json"
 	
 )
@@ -51,10 +53,14 @@ public class RLTweaker
 	
     public static final String MODID = "rltweaker";
     public static final String NAME = "RLTweaker";
-    public static final String VERSION = "0.3.1";
+    public static final String VERSION = "0.4.0";
     
     @Mod.Instance(RLTweaker.MODID)
 	public static RLTweaker instance;
+    
+    @SidedProxy(clientSide = "com.charles445.rltweaker.proxy.ClientProxy",
+			serverSide = "com.charles445.rltweaker.proxy.CommonProxy")
+    public static CommonProxy proxy;
 	
 	public static Logger logger = LogManager.getLogger("RLTweaker");
 	
@@ -92,6 +98,8 @@ public class RLTweaker
     	{
     		handlers.put(ModNames.WAYSTONES, new WaystonesHandler());
     	}
+    	
+    	proxy.preInit();
     }
 	
 	@Mod.EventHandler
@@ -106,12 +114,16 @@ public class RLTweaker
 		{
 			handlers.put(ModNames.TOUGHASNAILS, new TANHandler());
 		}
+		
+		proxy.init();
     }
 	
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event)
     {
     	JsonConfig.init();
+    	
+    	proxy.postInit();
     }
     
     @Mod.EventHandler
@@ -129,6 +141,8 @@ public class RLTweaker
     	{
     		handlers.put(ModNames.BATTLETOWERS, new BattleTowersHandler());
     	}
+    	
+    	proxy.loadComplete();
     }
     
     @Mod.EventHandler

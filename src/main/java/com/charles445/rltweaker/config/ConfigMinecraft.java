@@ -24,4 +24,12 @@ public class ConfigMinecraft
 	@Config.Comment("Synchronizes arrows with players more aggressively")
 	@Config.Name("Player Arrow Sync")
 	public boolean playerArrowSync = true;
+	
+	@Config.Comment("Removes some blacksmith chest loot to match TAN")
+	@Config.Name("Blacksmith Chest Tweak")
+	public boolean blacksmithChestTweak = true;
+	
+	@Config.Comment("In Minecraft 1.2.5, players who get knocked back have their camera tilted in the direction of the attack.")
+	@Config.Name("Damage Tilt Effect")
+	public boolean damageTilt = true;
 }

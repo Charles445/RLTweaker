@@ -4,6 +4,7 @@ import com.charles445.rltweaker.RLTweaker;
 import com.charles445.rltweaker.capability.RLCapabilities;
 import com.charles445.rltweaker.capability.TweakerProvider;
 import com.charles445.rltweaker.config.ModConfig;
+import com.charles445.rltweaker.network.MessageUpdateAttackYaw;
 import com.charles445.rltweaker.network.MessageUpdateDismountStatus;
 import com.charles445.rltweaker.network.MessageUpdateEntityMovement;
 import com.charles445.rltweaker.network.PacketHandler;
@@ -14,10 +15,15 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import net.minecraft.world.storage.loot.LootPool;
+import net.minecraft.world.storage.loot.LootTable;
+import net.minecraft.world.storage.loot.LootTableList;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.EntityMountEvent;
+import net.minecraftforge.event.entity.living.LivingKnockBackEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -94,6 +100,64 @@ public class MinecraftHandler
 		{
 			MessageUpdateEntityMovement message = new MessageUpdateEntityMovement(arrow);
 			PacketHandler.instance.sendToAllAround(message, new TargetPoint(world.provider.getDimension(), arrow.posX, arrow.posY, arrow.posZ, 24));
+		}
+	}
+	
+	@SubscribeEvent
+	public void onLootTableLoad(LootTableLoadEvent event)
+	{
+		if(ModConfig.server.minecraft.blacksmithChestTweak)
+		{
+			if(event.getName().equals(LootTableList.CHESTS_VILLAGE_BLACKSMITH))
+			{
+				LootTable table = event.getTable();
+				if(table!=null)
+				{
+					//The pool needed is called 'main'
+					LootPool pool = table.getPool("main");
+					
+					if(pool != null)
+					{
+						//RLTweaker.logger.info("Removing loot from village blacksmiths...");
+						pool.removeEntry("minecraft:diamond");
+						//pool.removeEntry("minecraft:iron_ingot");
+						//pool.removeEntry("minecraft:gold_ingot");
+						//pool.removeEntry("minecraft:bread");
+						//pool.removeEntry("minecraft:apple");
+						pool.removeEntry("minecraft:iron_pickaxe");
+						pool.removeEntry("minecraft:iron_sword");
+						pool.removeEntry("minecraft:iron_chestplate");
+						pool.removeEntry("minecraft:iron_helmet");
+						pool.removeEntry("minecraft:iron_leggings");
+						pool.removeEntry("minecraft:iron_boots");
+						pool.removeEntry("minecraft:obsidian");
+						//pool.removeEntry("minecraft:sapling");
+						//pool.removeEntry("minecraft:saddle");
+						pool.removeEntry("minecraft:iron_horse_armor");
+						pool.removeEntry("minecraft:golden_horse_armor");
+						pool.removeEntry("minecraft:diamond_horse_armor");
+					}
+				}
+				
+			}
+		}
+	}
+	
+	@SubscribeEvent
+	public void onKnockback (LivingKnockBackEvent event)
+	{
+		if(!ModConfig.server.minecraft.damageTilt)
+			return;
+		
+		if(event.getEntityLiving() instanceof EntityPlayer)
+		{
+			EntityPlayer player = (EntityPlayer) event.getEntityLiving();
+			if(player.world.isRemote)
+				return;
+			
+			//Server Side
+			
+			PacketHandler.instance.sendTo(new MessageUpdateAttackYaw(player), (EntityPlayerMP) player);
 		}
 	}
 }

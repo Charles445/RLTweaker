@@ -12,4 +12,8 @@ public class ConfigBattleTowers
 	@Config.Comment("Make tower explosions belong to nobody, avoids Infernal Mobs issues")
 	@Config.Name("Change Tower Explosion Owner")
 	public boolean towerExplosionNoCredit = true;
+	
+	@Config.Comment("Make golems stop building up speed when dormant")
+	@Config.Name("Golem Dormant Speed Fix")
+	public boolean golemDormantSpeedFix = true;
 }

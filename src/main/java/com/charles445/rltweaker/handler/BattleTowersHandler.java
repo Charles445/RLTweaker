@@ -10,7 +10,9 @@ import com.charles445.rltweaker.reflect.BattleTowersReflect;
 import com.charles445.rltweaker.util.CriticalException;
 import com.charles445.rltweaker.util.ErrorUtil;
 
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -39,6 +41,40 @@ public class BattleTowersHandler
 		}
 	}
 	
+	@SubscribeEvent
+	public void onLivingUpdate(LivingUpdateEvent event)
+	{
+		//Golem Dormant Speed Fix
+		
+		if(!ModConfig.server.battletowers.golemDormantSpeedFix)
+			return;
+		
+		//Check if the updating entity is a golem
+		if(reflector.isEntityGolem(event.getEntityLiving()))
+		{
+			EntityLivingBase golem = event.getEntityLiving();
+			
+			//Check if the golem is dormant
+			
+			try
+			{
+				if(reflector.getIsDormant(golem))
+				{
+					//If the golem is dormant, reset its motion
+					golem.motionX = 0.0d;
+					golem.motionY = 0.0d;
+					golem.motionZ = 0.0d;
+				}
+			}
+			catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
+			{
+				//Report
+				ErrorUtil.logSilent("BT getIsDormant Invocation");
+				return;
+			}
+		}
+	}
+	
 	//Registering on high so it always runs before BattleTowers' ServerTickHandler
 	@SubscribeEvent(priority = EventPriority.HIGH)
 	public void onTick(TickEvent.WorldTickEvent tick)
@@ -48,9 +84,10 @@ public class BattleTowersHandler
 		if(!ModConfig.server.battletowers.towerExplosionNoCredit)
 			return;
 		
-		if(System.currentTimeMillis() > tickedTime + 14000L) // its a fourteen second timer ZZZ
+		if(System.currentTimeMillis() > tickedTime) 
 		{
-			tickedTime = System.currentTimeMillis();
+			tickedTime = System.currentTimeMillis() + 14000L; // its a fourteen second timer ZZZ
+			
 			//It takes 15000L for the tower destroyer to run its first explosion, so this will intervene before then
 			//If the game gets paused while these timers are counting down, due to priority this will run before the tower starts exploding
 			//Really shouldn't be pausing the game during these anyway...

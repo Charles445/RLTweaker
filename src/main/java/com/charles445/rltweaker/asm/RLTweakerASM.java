@@ -35,13 +35,7 @@ public class RLTweakerASM implements IClassTransformer
 			return;
 		}
 		
-		if(ASMConfig.getBoolean("general.patches.particleThreading", true))
-		{
-			new PatchConcurrentParticles();
-		}
-		
-		
-		
+		this.createPatches();
 	}
 	
 	@Override
@@ -89,6 +83,17 @@ public class RLTweakerASM implements IClassTransformer
 		
 		List<IPatch> patches = transformMap.get(target);
 		patches.add(patch);
+	}
+	
+	private void createPatches()
+	{
+		//Create all the patches
+		
+		//particleThreading
+		if(ASMConfig.getBoolean("general.patches.particleThreading", true))
+		{
+			new PatchConcurrentParticles();
+		}
 	}
 
 }

@@ -7,6 +7,8 @@ import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
+import com.charles445.rltweaker.asm.util.TransformUtil;
+
 public class PatchConcurrentParticles extends PatchManager
 {
 	public PatchConcurrentParticles()
@@ -20,65 +22,20 @@ public class PatchConcurrentParticles extends PatchManager
 			{
 				MethodNode m_init = findMethod(c_ParticleManager, "<init>");
 				
-				AbstractInsnNode anchor = first(m_init);
+				AbstractInsnNode anchor = TransformUtil.findNextFieldWithOpcodeAndName(first(m_init), Opcodes.PUTFIELD, "queue", "field_187241_h");
 				
-				boolean success = false;
+				if(anchor == null)
+					throw new RuntimeException("Couldn't find queue or field_187241_h");
 				
-				while(anchor != null)
-				{
-					if(anchor.getOpcode() == Opcodes.PUTFIELD)
-					{
-						FieldInsnNode invo = (FieldInsnNode)anchor;
-						
-						if(invo.name.equals("queue") || invo.name.equals("field_187241_h"))
-						{
-							AbstractInsnNode abstractHookCaller = previous(invo);
-							if(abstractHookCaller.getOpcode() == Opcodes.INVOKESTATIC)
-							{
-								MethodInsnNode hookCaller = (MethodInsnNode)abstractHookCaller;
-								if(hookCaller.name.equals("newArrayDeque") && hookCaller.owner.equals("com/google/common/collect/Queues"))
-								{
-									//Verified
-									/*
-										INVOKESTATIC
-										com/google/common/collect/Queues
-										newArrayDeque
-										()Ljava/util/ArrayDeque;
-										PUTFIELD
-										net/minecraft/client/particle/ParticleManager
-										field_187241_h
-										Ljava/util/Queue;
-									 */
-									hookCaller.owner = "com/charles445/rltweaker/hook/HookMinecraft";
-									hookCaller.name = "newConcurrentLinkedDeque";
-									hookCaller.desc = "()Ljava/util/concurrent/ConcurrentLinkedDeque;";
-									
-									success = true;
-									break;
-								}
-								else
-								{
-									throw new RuntimeException("Unexpected invocation... "+hookCaller.owner+" : "+hookCaller.name);
-								}
-							}
-							else
-							{
-								throw new RuntimeException("Previous instruction to queue putfield wasn't a static invocation");
-							}
-						}
-						
-					}
-					anchor = anchor.getNext();
-				}
+				MethodInsnNode hookCaller = TransformUtil.findPreviousCallWithOpcodeAndName(anchor, Opcodes.INVOKESTATIC, "newArrayDeque");
 				
-				if(!success)
-				{
-					throw new RuntimeException("Patch had no success state");
-				}
+				if(hookCaller == null)
+					throw new RuntimeException("Couldn't find newArrayDeque");
+				
+				hookCaller.owner = "com/charles445/rltweaker/hook/HookMinecraft";
+				hookCaller.name = "newConcurrentLinkedDeque";
+				hookCaller.desc = "()Ljava/util/concurrent/ConcurrentLinkedDeque;";
 			}
-			
 		});
 	}
-	
-	
 }

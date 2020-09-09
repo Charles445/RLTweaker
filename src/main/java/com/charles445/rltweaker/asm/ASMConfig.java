@@ -9,8 +9,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.charles445.rltweaker.RLTweaker;
-
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
@@ -71,7 +69,7 @@ public class ASMConfig
 		System.out.println("ConfigSetup is running.");
 		
 		//Look for the RLTweaker config
-		Path path = getConfig(RLTweaker.MODID);
+		Path path = getConfig("rltweaker");
 		
 		//TODO the boolean here is "Case Sensitive Categories"
 		//Which one is appropriate?

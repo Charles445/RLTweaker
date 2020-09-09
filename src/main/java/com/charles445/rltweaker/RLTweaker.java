@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 import com.charles445.rltweaker.capability.ITweakerCapability;
 import com.charles445.rltweaker.capability.TweakerCapability;
 import com.charles445.rltweaker.capability.TweakerStorage;
+import com.charles445.rltweaker.command.CommandAdvisor;
 import com.charles445.rltweaker.command.CommandErrorReport;
 import com.charles445.rltweaker.config.JsonConfig;
 import com.charles445.rltweaker.config.ModConfig;
@@ -51,16 +52,16 @@ public class RLTweaker
 {
 	//TODO Evaluate that this can be server side
 	
-    public static final String MODID = "rltweaker";
-    public static final String NAME = "RLTweaker";
-    public static final String VERSION = "0.4.0";
-    
-    @Mod.Instance(RLTweaker.MODID)
+	public static final String MODID = "rltweaker";
+	public static final String NAME = "RLTweaker";
+	public static final String VERSION = "0.4.0";
+	
+	@Mod.Instance(RLTweaker.MODID)
 	public static RLTweaker instance;
-    
-    @SidedProxy(clientSide = "com.charles445.rltweaker.proxy.ClientProxy",
+	
+	@SidedProxy(clientSide = "com.charles445.rltweaker.proxy.ClientProxy",
 			serverSide = "com.charles445.rltweaker.proxy.CommonProxy")
-    public static CommonProxy proxy;
+	public static CommonProxy proxy;
 	
 	public static Logger logger = LogManager.getLogger("RLTweaker");
 	
@@ -69,17 +70,17 @@ public class RLTweaker
 	public static Map<String, Object> handlers = new HashMap<>();
 	
 	@Mod.EventHandler
-    public void preInit(FMLPreInitializationEvent event)
-    {
+	public void preInit(FMLPreInitializationEvent event)
+	{
 		jsonDirectory = new File(event.getModConfigurationDirectory(), RLTweaker.MODID);
 		
 		PacketHandler.init();
 		
 		CapabilityManager.INSTANCE.register(ITweakerCapability.class, new TweakerStorage(), TweakerCapability::new);
 		
-    	handlers.put(ModNames.MINECRAFT, new MinecraftHandler());
-    	
-    	if(Loader.isModLoaded(ModNames.RESKILLABLE) && ModConfig.server.reskillable.enabled)
+		handlers.put(ModNames.MINECRAFT, new MinecraftHandler());
+		
+		if(Loader.isModLoaded(ModNames.RESKILLABLE) && ModConfig.server.reskillable.enabled)
 		{
 			handlers.put(ModNames.RESKILLABLE, new ReskillableHandler());
 		}
@@ -94,17 +95,17 @@ public class RLTweaker
 			handlers.put(ModNames.RUINS, new RuinsHandler());
 		}
 		
-    	if(Loader.isModLoaded(ModNames.WAYSTONES) && ModConfig.server.waystones.enabled)
-    	{
-    		handlers.put(ModNames.WAYSTONES, new WaystonesHandler());
-    	}
-    	
-    	proxy.preInit();
-    }
+		if(Loader.isModLoaded(ModNames.WAYSTONES) && ModConfig.server.waystones.enabled)
+		{
+			handlers.put(ModNames.WAYSTONES, new WaystonesHandler());
+		}
+		
+		proxy.preInit();
+	}
 	
 	@Mod.EventHandler
-    public void init(FMLInitializationEvent event)
-    {
+	public void init(FMLInitializationEvent event)
+	{
 		if(Loader.isModLoaded(ModNames.RECURRENTCOMPLEX) && ModConfig.server.recurrentcomplex.enabled)
 		{
 			handlers.put(ModNames.RECURRENTCOMPLEX, new RecurrentHandler());
@@ -116,39 +117,40 @@ public class RLTweaker
 		}
 		
 		proxy.init();
-    }
+	}
 	
-    @Mod.EventHandler
-    public void postInit(FMLPostInitializationEvent event)
-    {
-    	JsonConfig.init();
-    	
-    	proxy.postInit();
-    }
-    
-    @Mod.EventHandler
-    public void loadComplete(FMLLoadCompleteEvent event)
-    {
-    	//Motion Check Handler runs after everything else, that way the priority listed will always be after
+	@Mod.EventHandler
+	public void postInit(FMLPostInitializationEvent event)
+	{
+		JsonConfig.init();
+		
+		proxy.postInit();
+	}
+	
+	@Mod.EventHandler
+	public void loadComplete(FMLLoadCompleteEvent event)
+	{
+		//Motion Check Handler runs after everything else, that way the priority listed will always be after
 		new MotionCheckHandler();
-    	
-    	if(Loader.isModLoaded(ModNames.SOMANYENCHANTMENTS) && ModConfig.server.somanyenchantments.enabled)
-    	{
-    		handlers.put(ModNames.SOMANYENCHANTMENTS, new SMEHandler());
-    	}
-    	
-    	if(Loader.isModLoaded(ModNames.BATTLETOWERS) && ModConfig.server.battletowers.enabled)
-    	{
-    		handlers.put(ModNames.BATTLETOWERS, new BattleTowersHandler());
-    	}
-    	
-    	proxy.loadComplete();
-    }
-    
-    @Mod.EventHandler
+		
+		if(Loader.isModLoaded(ModNames.SOMANYENCHANTMENTS) && ModConfig.server.somanyenchantments.enabled)
+		{
+			handlers.put(ModNames.SOMANYENCHANTMENTS, new SMEHandler());
+		}
+		
+		if(Loader.isModLoaded(ModNames.BATTLETOWERS) && ModConfig.server.battletowers.enabled)
+		{
+			handlers.put(ModNames.BATTLETOWERS, new BattleTowersHandler());
+		}
+		
+		proxy.loadComplete();
+	}
+	
+	@Mod.EventHandler
 	public void serverStarting(FMLServerStartingEvent event)
 	{
-    	event.registerServerCommand(new CommandErrorReport());
+		event.registerServerCommand(new CommandAdvisor());
+		event.registerServerCommand(new CommandErrorReport());
 	}
-    
+	
 }

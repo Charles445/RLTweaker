@@ -4,8 +4,13 @@ import javax.annotation.Nullable;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.IntInsnNode;
+import org.objectweb.asm.tree.LocalVariableNode;
 import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.MethodNode;
+
+import com.charles445.rltweaker.asm.helper.ASMHelper;
 
 public class TransformUtil
 {
@@ -147,5 +152,27 @@ public class TransformUtil
 		return null;
 	}
 	
+	public static void insertBeforeFirst(MethodNode mNode, InsnList insnList)
+	{
+		mNode.instructions.insertBefore(ASMHelper.findFirstInstruction(mNode), insnList);
+	}
 	
+	/** Search for the LocalVariableNode with a matching desc*/
+	@Nullable
+	public static LocalVariableNode findLocalVariableWithDesc(final MethodNode methodNode, final String desc)
+	{
+		int count = 0;
+		LocalVariableNode result = null;
+		
+		for(LocalVariableNode lvNode : methodNode.localVariables)
+		{
+			if(lvNode.desc.equals(desc))
+			{
+				result = lvNode;
+				count++;
+			}
+		}
+		
+		return result;
+	}
 }

@@ -110,7 +110,7 @@ public class CompatUtil
 			
 			
 			for(Map.Entry<Object, ArrayList<IEventListener>> listener_entry : listeners.entrySet())
-	        {
+			{
 				handler = listener_entry.getKey();
 				if (handler.getClass().getName().equals(name))
 				{
@@ -173,7 +173,7 @@ public class CompatUtil
 						break;
 					}
 				}
-	        }
+			}
 			
 			return null;
 		}

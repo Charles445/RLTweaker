@@ -52,18 +52,39 @@ public abstract class Patch implements IPatch
 	//FIND FIRST METHOD (by string)
 	
 	/**
-	 * Finds the first method with the matching name
+	 * Finds the first method with the matching choice of names
 	 * @param classNode
 	 * @param methodName
 	 * @return
 	 */
 	@Nullable
-	protected MethodNode findMethod(ClassNode classNode, String methodName)
+	protected MethodNode findMethod(ClassNode classNode, String... methodNames)
 	{
 		for(MethodNode m : classNode.methods)
 		{
-			if(m.name.equals(methodName))
-				return m;
+			for(String methodName : methodNames)
+			{
+				if(m.name.equals(methodName))
+					return m;
+			}
+		}
+		
+		return null;
+	}
+	
+	@Nullable
+	protected MethodNode findMethodWithDesc(ClassNode classNode, String desc, String... methodNames)
+	{
+		for(MethodNode m : classNode.methods)
+		{
+			if(m.desc.equals(desc))
+			{
+				for(String methodName : methodNames)
+				{
+					if(m.name.equals(methodName))
+						return m;
+				}
+			}
 		}
 		
 		return null;
@@ -164,4 +185,5 @@ public abstract class Patch implements IPatch
 		
 		return anchor;
 	}
+	
 }

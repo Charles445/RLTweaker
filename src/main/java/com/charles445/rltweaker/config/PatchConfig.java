@@ -18,4 +18,8 @@ public class PatchConfig
 	@Config.RequiresMcRestart
 	@Config.Comment("Makes the particle queue threaded. Fixes concurrency issue with logical server creating physical client particles.")
 	public boolean particleThreading = true;
+	
+	@Config.RequiresMcRestart
+	@Config.Comment("Makes some entities stop checking for large entity collisions")
+	public boolean lessCollisions = true;
 }

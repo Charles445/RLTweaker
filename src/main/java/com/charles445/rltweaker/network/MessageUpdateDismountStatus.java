@@ -83,19 +83,19 @@ public class MessageUpdateDismountStatus implements IMessage
 				return;
 			
 			if (player.getRidingEntity() != null)
-	        {
-	            Entity entity = player.getRidingEntity();
-	            try
-	            {
-	            	//player.sendMessage(new TextComponentString("Desync fix"));
-	            	f_ridingEntity.set(player, null);
-	            	m_removePassenger.invoke(entity, player);
-	            }
-	            catch(Exception e)
-	            {
-	            	//Ok
-	            }
-	        }
+			{
+				Entity entity = player.getRidingEntity();
+				try
+				{
+					//player.sendMessage(new TextComponentString("Desync fix"));
+					f_ridingEntity.set(player, null);
+					m_removePassenger.invoke(entity, player);
+				}
+				catch(Exception e)
+				{
+					//Ok
+				}
+			}
 		}
 		
 	}

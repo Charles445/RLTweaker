@@ -68,30 +68,8 @@ public class RLTweakerASM implements IClassTransformer
 				}
 			}
 			
-			//ClassWriter writer = new ComputeClassWriter(flags);
-			//clazzNode.accept(writer);
-			//return writer.toByteArray();
-			
 			return ASMHelper.writeClassToBytes(clazzNode, flags);
 			
-			/*
-			byte[] clazzToBytes;
-			
-			try
-			{
-				clazzToBytes = ASMHelper.writeClassToBytes(clazzNode, flags);
-			}
-			catch(Exception e)
-			{
-				//TODO incorporate OBF
-				System.out.println("WARNING: Uzing ComputeClassWriter for "+transformedName);
-				ClassWriter writer = new ComputeClassWriter(flags);
-				clazzNode.accept(writer);
-				clazzToBytes = writer.toByteArray();
-			}
-			
-			return clazzToBytes;
-			*/
 		}
 		
 		
@@ -119,16 +97,11 @@ public class RLTweakerASM implements IClassTransformer
 			new PatchConcurrentParticles();
 		}
 		
-		//new PatchHopperEvent();
-		
 		//lessCollisions
 		if(ASMConfig.getBoolean("general.patches.lessCollisions", true))
 		{
 			new PatchLessCollisions();
 		}
-		
-		//DEBUG
-		//new PatchParticleHandling();
 	}
 
 }

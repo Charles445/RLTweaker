@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import com.charles445.rltweaker.config.ModConfig;
 import com.charles445.rltweaker.util.WorldRadiusUtil;
 
 import net.minecraft.entity.Entity;
@@ -19,7 +18,7 @@ public class HookWorld
 	{
 		if(entity instanceof EntityItem)
 		{
-			return WorldRadiusUtil.getEntitiesWithinAABBExcludingEntity(world, entity, bb, 2.0d);
+			return WorldRadiusUtil.instance.getEntitiesWithinAABBExcludingEntity(world, entity, bb, 2.0d);
 		}
 		return world.getEntitiesWithinAABBExcludingEntity(entity, bb);
 	}

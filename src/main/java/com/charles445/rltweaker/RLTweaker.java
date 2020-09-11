@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -24,9 +25,11 @@ import com.charles445.rltweaker.handler.RuinsHandler;
 import com.charles445.rltweaker.handler.SMEHandler;
 import com.charles445.rltweaker.handler.TANHandler;
 import com.charles445.rltweaker.handler.WaystonesHandler;
+import com.charles445.rltweaker.network.NetworkHandler;
 import com.charles445.rltweaker.network.PacketHandler;
 import com.charles445.rltweaker.proxy.CommonProxy;
 import com.charles445.rltweaker.util.ModNames;
+import com.charles445.rltweaker.util.VersionDelimiter;
 
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fml.common.Loader;
@@ -37,6 +40,8 @@ import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.common.network.NetworkCheckHandler;
+import net.minecraftforge.fml.relauncher.Side;
 
 @Mod
 (
@@ -44,7 +49,7 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 	name = RLTweaker.NAME, 
 	version = RLTweaker.VERSION,
 	acceptedMinecraftVersions = "[1.12]",
-	acceptableRemoteVersions = "[0.4.0,)" //Last update - Damage Tilt
+	acceptableRemoteVersions = "[0.3.0,)" //THIS IS NO LONGER USED
 	//updateJSON = "https://raw.githubusercontent.com/Charles445/SimpleDifficulty/master/modupdatechecker.json"
 	
 )
@@ -55,6 +60,8 @@ public class RLTweaker
 	public static final String MODID = "rltweaker";
 	public static final String NAME = "RLTweaker";
 	public static final String VERSION = "0.4.0";
+	public static final VersionDelimiter VERSION_DELIMITER = new VersionDelimiter(VERSION);
+	public static final VersionDelimiter MINIMUM_VERSION = new VersionDelimiter("0.3.0");
 	
 	@Mod.Instance(RLTweaker.MODID)
 	public static RLTweaker instance;
@@ -68,6 +75,7 @@ public class RLTweaker
 	public static File jsonDirectory;
 	
 	public static Map<String, Object> handlers = new HashMap<>();
+	
 	
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event)
@@ -151,6 +159,54 @@ public class RLTweaker
 	{
 		event.registerServerCommand(new CommandAdvisor());
 		event.registerServerCommand(new CommandErrorReport());
+	}
+	
+	@NetworkCheckHandler
+	public boolean checkVersion(Map<String, String> values, Side side)
+	{
+		String version = values.get(MODID);
+		
+		if(side == Side.SERVER)
+		{
+			NetworkHandler.serverHasVersioning = false;
+			
+			//System.out.println("checkVersion SERVER");
+			if(StringUtils.isEmpty(version))
+			{
+				NetworkHandler.serverVersion = new VersionDelimiter("0.0.0");
+			}
+			else
+			{
+				VersionDelimiter servervd = new VersionDelimiter(version);
+				NetworkHandler.serverVersion = servervd;
+				if(servervd.isNewerVersionThan(0, 4))
+				{
+					NetworkHandler.serverHasVersioning = true;
+				}
+			}
+			
+			RLTweaker.logger.trace("Server Version: "+NetworkHandler.serverVersion);
+			RLTweaker.logger.trace("Local Version: "+VERSION_DELIMITER);
+			RLTweaker.logger.trace("Server Has Versioning: "+NetworkHandler.serverHasVersioning);
+			
+			return true;
+		}
+		else
+		{
+			//System.out.println("checkVersion CLIENT");
+			if(StringUtils.isEmpty(version))
+				return false;
+			
+			VersionDelimiter clientvd = new VersionDelimiter(version);
+			
+			RLTweaker.logger.trace("Client Version: "+clientvd);
+			RLTweaker.logger.trace("Local Version: "+VERSION_DELIMITER);
+			
+			boolean result = clientvd.isNewerVersionThan(MINIMUM_VERSION);
+			RLTweaker.logger.trace("Result: "+result);
+			
+			return result;
+		}
 	}
 	
 }

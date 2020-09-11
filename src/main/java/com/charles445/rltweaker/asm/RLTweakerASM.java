@@ -48,6 +48,7 @@ public class RLTweakerASM implements IClassTransformer
 		//Check for patches
 		if(transformMap.containsKey(transformedName))
 		{
+			System.out.println("Patch exists for "+transformedName);
 			int flags = 0;
 			
 			ClassNode clazzNode = ASMHelper.readClassFromBytes(basicClass);
@@ -68,12 +69,27 @@ public class RLTweakerASM implements IClassTransformer
 				}
 			}
 			
+			//TODO verbose
+			System.out.println("Writing class "+transformedName+" with flags "+flagsAsString(flags));
+			
 			return ASMHelper.writeClassToBytes(clazzNode, flags);
 			
 		}
 		
 		
 		return basicClass;
+	}
+	
+	public static String flagsAsString(int flags)
+	{
+		switch(flags)
+		{
+			case 0: return "None";
+			case 1: return "MAXS";
+			case 2: return "FRAMES";
+			case 3: return "MAXS | FRAMES";
+			default: return "(unknown "+flags+")";
+		}
 	}
 	
 	public static void addPatch(IPatch patch)

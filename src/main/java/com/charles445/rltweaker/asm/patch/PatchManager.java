@@ -13,7 +13,7 @@ public abstract class PatchManager implements IPatchManager
 	
 	public PatchManager(String name)
 	{
-		System.out.println("RLTweakerASM Patching: "+name);
+		System.out.println("RLTweakerASM PatchManager: "+name);
 		this.name = name;
 	}
 	

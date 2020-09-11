@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import com.charles445.rltweaker.RLTweaker;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 
@@ -19,37 +20,51 @@ import net.minecraft.world.chunk.Chunk;
 
 public class WorldRadiusUtil
 {
-	
 	//All uses of MAX_ENTITY_RADIUS, with a variable size
 	
-	private static Method m_isChunkLoaded;
+	public static WorldRadiusUtil instance = new WorldRadiusUtil();
 	
-	private static boolean errorgetEntitiesInAABBexcluding;
-	private static boolean errorgetEntitiesInAABB;
+	private Method m_isChunkLoaded;
 	
-	static
+	private boolean errorgetEntitiesInAABBexcluding;
+	private boolean errorgetEntitiesInAABB;
+	
+	private boolean working = false;
+	
+	public WorldRadiusUtil()
 	{
 		errorgetEntitiesInAABBexcluding = false;
 		errorgetEntitiesInAABB = false;
+		working = false;
 		
-		try 
+		try
 		{
 			m_isChunkLoaded = ReflectUtil.findMethodAny(World.class, "func_175680_a", "isChunkLoaded", int.class, int.class, boolean.class);
-		} 
-		catch (Exception e)
-		{
-			throw new RuntimeException("HookWorld failed, disable any RLTweaker patches that use it", e);
+			working = true;
+			RLTweaker.logger.debug("WorldRadiusUtil initialized");
 		}
+		catch(Exception e)
+		{
+			RLTweaker.logger.error("HookWorld failed, please consider sending this log to the RLTweaker dev!",e);
+			ErrorUtil.logSilent("WorldRadiusUtil Instantiation Failure");
+		}
+	}
+	
+	public List<Entity> getEntitiesWithinAABBExcludingEntity(World world, @Nullable Entity entityIn, AxisAlignedBB bb, double size)
+	{
+		if(!working)
+			return world.getEntitiesWithinAABBExcludingEntity(entityIn, bb);
 		
-	}
-	
-	public static List<Entity> getEntitiesWithinAABBExcludingEntity(World world, @Nullable Entity entityIn, AxisAlignedBB bb, double size)
-	{
+		
 		return getEntitiesInAABBexcluding(world, entityIn, bb, EntitySelectors.NOT_SPECTATING, size);
+			
 	}
 	
-	public static List<Entity> getEntitiesInAABBexcluding(World world, @Nullable Entity entity, AxisAlignedBB bb, @Nullable Predicate <? super Entity > predicate, double size)
+	public List<Entity> getEntitiesInAABBexcluding(World world, @Nullable Entity entity, AxisAlignedBB bb, @Nullable Predicate <? super Entity > predicate, double size)
 	{
+		if(!working)
+			return world.getEntitiesInAABBexcluding(entity, bb, predicate);
+		
 		List<Entity> list = Lists.<Entity>newArrayList();
 		int j2 = MathHelper.floor((bb.minX - size) / 16.0D);
 		int k2 = MathHelper.floor((bb.maxX + size) / 16.0D);
@@ -84,13 +99,19 @@ public class WorldRadiusUtil
 		return list;
 	}
 	
-	public static  <T extends Entity> List<T>  getEntitiesWithinAABB(World world, Class <? extends T > classEntity, AxisAlignedBB bb, double size)
+	public <T extends Entity> List<T>  getEntitiesWithinAABB(World world, Class <? extends T > classEntity, AxisAlignedBB bb, double size)
 	{
+		if(!working)
+			return world.getEntitiesWithinAABB(classEntity, bb);
+		
 		return getEntitiesWithinAABB(world, classEntity, bb, EntitySelectors.NOT_SPECTATING, size);
 	}
 	
-	public static  <T extends Entity> List<T> getEntitiesWithinAABB(World world, Class <? extends T > clazz, AxisAlignedBB aabb, @Nullable Predicate <? super T > filter, double size)
+	public <T extends Entity> List<T> getEntitiesWithinAABB(World world, Class <? extends T > clazz, AxisAlignedBB aabb, @Nullable Predicate <? super T > filter, double size)
 	{
+		if(!working)
+			return world.getEntitiesWithinAABB(clazz, aabb, filter);
+		
 		int j2 = MathHelper.floor((aabb.minX - size) / 16.0D);
 		int k2 = MathHelper.ceil((aabb.maxX + size) / 16.0D);
 		int l2 = MathHelper.floor((aabb.minZ - size) / 16.0D);
@@ -125,8 +146,14 @@ public class WorldRadiusUtil
 		return list;
 	}
 	
-	public static <T extends Entity> void getEntitiesOfTypeWithinAABB(Chunk chunk, Class <? extends T > entityClass, AxisAlignedBB aabb, List<T> listToFill, Predicate <? super T > filter, double size)
+	public <T extends Entity> void getEntitiesOfTypeWithinAABB(Chunk chunk, Class <? extends T > entityClass, AxisAlignedBB aabb, List<T> listToFill, Predicate <? super T > filter, double size)
 	{
+		if(!working)
+		{
+			chunk.getEntitiesOfTypeWithinAABB(entityClass, aabb, listToFill, filter);
+			return;
+		}
+		
 		ClassInheritanceMultiMap<Entity>[] entityLists = chunk.getEntityLists();
 		int i = MathHelper.floor((aabb.minY - size) / 16.0D);
 		int j = MathHelper.floor((aabb.maxY + size) / 16.0D);
@@ -145,8 +172,13 @@ public class WorldRadiusUtil
 		}
 	}
 	
-	public static void getEntitiesWithinAABBForEntity(Chunk chunk, @Nullable Entity entityIn, AxisAlignedBB aabb, List<Entity> listToFill, Predicate <? super Entity > filter, double size)
+	public void getEntitiesWithinAABBForEntity(Chunk chunk, @Nullable Entity entityIn, AxisAlignedBB aabb, List<Entity> listToFill, Predicate <? super Entity > filter, double size)
 	{
+		if(!working)
+		{
+			chunk.getEntitiesWithinAABBForEntity(entityIn, aabb, listToFill, filter);
+		}
+		
 		ClassInheritanceMultiMap<Entity>[] entityLists = chunk.getEntityLists();
 		int i = MathHelper.floor((aabb.minY - size) / 16.0D);
 		int j = MathHelper.floor((aabb.maxY + size) / 16.0D);

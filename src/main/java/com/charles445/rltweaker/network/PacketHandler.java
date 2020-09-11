@@ -12,15 +12,17 @@ public class PacketHandler
 	
 	public static void init()
 	{
+		//0.2.0
 		instance.registerMessage(MessageUpdateEntityMovement.Handler.class, MessageUpdateEntityMovement.class, 0, Side.CLIENT);
 		instance.registerMessage(MessageUpdateDismountStatus.Handler.class, MessageUpdateDismountStatus.class, 1, Side.CLIENT);
+		
+		//0.3.0
 		instance.registerMessage(MessageUpdateAttackYaw.Handler.class, MessageUpdateAttackYaw.class, 2, Side.CLIENT);
-		/*
-		instance.registerMessage(MessageUpdateThirst.Handler.class, MessageUpdateThirst.class, 0, Side.CLIENT);
-		instance.registerMessage(MessageDrinkWater.Handler.class, MessageDrinkWater.class, 1, Side.SERVER);
-		instance.registerMessage(MessageConfigLAN.Handler.class, MessageConfigLAN.class, 2, Side.SERVER);
-		instance.registerMessage(MessageUpdateConfig.Handler.class, MessageUpdateConfig.class, 3, Side.CLIENT);
-		instance.registerMessage(MessageUpdateTemperature.Handler.class, MessageUpdateTemperature.class, 4, Side.CLIENT);
-		*/
+		
+		//0.4.0
+		instance.registerMessage(MessageSendVersion.Handler.class, MessageSendVersion.class, 3, Side.SERVER);
+		
+		
+		
 	}
 }

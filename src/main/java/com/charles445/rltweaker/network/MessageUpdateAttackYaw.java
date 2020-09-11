@@ -1,6 +1,7 @@
 package com.charles445.rltweaker.network;
 
 import com.charles445.rltweaker.config.ModConfig;
+import com.charles445.rltweaker.util.VersionDelimiter;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
@@ -14,6 +15,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class MessageUpdateAttackYaw implements IMessage
 {
 	private float attackedAtYaw;
+	
+	public static final VersionDelimiter VERSION = new VersionDelimiter("0.4.0");
 	
 	public MessageUpdateAttackYaw()
 	{

@@ -7,7 +7,7 @@ import com.charles445.rltweaker.asm.helper.ObfHelper;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 
 @IFMLLoadingPlugin.Name("RLTweaker ASM")
-@IFMLLoadingPlugin.SortingIndex(1001)
+@IFMLLoadingPlugin.SortingIndex(1002)
 @IFMLLoadingPlugin.TransformerExclusions({ "com.charles445.rltweaker.asm", "com.charles445.rltweaker.asm." })
 
 public class CoreLoader implements IFMLLoadingPlugin

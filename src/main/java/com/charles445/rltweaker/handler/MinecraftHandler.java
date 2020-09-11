@@ -4,9 +4,11 @@ import com.charles445.rltweaker.RLTweaker;
 import com.charles445.rltweaker.capability.RLCapabilities;
 import com.charles445.rltweaker.capability.TweakerProvider;
 import com.charles445.rltweaker.config.ModConfig;
+import com.charles445.rltweaker.network.MessageSendVersion;
 import com.charles445.rltweaker.network.MessageUpdateAttackYaw;
 import com.charles445.rltweaker.network.MessageUpdateDismountStatus;
 import com.charles445.rltweaker.network.MessageUpdateEntityMovement;
+import com.charles445.rltweaker.network.NetworkHandler;
 import com.charles445.rltweaker.network.PacketHandler;
 import com.charles445.rltweaker.network.TaskScheduler;
 
@@ -26,6 +28,7 @@ import net.minecraftforge.event.entity.EntityMountEvent;
 import net.minecraftforge.event.entity.living.LivingKnockBackEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraftforge.fml.relauncher.Side;
@@ -81,6 +84,51 @@ public class MinecraftHandler
 			//Send a packet to the player of the player to dismount then and there
 			MessageUpdateDismountStatus message = new MessageUpdateDismountStatus();
 			PacketHandler.instance.sendTo(message, (EntityPlayerMP)event.getEntityMounting());
+		}
+	}
+	
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	public void onClientPlayerJoinWorldEvent(EntityJoinWorldEvent event)
+	{
+		if(!event.getWorld().isRemote)
+			return;
+		
+		//Client logical
+		
+		if(event.getEntity() instanceof EntityPlayer)
+		{
+			//EntityPlayer
+			
+			EntityPlayer localPlayer = RLTweaker.proxy.getClientMinecraftPlayer();
+			
+			if(localPlayer==null)
+				return;
+			
+			//Client logical
+			//Client physical
+			
+			EntityPlayer entPlayer = (EntityPlayer)event.getEntity();
+			
+			
+			if(entPlayer.getGameProfile().getId().equals(localPlayer.getGameProfile().getId()))
+			{
+				//Player is you
+				if(NetworkHandler.serverHasVersioning)
+				{
+					//Create a message to the server to let them know your version
+					RLTweaker.logger.debug("Sending MessageSendVersion to server");
+					PacketHandler.instance.sendToServer(new MessageSendVersion(RLTweaker.VERSION_DELIMITER));
+				}
+			}
+		}
+	}
+	
+	@SubscribeEvent(priority = EventPriority.LOWEST)
+	public void onPlayerLoggedOutEvent(PlayerLoggedOutEvent event)
+	{
+		if(event.player!=null)
+		{
+			NetworkHandler.removeClient(event.player.getGameProfile().getId());
 		}
 	}
 	
@@ -156,8 +204,8 @@ public class MinecraftHandler
 				return;
 			
 			//Server Side
-			
-			PacketHandler.instance.sendTo(new MessageUpdateAttackYaw(player), (EntityPlayerMP) player);
+			if(NetworkHandler.isVersionAtLeast(0, 4, player))
+				PacketHandler.instance.sendTo(new MessageUpdateAttackYaw(player), (EntityPlayerMP) player);
 		}
 	}
 }

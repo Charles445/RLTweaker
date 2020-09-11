@@ -1,17 +1,11 @@
 package com.charles445.rltweaker.asm.patch;
 
-
-
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
 import com.charles445.rltweaker.asm.util.TransformUtil;
-
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.world.World;
 
 public class PatchLessCollisions extends PatchManager
 {
@@ -34,8 +28,10 @@ public class PatchLessCollisions extends PatchManager
 				MethodInsnNode getAABBCall = TransformUtil.findNextCallWithOpcodeAndName(first(m_getCollisionBoxes), Opcodes.INVOKEVIRTUAL, "func_72839_b", "getEntitiesWithinAABBExcludingEntity");
 				
 				if(getAABBCall == null)
+				{
 					throw new RuntimeException("Couldn't find getEntitiesWithinAABBExcludingEntity or func_72839_b");
-				
+					
+				}
 				//Stack here should have everything needed for the static call, which is convenient.
 				getAABBCall.setOpcode(Opcodes.INVOKESTATIC);
 				getAABBCall.owner = "com/charles445/rltweaker/hook/HookWorld";

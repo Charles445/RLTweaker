@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.MethodNode;
 
 import com.charles445.rltweaker.asm.helper.ASMHelper;
@@ -186,4 +187,13 @@ public abstract class Patch implements IPatch
 		return anchor;
 	}
 	
+	protected InsnList wrap(AbstractInsnNode... nodes)
+	{
+		InsnList wrapper = new InsnList();
+		for(AbstractInsnNode node : nodes)
+		{
+			wrapper.add(node);
+		}
+		return wrapper;
+	}
 }

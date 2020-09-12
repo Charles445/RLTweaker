@@ -19,6 +19,8 @@ import com.charles445.rltweaker.config.json.JsonDoubleBlockState;
 import com.charles445.rltweaker.config.json.JsonFileName;
 import com.charles445.rltweaker.config.json.JsonTypeToken;
 import com.charles445.rltweaker.handler.ReskillableHandler;
+import com.charles445.rltweaker.util.CollisionUtil;
+import com.charles445.rltweaker.util.ErrorUtil;
 import com.charles445.rltweaker.util.ModNames;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -29,10 +31,26 @@ public class JsonConfig
 {
 	public static List<String> jsonErrors = new ArrayList<String>();
 	
+	public static Map<String, Double> lessCollisions = new HashMap<>();
 	public static Map<String, List<JsonDoubleBlockState>> reskillableTransmutation = new HashMap<>();
 	
 	public static void init()
 	{
+		if(ModConfig.patches.lessCollisions)
+		{
+			JsonConfig.lessCollisions.clear();
+			JsonConfig.lessCollisions.put("net.minecraft.entity.item.EntityItem", 2.0d);
+			JsonConfig.lessCollisions.put("net.minecraft.entity.passive.EntityChicken", 2.0d);
+			JsonConfig.lessCollisions.put("net.minecraft.entity.passive.EntitySquid", 2.0d);
+			
+			JsonConfig.lessCollisions = processJson(JsonFileName.lessCollisions, JsonConfig.lessCollisions, false);
+			
+			if(JsonConfig.lessCollisions == null)
+				JsonConfig.lessCollisions = new HashMap<>();
+			
+			CollisionUtil.instance.addToStringReference(lessCollisions);
+		}
+		
 		if(Loader.isModLoaded(ModNames.RESKILLABLE) && ModConfig.server.reskillable.enabled && ModConfig.server.reskillable.customTransmutation)
 		{
 			JsonConfig.reskillableTransmutation.clear();
@@ -62,7 +80,8 @@ public class JsonConfig
 		catch(Exception e)
 		{
 			RLTweaker.logger.error("Error managing JSON File: "+jfn.get(), e);
-			jsonErrors.add("config/simpledifficulty/"+jfn.get()+" failed to load!");
+			jsonErrors.add("config/rltweaker/"+jfn.get()+" failed to load!");
+			ErrorUtil.logSilent("JSON Error: "+jfn.get());
 			if(forMerging)
 			{
 				return null;

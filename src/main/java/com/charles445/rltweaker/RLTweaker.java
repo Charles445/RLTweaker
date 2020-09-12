@@ -12,6 +12,7 @@ import com.charles445.rltweaker.capability.ITweakerCapability;
 import com.charles445.rltweaker.capability.TweakerCapability;
 import com.charles445.rltweaker.capability.TweakerStorage;
 import com.charles445.rltweaker.command.CommandAdvisor;
+import com.charles445.rltweaker.command.CommandDebug;
 import com.charles445.rltweaker.command.CommandErrorReport;
 import com.charles445.rltweaker.config.JsonConfig;
 import com.charles445.rltweaker.config.ModConfig;
@@ -158,6 +159,7 @@ public class RLTweaker
 	public void serverStarting(FMLServerStartingEvent event)
 	{
 		event.registerServerCommand(new CommandAdvisor());
+		event.registerServerCommand(new CommandDebug());
 		event.registerServerCommand(new CommandErrorReport());
 	}
 	

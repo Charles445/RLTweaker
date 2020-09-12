@@ -6,6 +6,7 @@ import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.IntInsnNode;
+import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.LocalVariableNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
@@ -18,7 +19,7 @@ public class TransformUtil
 	@Nullable
 	public static FieldInsnNode findNextFieldWithOpcodeAndName(AbstractInsnNode anchor, int opcode, String... names)
 	{
-		AbstractInsnNode search = anchor.getNext();
+		AbstractInsnNode search = ASMHelper.findNextInstructionWithOpcode(anchor, opcode);
 		
 		while(search!=null)
 		{
@@ -32,7 +33,7 @@ public class TransformUtil
 					}
 				}
 			}
-			search = search.getNext();
+			search = ASMHelper.findNextInstructionWithOpcode(search, opcode);
 		}
 		
 		return null;
@@ -42,7 +43,7 @@ public class TransformUtil
 	@Nullable
 	public static FieldInsnNode findPreviousFieldWithOpcodeAndName(AbstractInsnNode anchor, int opcode, String... names)
 	{
-		AbstractInsnNode search = anchor.getPrevious();
+		AbstractInsnNode search = ASMHelper.findPreviousInstructionWithOpcode(anchor, opcode);
 		
 		while(search!=null)
 		{
@@ -56,7 +57,7 @@ public class TransformUtil
 					}
 				}
 			}
-			search = search.getPrevious();
+			search = ASMHelper.findPreviousInstructionWithOpcode(search, opcode);
 		}
 		
 		return null;
@@ -66,7 +67,7 @@ public class TransformUtil
 	@Nullable
 	public static IntInsnNode findNextIntInsnNodeWithValue(AbstractInsnNode anchor, int value)
 	{
-		AbstractInsnNode search = anchor.getNext();
+		AbstractInsnNode search = ASMHelper.findNextInstruction(anchor);
 		
 		while(search!=null)
 		{
@@ -77,7 +78,7 @@ public class TransformUtil
 					return (IntInsnNode) search;
 				}
 			}
-			search = search.getNext();
+			search = ASMHelper.findNextInstruction(search);
 		}
 		
 		return null;
@@ -87,7 +88,7 @@ public class TransformUtil
 	@Nullable
 	public static IntInsnNode findPreviousIntInsnNodeWithValue(AbstractInsnNode anchor, int value)
 	{
-		AbstractInsnNode search = anchor.getPrevious();
+		AbstractInsnNode search = ASMHelper.findPreviousInstruction(anchor);
 		
 		while(search!=null)
 		{
@@ -98,7 +99,7 @@ public class TransformUtil
 					return (IntInsnNode) search;
 				}
 			}
-			search = search.getPrevious();
+			search = ASMHelper.findPreviousInstruction(search);
 		}
 		
 		return null;
@@ -108,7 +109,7 @@ public class TransformUtil
 	@Nullable
 	public static MethodInsnNode findNextCallWithOpcodeAndName(AbstractInsnNode anchor, int opcode, String... names)
 	{
-		AbstractInsnNode search = anchor.getNext();
+		AbstractInsnNode search = ASMHelper.findNextInstructionWithOpcode(anchor, opcode);
 			
 		while(search!=null)
 		{
@@ -122,7 +123,7 @@ public class TransformUtil
 					}
 				}
 			}
-			search = search.getNext();
+			search = ASMHelper.findNextInstructionWithOpcode(search, opcode);
 		}
 		
 		return null;
@@ -132,7 +133,7 @@ public class TransformUtil
 	@Nullable
 	public static MethodInsnNode findPreviousCallWithOpcodeAndName(AbstractInsnNode anchor, int opcode, String... names)
 	{
-		AbstractInsnNode search = anchor.getPrevious();
+		AbstractInsnNode search = ASMHelper.findPreviousInstructionWithOpcode(anchor, opcode);
 			
 		while(search!=null)
 		{
@@ -146,7 +147,7 @@ public class TransformUtil
 					}
 				}
 			}
-			search = search.getPrevious();
+			search = ASMHelper.findPreviousInstructionWithOpcode(search, opcode);
 		}
 		
 		return null;
@@ -174,5 +175,45 @@ public class TransformUtil
 		}
 		
 		return result;
+	}
+	
+	@Nullable
+	/** REQUIRES MAXS : Creates, but does not add, a new local variable node */
+	public static LocalVariableNode createNewLocalVariable(final MethodNode methodNode, String name, String desc)
+	{
+		int index=0;
+		for(LocalVariableNode lvn : methodNode.localVariables)
+		{
+			if(lvn.index >= index)
+				index = lvn.index + 1;
+		}
+		
+		AbstractInsnNode anchor = methodNode.instructions.getFirst();
+		LabelNode l1 = null;
+		LabelNode l2 = null;
+		
+		//First and last labels of the method
+		while(anchor!=null)
+		{
+			if(anchor instanceof LabelNode)
+			{
+				if(l1==null)
+				{
+					l1 = (LabelNode)anchor;
+				}
+				
+				l2 = (LabelNode)anchor;
+			}
+			
+			anchor = anchor.getNext();
+		}
+		
+		if(l1 == null | l2 == null)
+		{
+			//Failure, didn't manage the labels
+			return null;
+		}
+		
+		return new LocalVariableNode(name,desc,null,l1,l2,index);
 	}
 }

@@ -32,4 +32,8 @@ public class ConfigMinecraft
 	@Config.Comment("In Minecraft 1.2.5, players who get knocked back have their camera tilted in the direction of the attack.")
 	@Config.Name("Damage Tilt Effect")
 	public boolean damageTilt = true;
+	
+	@Config.Comment("Requires lessCollisions patch, toggle the patch instead unless you are benchmarking")
+	@Config.Name("Less Collisions")
+	public boolean lessCollisions = true;
 }

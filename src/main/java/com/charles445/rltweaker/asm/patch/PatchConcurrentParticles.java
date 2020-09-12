@@ -1,5 +1,6 @@
 package com.charles445.rltweaker.asm.patch;
 
+import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
@@ -14,7 +15,7 @@ public class PatchConcurrentParticles extends PatchManager
 	{
 		super("Concurrent Particles");
 		
-		add(new Patch(this, "net.minecraft.client.particle.ParticleManager", 0)
+		add(new Patch(this, "net.minecraft.client.particle.ParticleManager", ClassWriter.COMPUTE_MAXS)
 		{
 			@Override
 			public void patch(ClassNode c_ParticleManager)

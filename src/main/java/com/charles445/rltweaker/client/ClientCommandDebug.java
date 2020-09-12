@@ -34,7 +34,25 @@ public class ClientCommandDebug extends ClientCommandBase
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
 	{
-		checkParticles(server, sender, args);
+		if(args.length > 0)
+		{
+			try
+			{
+				double val = Double.parseDouble(args[0]);
+				if(val < 2.0d)
+					val = 2.0d;
+				if(val > 100.0d)
+					val = 100.0d;
+				inform("Setting Client MAX_ENTITY_RADIUS to: "+val, sender);
+				Minecraft.getMinecraft().player.getEntityWorld().MAX_ENTITY_RADIUS = val;
+			}
+			catch(NumberFormatException e)
+			{
+				
+			}
+		}
+		
+		//checkParticles(server, sender, args);
 	}
 	
 	//Particle Debug...

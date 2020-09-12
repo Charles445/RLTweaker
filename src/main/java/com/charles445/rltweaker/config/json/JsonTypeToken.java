@@ -12,6 +12,7 @@ public class JsonTypeToken
 	{
 		switch(jcfn)
 		{
+			case lessCollisions: return new TypeToken<Map<String, Double>>(){}.getType();
 			case reskillableTransmutation: return new TypeToken<Map<String, List<JsonDoubleBlockState>>>(){}.getType();
 		
 			default:

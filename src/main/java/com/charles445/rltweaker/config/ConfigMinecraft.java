@@ -33,7 +33,7 @@ public class ConfigMinecraft
 	@Config.Name("Damage Tilt Effect")
 	public boolean damageTilt = true;
 	
-	@Config.Comment("Requires lessCollisions patch, toggle the patch instead unless you are benchmarking")
+	@Config.Comment("Requires lessCollisions patch, change that config value instead, don't change this unless you are benchmarking")
 	@Config.Name("Less Collisions")
 	public boolean lessCollisions = true;
 }

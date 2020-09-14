@@ -61,6 +61,35 @@ public class PatchLessCollisions extends PatchManager
 				
 			}
 		});
+		
+		add(new Patch(this, "net.minecraft.entity.EntityLivingBase", ClassWriter.COMPUTE_MAXS)
+		{
+			@Override
+			public void patch(ClassNode c_EntityLivingBase)
+			{
+				if(true) // func_85033_bc collideWithNearbyEntities
+				{
+					MethodNode m_collideWithNearbyEntities = findMethodWithDesc(c_EntityLivingBase, "()V", "func_85033_bc", "collideWithNearbyEntities");
+					
+					if(m_collideWithNearbyEntities == null)
+						throw new RuntimeException("Couldn't find collideWithNearbyEntities or func_85033_bc with matching desc");
+					
+					
+					MethodInsnNode getAABBCall = TransformUtil.findNextCallWithOpcodeAndName(first(m_collideWithNearbyEntities), Opcodes.INVOKEVIRTUAL, "func_175674_a", "getEntitiesInAABBexcluding");
+					if(getAABBCall == null)
+					{
+						System.out.println("Unexpected error, please show the below wall of text to the RLTweaker developer, thanks! Couldn't find getEntitiesInAABBexcluding or func_175674_a");
+						ClassDisplayer.instance.printMethod(m_collideWithNearbyEntities);
+						throw new RuntimeException("Couldn't find getEntitiesInAABBexcluding or func_175674_a");
+					}
+					//Stack here should have everything needed for the static call, which is convenient.
+					getAABBCall.setOpcode(Opcodes.INVOKESTATIC);
+					getAABBCall.owner = "com/charles445/rltweaker/hook/HookWorld";
+					getAABBCall.name = "getEntitiesInAABBexcluding";
+					getAABBCall.desc = "(Lnet/minecraft/world/World;Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/AxisAlignedBB;Lcom/google/common/base/Predicate;)Ljava/util/List;";
+				}
+			}
+		});
 	}
 	
 	

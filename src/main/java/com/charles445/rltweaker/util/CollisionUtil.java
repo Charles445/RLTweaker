@@ -32,6 +32,13 @@ public class CollisionUtil
 		stringReference.putAll(sent);
 	}
 	
+	public void refreshCollisionMaps()
+	{
+		//Empties out the cache
+		collisionMapServer.clear();
+		collisionMapClient.clear();
+	}
+	
 	public double getRadiusForEntity(@Nonnull Entity entity)
 	{
 		if(entity.world.isRemote)

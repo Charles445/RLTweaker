@@ -1,9 +1,9 @@
 package com.charles445.rltweaker.command;
 
+import java.util.HashMap;
 import java.util.Map;
 
-import com.charles445.rltweaker.debug.DebugUtil;
-import com.charles445.rltweaker.util.ErrorUtil;
+import com.charles445.rltweaker.util.CollisionUtil;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -33,6 +33,42 @@ public class CommandDebug extends CommandBase
 
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
+	{
+		addLessCollision(server, sender, args);
+	}
+	
+	private void addLessCollision(MinecraftServer server, ICommandSender sender, String[] args)
+	{
+		if(args.length>1)
+		{
+			try
+			{
+				double val = Double.parseDouble(args[1]);
+				
+				if(val < 2.0d)
+					val = 2.0d;
+				if(val > 100.0d)
+					val = 100.0d;
+				
+				String name = args[0];
+				
+				inform("Adding "+name+" as "+val,sender);
+				
+				CollisionUtil.instance.refreshCollisionMaps();
+				
+				Map<String, Double> strMap = new HashMap<String, Double>();
+				strMap.put(name, val);
+				CollisionUtil.instance.addToStringReference(strMap);
+				
+			}
+			catch(NumberFormatException e)
+			{
+				inform("Bad number",sender);
+			}
+		}
+	}
+	
+	private void setMER(MinecraftServer server, ICommandSender sender, String[] args)
 	{
 		if(args.length>0)
 		{

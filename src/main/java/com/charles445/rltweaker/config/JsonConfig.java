@@ -38,26 +38,90 @@ public class JsonConfig
 	{
 		if(ModConfig.patches.lessCollisions)
 		{
-			JsonConfig.lessCollisions.clear();
-			JsonConfig.lessCollisions.put("net.minecraft.entity.item.EntityItem", 2.0d);
-			JsonConfig.lessCollisions.put("net.minecraft.entity.passive.EntityChicken", 2.0d);
-			JsonConfig.lessCollisions.put("net.minecraft.entity.passive.EntitySquid", 2.0d);
+			lessCollisions.clear();
 			
-			JsonConfig.lessCollisions = processJson(JsonFileName.lessCollisions, JsonConfig.lessCollisions, false);
+			//Np combat allies or offensive tools
+			//No mountables, except for pigs.
 			
-			if(JsonConfig.lessCollisions == null)
-				JsonConfig.lessCollisions = new HashMap<>();
+			if(Loader.isModLoaded(ModNames.LYCANITESMOBS))
+			{
+				lessCollisions.put("com.lycanitesmobs.core.entity.EntityItemCustom", 2.0d);
+			}
+			
+			//Minecraft
+			
+			lessCollisions.put("net.minecraft.entity.item.EntityArmorStand", 2.0d);
+			lessCollisions.put("net.minecraft.entity.item.EntityItem", 2.0d);
+			lessCollisions.put("net.minecraft.entity.item.EntityItemFrame", 2.0d);
+			lessCollisions.put("net.minecraft.entity.item.EntityPainting", 2.0d);
+			lessCollisions.put("net.minecraft.entity.item.EntityXPOrb", 2.0d);
+			lessCollisions.put("net.minecraft.entity.monster.EntityBlaze", 2.0d);
+			lessCollisions.put("net.minecraft.entity.monster.EntityCaveSpider", 2.0d);
+			lessCollisions.put("net.minecraft.entity.monster.EntityCreeper", 2.0d);
+			lessCollisions.put("net.minecraft.entity.monster.EntityElderGuardian", 2.0d);
+			lessCollisions.put("net.minecraft.entity.monster.EntityEnderman", 2.0d);
+			lessCollisions.put("net.minecraft.entity.monster.EntityEndermite", 2.0d);
+			lessCollisions.put("net.minecraft.entity.monster.EntityEvoker", 2.0d);
+			lessCollisions.put("net.minecraft.entity.monster.EntityGhast", 2.0d);
+			lessCollisions.put("net.minecraft.entity.monster.EntityGuardian", 2.0d);
+			lessCollisions.put("net.minecraft.entity.monster.EntityHusk", 2.0d);
+			lessCollisions.put("net.minecraft.entity.monster.EntityIllusionIllager", 2.0d);
+			lessCollisions.put("net.minecraft.entity.monster.EntityMagmaCube", 2.0d);
+			lessCollisions.put("net.minecraft.entity.monster.EntityPigZombie", 2.0d);
+			lessCollisions.put("net.minecraft.entity.monster.EntityPolarBear", 2.0d);
+			lessCollisions.put("net.minecraft.entity.monster.EntityShulker", 2.0d);
+			lessCollisions.put("net.minecraft.entity.monster.EntitySilverfish", 2.0d);
+			lessCollisions.put("net.minecraft.entity.monster.EntitySkeleton", 2.0d);
+			lessCollisions.put("net.minecraft.entity.monster.EntitySlime", 2.0d);
+			lessCollisions.put("net.minecraft.entity.monster.EntitySpider", 2.0d);
+			lessCollisions.put("net.minecraft.entity.monster.EntityStray", 2.0d);
+			lessCollisions.put("net.minecraft.entity.monster.EntityVex", 2.0d);
+			lessCollisions.put("net.minecraft.entity.monster.EntityVindicator", 2.0d);
+			lessCollisions.put("net.minecraft.entity.monster.EntityWitch", 2.0d);
+			lessCollisions.put("net.minecraft.entity.monster.EntityWitherSkeleton", 2.0d);
+			lessCollisions.put("net.minecraft.entity.monster.EntityZombie", 2.0d);
+			lessCollisions.put("net.minecraft.entity.monster.EntityZombieVillager", 2.0d);
+
+			lessCollisions.put("net.minecraft.entity.passive.EntityBat", 2.0d);
+			lessCollisions.put("net.minecraft.entity.passive.EntityChicken", 2.0d);
+			lessCollisions.put("net.minecraft.entity.passive.EntityCow", 2.0d);
+			lessCollisions.put("net.minecraft.entity.passive.EntityMooshroom", 2.0d);
+			lessCollisions.put("net.minecraft.entity.passive.EntityOcelot", 2.0d);
+			lessCollisions.put("net.minecraft.entity.passive.EntityParrot", 2.0d);
+			lessCollisions.put("net.minecraft.entity.passive.EntityPig", 2.0d); //Take a pig ride through asmodeus
+			lessCollisions.put("net.minecraft.entity.passive.EntityRabbit", 2.0d);
+			lessCollisions.put("net.minecraft.entity.passive.EntitySheep", 2.0d);
+			lessCollisions.put("net.minecraft.entity.passive.EntitySquid", 2.0d);
+			lessCollisions.put("net.minecraft.entity.passive.EntityVillager", 2.0d);
+			
+			Map<String, Double> lcJson = processJson(JsonFileName.lessCollisions, lessCollisions, true);
+			if(lcJson!=null)
+			{
+				try
+				{
+					lessCollisions.putAll(lcJson);
+					manuallyWriteToJson(JsonFileName.lessCollisions, lessCollisions);
+				}
+				catch(Exception e)
+				{
+					RLTweaker.logger.error("Failed to merge write lessCollisions!");
+					ErrorUtil.logSilent("JSON Merge Write LessCollisions");
+				}
+			}
+			
+			if(lessCollisions == null)
+				lessCollisions = new HashMap<>();
 			
 			CollisionUtil.instance.addToStringReference(lessCollisions);
 		}
 		
 		if(Loader.isModLoaded(ModNames.RESKILLABLE) && ModConfig.server.reskillable.enabled && ModConfig.server.reskillable.customTransmutation)
 		{
-			JsonConfig.reskillableTransmutation.clear();
-			JsonConfig.reskillableTransmutation.put("minecraft:stick", Arrays.asList(new JsonDoubleBlockState[]{JsonDoubleBlockState.AIR}));
+			reskillableTransmutation.clear();
+			reskillableTransmutation.put("minecraft:stick", Arrays.asList(new JsonDoubleBlockState[]{JsonDoubleBlockState.AIR}));
 			
-			JsonConfig.reskillableTransmutation = processJson(JsonFileName.reskillableTransmutation, JsonConfig.reskillableTransmutation, false);
-			if(JsonConfig.reskillableTransmutation!=null)
+			reskillableTransmutation = processJson(JsonFileName.reskillableTransmutation, reskillableTransmutation, false);
+			if(reskillableTransmutation!=null)
 			{
 				Object reskillableHandler = RLTweaker.handlers.get(ModNames.RESKILLABLE);
 				if(reskillableHandler instanceof ReskillableHandler)

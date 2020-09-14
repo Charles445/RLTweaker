@@ -146,33 +146,33 @@ public class WorldRadiusUtil
 		return list;
 	}
 	
-    public <T extends Entity> T findNearestEntityWithinAABB(World world, Class <? extends T > entityType, AxisAlignedBB aabb, T closestTo, double size)
-    {
-    	if(!working)
-    		return world.findNearestEntityWithinAABB(entityType, aabb, closestTo);
-    	
-        List<T> list = this.<T>getEntitiesWithinAABB(world, entityType, aabb, size);
-        T t = null;
-        double d0 = Double.MAX_VALUE;
+	public <T extends Entity> T findNearestEntityWithinAABB(World world, Class <? extends T > entityType, AxisAlignedBB aabb, T closestTo, double size)
+	{
+		if(!working)
+			return world.findNearestEntityWithinAABB(entityType, aabb, closestTo);
+		
+		List<T> list = this.<T>getEntitiesWithinAABB(world, entityType, aabb, size);
+		T t = null;
+		double d0 = Double.MAX_VALUE;
 
-        for (int j2 = 0; j2 < list.size(); ++j2)
-        {
-            T t1 = list.get(j2);
+		for (int j2 = 0; j2 < list.size(); ++j2)
+		{
+			T t1 = list.get(j2);
 
-            if (t1 != closestTo && EntitySelectors.NOT_SPECTATING.apply(t1))
-            {
-                double d1 = closestTo.getDistanceSq(t1);
+			if (t1 != closestTo && EntitySelectors.NOT_SPECTATING.apply(t1))
+			{
+				double d1 = closestTo.getDistanceSq(t1);
 
-                if (d1 <= d0)
-                {
-                    t = t1;
-                    d0 = d1;
-                }
-            }
-        }
+				if (d1 <= d0)
+				{
+					t = t1;
+					d0 = d1;
+				}
+			}
+		}
 
-        return t;
-    }
+		return t;
+	}
 	
 	public <T extends Entity> void getEntitiesOfTypeWithinAABB(Chunk chunk, Class <? extends T > entityClass, AxisAlignedBB aabb, List<T> listToFill, Predicate <? super T > filter, double size)
 	{

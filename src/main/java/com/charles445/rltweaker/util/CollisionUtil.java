@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nonnull;
 
 import com.charles445.rltweaker.RLTweaker;
+import com.charles445.rltweaker.config.ModConfig;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
@@ -55,7 +56,9 @@ public class CollisionUtil
 				dub = new Double(World.MAX_ENTITY_RADIUS);
 			}
 			
-			RLTweaker.logger.debug("Adding "+entity.getClass().getName()+" with radius "+dub+" to client");
+			if(ModConfig.server.minecraft.debug)
+				RLTweaker.logger.debug("Adding "+entity.getClass().getName()+" with radius "+dub+" to client");
+			
 			collisionMapClient.put(entity.getClass(), dub);
 			
 			return dub.doubleValue();
@@ -74,7 +77,9 @@ public class CollisionUtil
 				dub = new Double(World.MAX_ENTITY_RADIUS);
 			}
 			
-			RLTweaker.logger.debug("Adding "+entity.getClass().getName()+" with radius "+dub+" to server");
+			if(ModConfig.server.minecraft.debug)
+				RLTweaker.logger.debug("Adding "+entity.getClass().getName()+" with radius "+dub+" to server");
+			
 			collisionMapServer.put(entity.getClass(), dub);
 			
 			return dub.doubleValue();

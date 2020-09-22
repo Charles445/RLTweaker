@@ -7,6 +7,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import com.charles445.rltweaker.RLTweaker;
+import com.charles445.rltweaker.config.ModConfig;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 
@@ -14,6 +15,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.ClassInheritanceMultiMap;
 import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
@@ -24,30 +26,16 @@ public class WorldRadiusUtil
 	
 	public static WorldRadiusUtil instance = new WorldRadiusUtil();
 	
-	private Method m_isChunkLoaded;
-	
 	private boolean errorgetEntitiesInAABBexcluding;
 	private boolean errorgetEntitiesInAABB;
 	
-	private boolean working = false;
+	private boolean working;
 	
 	public WorldRadiusUtil()
 	{
 		errorgetEntitiesInAABBexcluding = false;
 		errorgetEntitiesInAABB = false;
-		working = false;
-		
-		try
-		{
-			m_isChunkLoaded = ReflectUtil.findMethodAny(World.class, "func_175680_a", "isChunkLoaded", int.class, int.class, boolean.class);
-			working = true;
-			RLTweaker.logger.debug("WorldRadiusUtil initialized");
-		}
-		catch(Exception e)
-		{
-			RLTweaker.logger.error("HookWorld failed, please consider sending this log to the RLTweaker dev!",e);
-			ErrorUtil.logSilent("WorldRadiusUtil Instantiation Failure");
-		}
+		working = true;
 	}
 	
 	public List<Entity> getEntitiesWithinAABBExcludingEntity(World world, @Nullable Entity entityIn, AxisAlignedBB bb, double size)
@@ -75,23 +63,11 @@ public class WorldRadiusUtil
 		{
 			for (int k3 = l2; k3 <= i3; ++k3)
 			{
-				try
+				//This runs faster in a warmed up environment than isChunkLoaded's reflection invoke
+				if (world.isBlockLoaded(new BlockPos(j3<<4, 64, k3<<4), true))
 				{
-					if ((boolean) m_isChunkLoaded.invoke(world, j3, k3, true))
-					{
-						Chunk chunk = world.getChunkFromChunkCoords(j3, k3);
-						getEntitiesWithinAABBForEntity(chunk, entity, bb, list, predicate, size);
-					}
-				}
-				catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | CriticalException e)
-				{
-					if(!errorgetEntitiesInAABBexcluding)
-					{
-						ErrorUtil.logSilent("HookWorld getEntitiesInAABBexcluding Exception "+e.getClass());
-						errorgetEntitiesInAABBexcluding = true;
-						e.printStackTrace();
-					}
-					return world.getEntitiesInAABBexcluding(entity, bb, predicate);
+					Chunk chunk = world.getChunkFromChunkCoords(j3, k3);
+					getEntitiesWithinAABBForEntity(chunk, entity, bb, list, predicate, size);
 				}
 			}
 		}
@@ -99,7 +75,7 @@ public class WorldRadiusUtil
 		return list;
 	}
 	
-	public <T extends Entity> List<T>  getEntitiesWithinAABB(World world, Class <? extends T > classEntity, AxisAlignedBB bb, double size)
+	public <T extends Entity> List<T> getEntitiesWithinAABB(World world, Class <? extends T > classEntity, AxisAlignedBB bb, double size)
 	{
 		if(!working)
 			return world.getEntitiesWithinAABB(classEntity, bb);
@@ -122,23 +98,11 @@ public class WorldRadiusUtil
 		{
 			for (int k3 = l2; k3 < i3; ++k3)
 			{
-				try
+				//This runs faster in a warmed up environment than isChunkLoaded's reflection invoke
+				if (world.isBlockLoaded(new BlockPos(j3<<4, 64, k3<<4), true))
 				{
-					if ((boolean) m_isChunkLoaded.invoke(world, j3, k3, true))
-					{
-						Chunk chunk = world.getChunkFromChunkCoords(j3, k3);
-						getEntitiesOfTypeWithinAABB(chunk, clazz, aabb, list, filter, size);
-					}
-				}
-				catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | CriticalException e)
-				{
-					if(!errorgetEntitiesInAABB)
-					{
-						ErrorUtil.logSilent("HookWorld getEntitiesWithinAABB Exception "+e.getClass());
-						errorgetEntitiesInAABB = true;
-						e.printStackTrace();
-					}
-					return world.getEntitiesWithinAABB(clazz, aabb, filter);
+					Chunk chunk = world.getChunkFromChunkCoords(j3, k3);
+					getEntitiesOfTypeWithinAABB(chunk, clazz, aabb, list, filter, size);
 				}
 			}
 		}

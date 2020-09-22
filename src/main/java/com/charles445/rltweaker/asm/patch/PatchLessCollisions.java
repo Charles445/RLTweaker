@@ -15,6 +15,8 @@ public class PatchLessCollisions extends PatchManager
 	{
 		super("Less Collisions");
 		
+		//Sponge overwrites this entirely, so it doesn't work
+		/*
 		add(new Patch(this, "net.minecraft.world.World", ClassWriter.COMPUTE_MAXS)
 		{
 			@Override
@@ -61,7 +63,43 @@ public class PatchLessCollisions extends PatchManager
 				
 			}
 		});
+		*/
 		
+		//Sponge compatible, 7.3.0
+		add(new Patch(this, "net.minecraft.world.World", ClassWriter.COMPUTE_MAXS)
+		{
+			//Possible issues:
+			//
+			//Explosion owner
+			//Projectiles that use ProjectileHelper forwardsRaycast
+			
+			@Override
+			public void patch(ClassNode c_World)
+			{
+				if(true) // func_72839_b getEntitiesWithinAABBExcludingEntity
+				{
+					MethodNode m_getEntWithAABBExclEntity = findMethodWithDesc(c_World, "(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/AxisAlignedBB;)Ljava/util/List;", "func_72839_b", "getEntitiesWithinAABBExcludingEntity");
+					
+					if(m_getEntWithAABBExclEntity == null)
+						throw new RuntimeException("Couldn't find getEntitiesWithinAABBExcludingEntity or func_72839_b with matching desc");
+					
+					MethodInsnNode getAABBCall = TransformUtil.findNextCallWithOpcodeAndName(first(m_getEntWithAABBExclEntity), Opcodes.INVOKEVIRTUAL, "func_175674_a","getEntitiesInAABBexcluding");
+					if(getAABBCall == null)
+					{
+						System.out.println("Unexpected error, please show the below wall of text to the RLTweaker developer, thanks! Couldn't find getEntitiesInAABBexcluding or func_175674_a");
+						ClassDisplayer.instance.printMethod(m_getEntWithAABBExclEntity);
+						throw new RuntimeException("Couldn't find getEntitiesInAABBexcluding or func_175674_a");
+					}
+					//Stack here should have everything needed for the static call, which is convenient.
+					getAABBCall.setOpcode(Opcodes.INVOKESTATIC);
+					getAABBCall.owner = "com/charles445/rltweaker/hook/HookWorld";
+					getAABBCall.name = "getEntitiesInAABBexcluding";
+					getAABBCall.desc = "(Lnet/minecraft/world/World;Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/AxisAlignedBB;Lcom/google/common/base/Predicate;)Ljava/util/List;";
+				}
+			}
+		});
+		
+		//Sponge compatible, 7.3.0
 		add(new Patch(this, "net.minecraft.entity.EntityLivingBase", ClassWriter.COMPUTE_MAXS)
 		{
 			@Override

@@ -13,6 +13,10 @@ public class JsonConfigLessCollisions
 	{
 		//Np combat allies or offensive tools
 		//No mountables, except for pigs.
+		//No projectiles of any kind
+		//Caution with entities that may become the owner of explosions
+		
+		
 		
 		Map<String,Double> map = new HashMap<String,Double>();
 		

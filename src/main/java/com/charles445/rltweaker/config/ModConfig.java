@@ -17,6 +17,10 @@ public class ModConfig
 	//Fun fact, categories get run through toLowerCase(Locale.ENGLISH)
 	//But properties do not. Okay...
 	
+	@Config.Comment("Client options")
+	@Config.Name("Client")
+	public static ClientConfig client = new ClientConfig();
+	
 	@Config.Comment("Patch options for the coremod")
 	@Config.Name("patches")
 	public static PatchConfig patches = new PatchConfig();
@@ -34,6 +38,10 @@ public class ModConfig
 		@Config.Comment("Battle Towers tweaks")
 		@Config.Name("Battle Towers")
 		public ConfigBattleTowers battletowers = new ConfigBattleTowers();
+		
+		@Config.Comment("Lost Cities tweaks")
+		@Config.Name("Lost Cities")
+		public ConfigLostCities lostcities = new ConfigLostCities();
 		
 		@Config.Comment("Recurrent Complex tweaks")
 		@Config.Name("Recurrent Complex")
@@ -62,6 +70,17 @@ public class ModConfig
 		@Config.Comment("Waystones tweaks")
 		@Config.Name("Waystones")
 		public ConfigWaystones waystones = new ConfigWaystones();
+	}
+	
+	public static class ClientConfig
+	{
+		@Config.Comment("Classy Hats tweaks")
+		@Config.Name("Classy Hats")
+		public ConfigClassyHatsClient classyhats = new ConfigClassyHatsClient();
+		
+		@Config.Comment("Potion Core Tweaks")
+		@Config.Name("Potion Core")
+		public ConfigPotionCoreClient potioncore = new ConfigPotionCoreClient();
 	}
 	
 	@Mod.EventBusSubscriber(modid = RLTweaker.MODID)

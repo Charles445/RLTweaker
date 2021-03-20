@@ -44,9 +44,13 @@ public class BattleTowersHandler
 	@SubscribeEvent
 	public void onLivingUpdate(LivingUpdateEvent event)
 	{
-		//Golem Dormant Speed Fix
+		//Golem Dormant Speed Fix / Golem Drowning Fix / Golem Speed Cap / Golem Dismount Fix
+		boolean dormantSpeedFix = ModConfig.server.battletowers.golemDormantSpeedFix;
+		boolean drownFix = ModConfig.server.battletowers.golemDrowningFix;
+		double golemSpeedCap = ModConfig.server.battletowers.golemSpeedCap;
+		boolean dismountFix = ModConfig.server.battletowers.golemAutoDismount;
 		
-		if(!ModConfig.server.battletowers.golemDormantSpeedFix)
+		if(!dormantSpeedFix && !drownFix && !dismountFix && golemSpeedCap < 0.0d)
 			return;
 		
 		//Check if the updating entity is a golem
@@ -54,23 +58,62 @@ public class BattleTowersHandler
 		{
 			EntityLivingBase golem = event.getEntityLiving();
 			
-			//Check if the golem is dormant
-			
-			try
+			if(dismountFix)
 			{
-				if(reflector.getIsDormant(golem))
+				golem.dismountRidingEntity();
+			}
+			
+			if(drownFix)
+			{
+				golem.setAir(300);
+			}
+			
+			if(golemSpeedCap >= 0.0d)
+			{
+				if(golem.motionX > golemSpeedCap)
 				{
-					//If the golem is dormant, reset its motion
-					golem.motionX = 0.0d;
-					golem.motionY = 0.0d;
-					golem.motionZ = 0.0d;
+					golem.motionX = golemSpeedCap;
+				}
+				else if(golem.motionX < -golemSpeedCap)
+				{
+					golem.motionX = -golemSpeedCap;
+				}
+				
+				if(golem.motionZ > golemSpeedCap)
+				{
+					golem.motionZ = golemSpeedCap;
+				}
+				else if(golem.motionZ < -golemSpeedCap)
+				{
+					golem.motionZ = -golemSpeedCap;
+				}
+
+				//Allow golems to fall, but not rise
+				if(golem.motionY > golemSpeedCap)
+				{
+					golem.motionY = golemSpeedCap;
 				}
 			}
-			catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
+			
+			if(dormantSpeedFix)
 			{
-				//Report
-				ErrorUtil.logSilent("BT getIsDormant Invocation");
-				return;
+				//Check if the golem is dormant
+				
+				try
+				{
+					if(reflector.getIsDormant(golem))
+					{
+						//If the golem is dormant, reset its motion
+						golem.motionX = 0.0d;
+						golem.motionY = 0.0d;
+						golem.motionZ = 0.0d;
+					}
+				}
+				catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
+				{
+					//Report
+					ErrorUtil.logSilent("BT getIsDormant Invocation");
+				}
 			}
 		}
 	}

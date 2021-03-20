@@ -1,17 +1,19 @@
 package com.charles445.rltweaker.handler;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.charles445.rltweaker.RLTweaker;
 import com.charles445.rltweaker.config.ModConfig;
-import com.charles445.rltweaker.debug.DebugUtil;
 import com.charles445.rltweaker.reflect.SMEReflect;
 import com.charles445.rltweaker.util.CompatUtil;
 import com.charles445.rltweaker.util.CriticalException;
 import com.charles445.rltweaker.util.ErrorUtil;
 import com.charles445.rltweaker.util.ModNames;
+import com.charles445.rltweaker.util.ReflectUtil;
+import com.charles445.rltweaker.util.VersionDelimiter;
 
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -53,6 +55,19 @@ public class SMEHandler
 	{
 		try
 		{
+			//Get the version to decide what to do next
+			Class c_somanyenchantments = Class.forName("com.Shultrea.Rin.Main_Sector.somanyenchantments");
+			Field f_version = ReflectUtil.findField(c_somanyenchantments, "VERSION");
+			VersionDelimiter vd = new VersionDelimiter((String)f_version.get(null));
+			
+			if(vd.isSameOrNewerVersion(0, 5))
+			{
+				RLTweaker.logger.info("Skipping SMEHandler setup, SME version is 0.5.0 or higher");
+				return;
+			}
+			
+			
+			
 			this.reflector = new SMEReflect();
 			
 			//Advanced Mending

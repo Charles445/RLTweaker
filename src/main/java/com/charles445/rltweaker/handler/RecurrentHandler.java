@@ -242,6 +242,7 @@ public class RecurrentHandler
 	public class RCHandler
 	{
 		//RCForgeEventHandler
+		//NOTE: This should be an IEventListener
 		private Object handler;
 		
 		//Currently only onPreChunkDecoration has been intercepted

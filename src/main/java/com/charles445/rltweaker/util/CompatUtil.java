@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
@@ -15,6 +16,7 @@ import com.charles445.rltweaker.config.ModConfig;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
+import net.minecraftforge.fml.common.eventhandler.ASMEventHandler;
 import net.minecraftforge.fml.common.eventhandler.IEventListener;
 import net.minecraftforge.fml.common.eventhandler.ListenerList;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -38,6 +40,25 @@ public class CompatUtil
 		f_listeners.setAccessible(true);
 		f_busID = c_EventBus.getDeclaredField("busID");
 		f_busID.setAccessible(true);
+	}
+	
+	/** Removes a specific handler from the event bus and creates a new handler.<br>
+	 *  The new handler is NOT registered automatically
+	 * 
+	 * @param name (String) name of the new handler to show in the log
+	 * @param constructor (Consumer) Constructor of the new handler class, needs IEventListener parameter
+	 * @param clazzName (String) name of the class to search for
+	 * @param methodName (String) name of the method to search for
+	 * @throws Exception
+	 */
+	public static void wrapSpecificHandler(String name, Consumer<IEventListener> constructor, String clazzName, String methodName) throws Exception
+	{
+		Object handler = CompatUtil.findAndRemoveHandlerFromEventBus(clazzName, methodName);
+		if(handler instanceof IEventListener)
+		{
+			RLTweaker.logger.info("Registering "+name+" to the event bus");
+			constructor.accept((IEventListener)handler);
+		}
 	}
 	
 	/** Manual EVENT_BUS registering 
@@ -92,6 +113,12 @@ public class CompatUtil
 		return findAndRemoveHandlerFromEventBus(name, null);
 	}
 	
+	/** 
+	 * @param name : Class name to remove from the event bus.
+	 * @param specific : If specified, removes only a single method.
+	 * @return : If specific, returns the specific IEventListener, otherwise returns the entire handler.
+	 * @throws Exception
+	 */
 	@Nullable
 	public static Object findAndRemoveHandlerFromEventBus(String name, @Nullable String specific) throws Exception
 	{
@@ -108,11 +135,19 @@ public class CompatUtil
 			
 			Object handler = null;
 			
-			
 			for(Map.Entry<Object, ArrayList<IEventListener>> listener_entry : listeners.entrySet())
 			{
 				handler = listener_entry.getKey();
-				if (handler.getClass().getName().equals(name))
+				
+				String handlerName = handler.getClass().getName();
+				
+				//Name fixup for static handlers
+				if(handlerName.equals("java.lang.Class"))
+				{
+					handlerName = ((Class)handler).getName();
+				}
+				
+				if (handlerName.equals(name))
 				{
 					if(ModConfig.server.minecraft.debug)
 					{
@@ -166,7 +201,7 @@ public class CompatUtil
 								
 								
 								RLTweaker.logger.info("Found and removed "+name+" IEventListener "+specific+" from the event bus");
-								return handler;
+								return eventListener;
 							}
 						}
 						

@@ -41,11 +41,11 @@ public class NetworkHandler
 		
 		if(value!=null)
 		{
-			return value.isNewerVersionThan(major, minor);
+			return value.isSameOrNewerVersion(major, minor);
 		}
 		else
 		{
-			return RLTweaker.MINIMUM_VERSION.isNewerVersionThan(major, minor);
+			return RLTweaker.MINIMUM_VERSION.isSameOrNewerVersion(major, minor);
 		}
 	}
 }

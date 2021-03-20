@@ -86,6 +86,13 @@ public class WaystonesHandler
 		{
 			//Check if it's a village waystone
 			World world = DimensionManager.getWorld(dimension);
+			
+			//Make sure this is only on server
+			if(world == null || world.isRemote)
+			{
+				return s;
+			}
+			
 			Block block = world.getBlockState(pos.down()).getBlock();
 			//Village waystones spawn on glowstone
 			if(block!=Blocks.GLOWSTONE)

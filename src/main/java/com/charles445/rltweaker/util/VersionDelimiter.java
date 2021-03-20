@@ -42,12 +42,12 @@ public class VersionDelimiter
 		this.patch = patch;
 	}
 	
-	public boolean isNewerVersionThan(VersionDelimiter vd)
+	public boolean isSameOrNewerVersion(VersionDelimiter vd)
 	{
-		return isNewerVersionThan(vd.major, vd.minor);
+		return isSameOrNewerVersion(vd.major, vd.minor);
 	}
 	
-	public boolean isNewerVersionThan(int major, int minor)
+	public boolean isSameOrNewerVersion(int major, int minor)
 	{
 		if(this.major>major)
 		{

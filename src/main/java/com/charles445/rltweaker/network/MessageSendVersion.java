@@ -34,9 +34,23 @@ public class MessageSendVersion implements IMessage
 	@Override
 	public void fromBytes(ByteBuf buf)
 	{
-		this.major = buf.readInt();
-		this.minor = buf.readInt();
-		this.patch = buf.readInt();
+		if(buf == null)
+		{
+			setPacketInvalid();
+			return;
+		}
+		
+		try
+		{
+			this.major = buf.readInt();
+			this.minor = buf.readInt();
+			this.patch = buf.readInt();
+		}
+		catch(IndexOutOfBoundsException e)
+		{
+			setPacketInvalid();
+			return;
+		}
 	}
 
 	@Override
@@ -47,6 +61,13 @@ public class MessageSendVersion implements IMessage
 		buf.writeInt(this.patch);
 	}
 	
+	private void setPacketInvalid()
+	{
+		this.major = 0;
+		this.minor = 0;
+		this.patch = 0;
+	}
+	
 	public static class Handler implements IMessageHandler<MessageSendVersion, IMessage>
 	{
 		@Override
@@ -54,7 +75,7 @@ public class MessageSendVersion implements IMessage
 		{
 			if(ctx.side == Side.SERVER)
 			{
-				RLTweaker.logger.info("Received version message: "+message.major+"."+message.minor+"."+message.patch);
+				RLTweaker.logger.debug("Received version message: "+message.major+"."+message.minor+"."+message.patch);
 				
 				if(ctx.netHandler instanceof NetHandlerPlayServer)
 				{

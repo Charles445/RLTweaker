@@ -17,6 +17,7 @@ import com.charles445.rltweaker.command.CommandErrorReport;
 import com.charles445.rltweaker.config.JsonConfig;
 import com.charles445.rltweaker.config.ModConfig;
 import com.charles445.rltweaker.handler.BattleTowersHandler;
+import com.charles445.rltweaker.handler.LostCitiesHandler;
 import com.charles445.rltweaker.handler.MinecraftHandler;
 import com.charles445.rltweaker.handler.MotionCheckHandler;
 import com.charles445.rltweaker.handler.RecurrentHandler;
@@ -56,11 +57,9 @@ import net.minecraftforge.fml.relauncher.Side;
 )
 public class RLTweaker
 {
-	//TODO Evaluate that this can be server side
-	
 	public static final String MODID = "rltweaker";
 	public static final String NAME = "RLTweaker";
-	public static final String VERSION = "0.4.1";
+	public static final String VERSION = "0.4.2";
 	public static final VersionDelimiter VERSION_DELIMITER = new VersionDelimiter(VERSION);
 	public static final VersionDelimiter MINIMUM_VERSION = new VersionDelimiter("0.3.0");
 	
@@ -131,6 +130,11 @@ public class RLTweaker
 	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event)
 	{
+		if(Loader.isModLoaded(ModNames.LOSTCITIES) && ModConfig.server.lostcities.enabled)
+		{
+			handlers.put(ModNames.LOSTCITIES, new LostCitiesHandler());
+		}
+		
 		JsonConfig.init();
 		
 		proxy.postInit();
@@ -181,7 +185,7 @@ public class RLTweaker
 			{
 				VersionDelimiter servervd = new VersionDelimiter(version);
 				NetworkHandler.serverVersion = servervd;
-				if(servervd.isNewerVersionThan(0, 4))
+				if(servervd.isSameOrNewerVersion(0, 4))
 				{
 					NetworkHandler.serverHasVersioning = true;
 				}
@@ -204,7 +208,7 @@ public class RLTweaker
 			RLTweaker.logger.trace("Client Version: "+clientvd);
 			RLTweaker.logger.trace("Local Version: "+VERSION_DELIMITER);
 			
-			boolean result = clientvd.isNewerVersionThan(MINIMUM_VERSION);
+			boolean result = clientvd.isSameOrNewerVersion(MINIMUM_VERSION);
 			RLTweaker.logger.trace("Result: "+result);
 			
 			return result;

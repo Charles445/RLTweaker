@@ -28,6 +28,9 @@ public class BattleTowersReflect
 	
 	public final Class c_AS_EntityGolemFireball;
 	public final Field f_AS_EntityGolemFireball_shooterEntity;
+	public final Field f_AS_EntityGolemFireball_accelerationX;
+	public final Field f_AS_EntityGolemFireball_accelerationY;
+	public final Field f_AS_EntityGolemFireball_accelerationZ;
 	
 	//Lycanites Mobs
 	private boolean isLycanitesAvailable;
@@ -63,6 +66,9 @@ public class BattleTowersReflect
 		
 		c_AS_EntityGolemFireball = Class.forName("atomicstryker.battletowers.common.AS_EntityGolemFireball");
 		f_AS_EntityGolemFireball_shooterEntity = ReflectUtil.findField(c_AS_EntityGolemFireball, "shooterEntity");
+		f_AS_EntityGolemFireball_accelerationX = ReflectUtil.findField(c_AS_EntityGolemFireball, "accelerationX");
+		f_AS_EntityGolemFireball_accelerationY = ReflectUtil.findField(c_AS_EntityGolemFireball, "accelerationY");
+		f_AS_EntityGolemFireball_accelerationZ = ReflectUtil.findField(c_AS_EntityGolemFireball, "accelerationZ");
 		
 		//Lycanites Compatibility Setup
 		if(Loader.isModLoaded(ModNames.LYCANITESMOBS))
@@ -110,6 +116,21 @@ public class BattleTowersReflect
 	public boolean isEntityGolemFireball(Entity entity)
 	{
 		return c_AS_EntityGolemFireball.isInstance(entity);
+	}
+	
+	public double getGolemFireballAccelerationX(Object golemFireball) throws IllegalArgumentException, IllegalAccessException
+	{
+		return f_AS_EntityGolemFireball_accelerationX.getDouble(golemFireball);
+	}
+	
+	public double getGolemFireballAccelerationY(Object golemFireball) throws IllegalArgumentException, IllegalAccessException
+	{
+		return f_AS_EntityGolemFireball_accelerationY.getDouble(golemFireball);
+	}
+	
+	public double getGolemFireballAccelerationZ(Object golemFireball) throws IllegalArgumentException, IllegalAccessException
+	{
+		return f_AS_EntityGolemFireball_accelerationZ.getDouble(golemFireball);
 	}
 	
 	//Lycanites Compatibility

@@ -68,14 +68,10 @@ public class BattleTowersHandler
 						return;
 					}
 					
-					//Run a single step...
-					//TODO doesn't seem safe to run update on an entity that isn't even spawned in
-					fireball.onUpdate();
-					
 					demonFireball.setPosition(fireball.posX, fireball.posY, fireball.posZ);
-					demonFireball.motionX = fireball.motionX;
-					demonFireball.motionY = fireball.motionY;
-					demonFireball.motionZ = fireball.motionZ;
+					demonFireball.motionX = reflector.getGolemFireballAccelerationX(fireball);
+					demonFireball.motionY = reflector.getGolemFireballAccelerationY(fireball);
+					demonFireball.motionZ = reflector.getGolemFireballAccelerationZ(fireball);
 					demonFireball.rotationYaw = fireball.rotationYaw;
 					demonFireball.rotationPitch = fireball.rotationPitch;
 					demonFireball.prevRotationYaw = fireball.prevRotationYaw;

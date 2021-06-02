@@ -36,4 +36,24 @@ public class ConfigMinecraft
 	@Config.Comment("Requires lessCollisions patch, change that config value instead, don't change this unless you are benchmarking")
 	@Config.Name("Less Collisions")
 	public boolean lessCollisions = true;
+	
+	@Config.Comment("Replace thrown witch potions with configured potions")
+	@Config.Name("Witch Potion Replacements")
+	public boolean witchPotionReplacements = false;
+	
+	@Config.Comment("Replace thrown witch harming potions with configured potions")
+	@Config.Name("Witch Potion Replacements - Harming")
+	public String[] witchHarmingReplacements = {"minecraft:harming"};
+	
+	@Config.Comment("Replace thrown witch slowness potions with configured potions")
+	@Config.Name("Witch Potion Replacements - Slowness")
+	public String[] witchSlownessReplacements = {"minecraft:slowness"};
+	
+	@Config.Comment("Replace thrown witch poison potions with configured potions")
+	@Config.Name("Witch Potion Replacements - Poison")
+	public String[] witchPoisonReplacements = {"minecraft:poison"};
+	
+	@Config.Comment("Replace thrown witch weakness potions with configured potions")
+	@Config.Name("Witch Potion Replacements - Weakness")
+	public String[] witchWeaknessReplacements = {"minecraft:weakness"};
 }

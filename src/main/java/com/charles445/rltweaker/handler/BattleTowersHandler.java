@@ -10,8 +10,11 @@ import com.charles445.rltweaker.reflect.BattleTowersReflect;
 import com.charles445.rltweaker.util.CriticalException;
 import com.charles445.rltweaker.util.ErrorUtil;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -38,6 +41,78 @@ public class BattleTowersHandler
 			//Crash on Critical
 			if(e instanceof CriticalException)
 				throw new RuntimeException(e);
+		}
+	}
+	
+	@SubscribeEvent
+	public void onEntityJoinWorld(EntityJoinWorldEvent event)
+	{
+		if(reflector.isLycanitesAvailable() && ModConfig.server.battletowers.golemLycanitesProjectile)
+		{
+			//LycanitesMobs is available, and the config is enabled
+			
+			if(reflector.isEntityGolemFireball(event.getEntity()))
+			{
+				try
+				{
+					Entity fireball = event.getEntity();
+					EntityLiving shooter = (EntityLiving) reflector.f_AS_EntityGolemFireball_shooterEntity.get(fireball);
+					Entity demonFireball = reflector.createLycanitesProjectileWithNameAndShooter(
+							ModConfig.server.battletowers.golemLycanitesProjectileName, 
+							shooter, 
+							(float)ModConfig.server.battletowers.golemLycanitesProjectileScaleModifier);
+					
+					if(demonFireball == null)
+					{
+						//Failed to create a new fireball, just exit and allow the normal one to spawn
+						return;
+					}
+					
+					//Run a single step...
+					//TODO doesn't seem safe to run update on an entity that isn't even spawned in
+					fireball.onUpdate();
+					
+					demonFireball.setPosition(fireball.posX, fireball.posY, fireball.posZ);
+					demonFireball.motionX = fireball.motionX;
+					demonFireball.motionY = fireball.motionY;
+					demonFireball.motionZ = fireball.motionZ;
+					demonFireball.rotationYaw = fireball.rotationYaw;
+					demonFireball.rotationPitch = fireball.rotationPitch;
+					demonFireball.prevRotationYaw = fireball.prevRotationYaw;
+					demonFireball.prevRotationPitch = fireball.prevRotationPitch;
+					
+					//Speedup
+					double speedModifier = ModConfig.server.battletowers.golemLycanitesProjectileSpeedModifier;
+					demonFireball.motionX *= speedModifier;
+					demonFireball.motionY *= speedModifier;
+					demonFireball.motionZ *= speedModifier;
+	
+					
+					shooter.getEntityWorld().spawnEntity(demonFireball);
+					
+				}
+				catch(IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
+				{
+					ErrorUtil.logSilent("BT golemLycanitesProjectile Invocation");
+				}
+				
+				
+				/*
+				 * ProjectileInfo projectileInfo = ProjectileManager.getInstance().getProjectile(projectileName);
+					if(projectileInfo == null) {
+						return null;
+					}
+					
+					
+					//en = projectileInfo.createProjectile(this.getEntityWorld(), this)
+					
+				 */
+				
+				//Cancel original fireball
+				event.setCanceled(true);
+				
+				
+			}
 		}
 	}
 	
@@ -89,10 +164,13 @@ public class BattleTowersHandler
 				}
 
 				//Allow golems to fall, but not rise
+				//Removed, was preventing golems from using their stomp attack
+				/*
 				if(golem.motionY > golemSpeedCap)
 				{
 					golem.motionY = golemSpeedCap;
 				}
+				*/
 			}
 			
 			if(dormantSpeedFix)

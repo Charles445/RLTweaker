@@ -29,4 +29,21 @@ public class ConfigBattleTowers
 	@Config.Comment("Prevent golems from riding anything, like boats or minecarts")
 	@Config.Name("Golem Auto Dismount")
 	public boolean golemAutoDismount = true;
+	
+	@Config.Comment("Replace the golem's projectile with a LycanitesMobs Projectile (Requires LycanitesMobs)")
+	@Config.Name("Golem Lycanites Projectile")
+	public boolean golemLycanitesProjectile = true;
+	
+	@Config.Comment("The name of the projectile to use")
+	@Config.Name("Golem Lycanites Projectile Name")
+	public String golemLycanitesProjectileName = "demonicblast";
+	
+	@Config.Comment("Scale modifier for the lycanites projectile")
+	@Config.Name("Golem Lycanites Projectile Scale Modifier")
+	public double golemLycanitesProjectileScaleModifier = 1.0d;
+	
+	@Config.Comment("Speed modifier for the lycanites projectile")
+	@Config.Name("Golem Lycanites Projectile Speed Modifier")
+	public double golemLycanitesProjectileSpeedModifier = 9.0d;
+	
 }

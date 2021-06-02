@@ -177,6 +177,25 @@ public class TransformUtil
 		return result;
 	}
 	
+	/** Search for the LocalVariableNode with a matching name*/
+	@Nullable
+	public static LocalVariableNode findLocalVariableWithName(final MethodNode methodNode, final String name)
+	{
+		int count = 0;
+		LocalVariableNode result = null;
+		
+		for(LocalVariableNode lvNode : methodNode.localVariables)
+		{
+			if(lvNode.name.equals(name))
+			{
+				result = lvNode;
+				count++;
+			}
+		}
+		
+		return result;
+	}
+	
 	@Nullable
 	/** REQUIRES MAXS : Creates, but does not add, a new local variable node */
 	public static LocalVariableNode createNewLocalVariable(final MethodNode methodNode, String name, String desc)

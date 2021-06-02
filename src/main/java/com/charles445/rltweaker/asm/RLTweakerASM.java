@@ -9,6 +9,7 @@ import org.objectweb.asm.tree.ClassNode;
 
 import com.charles445.rltweaker.asm.helper.ASMHelper;
 import com.charles445.rltweaker.asm.patch.IPatch;
+import com.charles445.rltweaker.asm.patch.PatchBetterCombatMountFix;
 import com.charles445.rltweaker.asm.patch.PatchConcurrentParticles;
 import com.charles445.rltweaker.asm.patch.PatchLessCollisions;
 
@@ -117,6 +118,12 @@ public class RLTweakerASM implements IClassTransformer
 		if(ASMConfig.getBoolean("general.patches.lessCollisions", true))
 		{
 			new PatchLessCollisions();
+		}
+		
+		//betterCombatMountFix
+		if(ASMConfig.getBoolean("general.patches.betterCombatMountFix", true))
+		{
+			new PatchBetterCombatMountFix();
 		}
 	}
 

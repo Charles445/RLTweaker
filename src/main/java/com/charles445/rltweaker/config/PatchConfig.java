@@ -22,4 +22,8 @@ public class PatchConfig
 	@Config.RequiresMcRestart
 	@Config.Comment("Makes some entities stop checking for large entity collisions")
 	public boolean lessCollisions = true;
+	
+	@Config.RequiresMcRestart
+	@Config.Comment("Allows for mounted combat with BetterCombat")
+	public boolean betterCombatMountFix = true;
 }

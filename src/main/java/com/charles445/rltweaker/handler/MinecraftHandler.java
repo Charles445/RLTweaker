@@ -12,9 +12,15 @@ import com.charles445.rltweaker.network.NetworkHandler;
 import com.charles445.rltweaker.network.PacketHandler;
 import com.charles445.rltweaker.network.TaskScheduler;
 
+import net.minecraft.entity.monster.EntityWitch;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.projectile.EntityArrow;
+import net.minecraft.entity.projectile.EntityPotion;
+import net.minecraft.init.PotionTypes;
+import net.minecraft.item.ItemStack;
+import net.minecraft.potion.PotionType;
+import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.loot.LootPool;
@@ -138,6 +144,53 @@ public class MinecraftHandler
 		if(event.getEntity() instanceof EntityArrow)
 		{
 			handleArrowJoinWorld((EntityArrow)event.getEntity());
+		}
+		
+		if(event.getEntity() instanceof EntityPotion)
+		{
+			handlePotionJoinWorld((EntityPotion)event.getEntity());
+		}
+	}
+	
+	private void handlePotionJoinWorld(EntityPotion potion)
+	{
+		if(ModConfig.server.minecraft.witchPotionReplacements && potion.getThrower() instanceof EntityWitch)
+		{
+			ItemStack stack = potion.getPotion();
+			
+			//Switch based on type
+			PotionType type = PotionUtils.getPotionFromItem(stack);
+			
+			if(type == PotionTypes.HARMING)
+			{
+				swapPotionFromList(potion, stack, ModConfig.server.minecraft.witchHarmingReplacements);
+			}
+			else if(type == PotionTypes.SLOWNESS)
+			{
+				swapPotionFromList(potion, stack, ModConfig.server.minecraft.witchSlownessReplacements);
+			}
+			else if(type == PotionTypes.POISON)
+			{
+				swapPotionFromList(potion, stack, ModConfig.server.minecraft.witchPoisonReplacements);
+			}
+			else if(type == PotionTypes.WEAKNESS)
+			{
+				swapPotionFromList(potion, stack, ModConfig.server.minecraft.witchWeaknessReplacements);
+			}
+		}
+	}
+	
+	private void swapPotionFromList(EntityPotion potion, ItemStack stack, String[] potionNames)
+	{
+		if(potionNames.length > 0)
+		{
+			PotionType toSwap = PotionType.getPotionTypeForName(potionNames[potion.world.rand.nextInt(potionNames.length)]);
+			
+			if(toSwap!=null)
+			{
+				PotionUtils.addPotionToItemStack(stack, toSwap);
+				potion.setItem(stack);
+			}
 		}
 	}
 	

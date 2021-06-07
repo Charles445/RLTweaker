@@ -35,6 +35,10 @@ public class ModConfig
 		@Config.Name("Minecraft")
 		public ConfigMinecraft minecraft = new ConfigMinecraft();
 		
+		@Config.Comment("Aquaculture tweaks")
+		@Config.Name("Aquaculture")
+		public ConfigAquaculture aquaculture = new ConfigAquaculture();
+		
 		@Config.Comment("Battle Towers tweaks")
 		@Config.Name("Battle Towers")
 		public ConfigBattleTowers battletowers = new ConfigBattleTowers();
@@ -78,7 +82,7 @@ public class ModConfig
 		@Config.Name("Classy Hats")
 		public ConfigClassyHatsClient classyhats = new ConfigClassyHatsClient();
 		
-		@Config.Comment("Potion Core Tweaks")
+		@Config.Comment("Potion Core tweaks")
 		@Config.Name("Potion Core")
 		public ConfigPotionCoreClient potioncore = new ConfigPotionCoreClient();
 	}

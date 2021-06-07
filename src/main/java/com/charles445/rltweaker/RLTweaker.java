@@ -16,6 +16,7 @@ import com.charles445.rltweaker.command.CommandDebug;
 import com.charles445.rltweaker.command.CommandErrorReport;
 import com.charles445.rltweaker.config.JsonConfig;
 import com.charles445.rltweaker.config.ModConfig;
+import com.charles445.rltweaker.handler.AquacultureHandler;
 import com.charles445.rltweaker.handler.BattleTowersHandler;
 import com.charles445.rltweaker.handler.LostCitiesHandler;
 import com.charles445.rltweaker.handler.MinecraftHandler;
@@ -114,6 +115,11 @@ public class RLTweaker
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event)
 	{
+		if(Loader.isModLoaded(ModNames.AQUACULTURE) && ModConfig.server.aquaculture.enabled)
+		{
+			handlers.put(ModNames.AQUACULTURE, new AquacultureHandler());
+		}
+		
 		if(Loader.isModLoaded(ModNames.RECURRENTCOMPLEX) && ModConfig.server.recurrentcomplex.enabled)
 		{
 			handlers.put(ModNames.RECURRENTCOMPLEX, new RecurrentHandler());

@@ -34,7 +34,7 @@ public class CommandDebug extends CommandBase
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
 	{
-		addLessCollision(server, sender, args);
+		//addLessCollision(server, sender, args);
 	}
 	
 	private void addLessCollision(MinecraftServer server, ICommandSender sender, String[] args)

@@ -2,6 +2,7 @@ package com.charles445.rltweaker.util;
 
 public class ModNames
 {
+	public static final String AQUACULTURE = "aquaculture";
 	public static final String BATTLETOWERS = "battletowers";
 	public static final String CLASSYHATS = "classyhats";
 	public static final String DEFILEDLANDS = "defiledlands";

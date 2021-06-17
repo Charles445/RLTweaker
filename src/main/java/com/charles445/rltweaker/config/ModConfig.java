@@ -43,6 +43,11 @@ public class ModConfig
 		@Config.Name("Battle Towers")
 		public ConfigBattleTowers battletowers = new ConfigBattleTowers();
 		
+		@Config.Comment("Grappling Hook Mod tweaks")
+		@Config.Name("Grappling Hook Mod")
+		public ConfigGrapplemod grapplemod = new ConfigGrapplemod();
+		
+		
 		@Config.Comment("Lost Cities tweaks")
 		@Config.Name("Lost Cities")
 		public ConfigLostCities lostcities = new ConfigLostCities();
@@ -81,6 +86,10 @@ public class ModConfig
 		@Config.Comment("Classy Hats tweaks")
 		@Config.Name("Classy Hats")
 		public ConfigClassyHatsClient classyhats = new ConfigClassyHatsClient();
+		
+		@Config.Comment("Mantle tweaks")
+		@Config.Name("Mantle")
+		public ConfigMantleClient mantle = new ConfigMantleClient();
 		
 		@Config.Comment("Potion Core tweaks")
 		@Config.Name("Potion Core")

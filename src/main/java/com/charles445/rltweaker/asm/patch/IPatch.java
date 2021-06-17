@@ -13,4 +13,6 @@ public interface IPatch
 	public IPatchManager getPatchManager();
 	
 	public void patch(ClassNode clazzNode);
+	
+	public boolean isCancelled();
 }

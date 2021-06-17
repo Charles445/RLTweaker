@@ -18,6 +18,7 @@ import com.charles445.rltweaker.config.JsonConfig;
 import com.charles445.rltweaker.config.ModConfig;
 import com.charles445.rltweaker.handler.AquacultureHandler;
 import com.charles445.rltweaker.handler.BattleTowersHandler;
+import com.charles445.rltweaker.handler.GrapplemodHandler;
 import com.charles445.rltweaker.handler.LostCitiesHandler;
 import com.charles445.rltweaker.handler.MinecraftHandler;
 import com.charles445.rltweaker.handler.MotionCheckHandler;
@@ -51,7 +52,7 @@ import net.minecraftforge.fml.relauncher.Side;
 	modid = RLTweaker.MODID, 
 	name = RLTweaker.NAME, 
 	version = RLTweaker.VERSION,
-	acceptedMinecraftVersions = "[1.12]",
+	acceptedMinecraftVersions = "[1.12, 1.13)",
 	acceptableRemoteVersions = "[0.3.0,)" //THIS IS NO LONGER USED
 	//updateJSON = "https://raw.githubusercontent.com/Charles445/SimpleDifficulty/master/modupdatechecker.json"
 	
@@ -76,6 +77,7 @@ public class RLTweaker
 	public static File jsonDirectory;
 	
 	public static Map<String, Object> handlers = new HashMap<>();
+	public static Map<String, Object> clientHandlers = new HashMap<>();
 	
 	
 	@Mod.EventHandler
@@ -118,6 +120,11 @@ public class RLTweaker
 		if(Loader.isModLoaded(ModNames.AQUACULTURE) && ModConfig.server.aquaculture.enabled)
 		{
 			handlers.put(ModNames.AQUACULTURE, new AquacultureHandler());
+		}
+		
+		if(Loader.isModLoaded(ModNames.GRAPPLEMOD) && ModConfig.server.grapplemod.enabled)
+		{
+			handlers.put(ModNames.GRAPPLEMOD, new GrapplemodHandler());
 		}
 		
 		if(Loader.isModLoaded(ModNames.RECURRENTCOMPLEX) && ModConfig.server.recurrentcomplex.enabled)

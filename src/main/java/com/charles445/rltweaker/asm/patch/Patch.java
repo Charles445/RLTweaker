@@ -14,14 +14,16 @@ public abstract class Patch implements IPatch
 	protected String target;
 	protected int flags;
 	protected IPatchManager manager;
+	protected boolean cancelled;
 	
 	public Patch(IPatchManager manager, String target, int flags)
 	{
 		this.manager = manager;
 		this.target = target;
 		this.flags = flags;
+		this.cancelled = false;
 	}
-
+	
 	@Override
 	public String getTargetClazz()
 	{
@@ -38,6 +40,12 @@ public abstract class Patch implements IPatch
 	public IPatchManager getPatchManager()
 	{
 		return manager;
+	}
+	
+	@Override
+	public boolean isCancelled()
+	{
+		return cancelled;
 	}
 
 	@Override

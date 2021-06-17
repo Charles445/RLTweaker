@@ -1,9 +1,10 @@
 package com.charles445.rltweaker.reflect;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Map;
 
 import com.charles445.rltweaker.util.ReflectUtil;
 
@@ -28,6 +29,11 @@ public class AquacultureReflect
 	public final Class c_SubItem;
 	public final Method m_SubItem_getItemStack;
 	
+	public final Class c_BiomeType;
+	public final Field f_BiomeType_biomeMap;
+	public final Field f_BiomeType_freshwater;
+	public final Method m_BiomeType_addBiome;
+	
 	public AquacultureReflect() throws Exception
 	{
 		c_WeightedLootSet = Class.forName("com.teammetallurgy.aquaculture.loot.WeightedLootSet");
@@ -46,6 +52,11 @@ public class AquacultureReflect
 		
 		c_SubItem = Class.forName("com.teammetallurgy.aquaculture.items.meta.SubItem");
 		m_SubItem_getItemStack = ReflectUtil.findMethod(c_SubItem, "getItemStack", int.class);
+		
+		c_BiomeType = Class.forName("com.teammetallurgy.aquaculture.loot.BiomeType");
+		f_BiomeType_biomeMap = ReflectUtil.findField(c_BiomeType, "biomeMap");
+		f_BiomeType_freshwater = ReflectUtil.findField(c_BiomeType, "freshwater");
+		m_BiomeType_addBiome = ReflectUtil.findMethod(c_BiomeType, "addBiome");
 	}
 	
 	public Object getNeptunesBountyLoot() throws IllegalArgumentException, IllegalAccessException, InvocationTargetException
@@ -76,5 +87,15 @@ public class AquacultureReflect
 	public ItemStack getNeptuniumBarStack() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException
 	{
 		return (ItemStack) m_SubItem_getItemStack.invoke(f_AquacultureItems_neptuniumBar.get(null),1);
+	}
+	
+	public Map<Integer, ArrayList<Object>> getBiomeMap() throws IllegalArgumentException, IllegalAccessException
+	{
+		return (Map<Integer, ArrayList<Object>>) f_BiomeType_biomeMap.get(null);
+	}
+	
+	public Object getFreshwaterBiomeType() throws IllegalArgumentException, IllegalAccessException
+	{
+		return f_BiomeType_freshwater.get(null);
 	}
 }

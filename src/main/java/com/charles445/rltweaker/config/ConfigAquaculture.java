@@ -13,4 +13,9 @@ public class ConfigAquaculture
 	@Config.Name("Fix Neptunes Bounty Loot")
 	@Config.RequiresMcRestart
 	public boolean fixNeptunesBounty = true;
+	
+	@Config.Comment("Fix modded biomes causing other biomes to become freshwater")
+	@Config.Name("Fix Freshwater Bug")
+	@Config.RequiresMcRestart
+	public boolean fixFreshwaterBug = true;
 }

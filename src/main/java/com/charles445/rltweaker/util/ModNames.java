@@ -7,9 +7,11 @@ public class ModNames
 	public static final String CLASSYHATS = "classyhats";
 	public static final String DEFILEDLANDS = "defiledlands";
 	public static final String FAMILIARFAUNA = "familiarfauna";
+	public static final String GRAPPLEMOD = "grapplemod";
 	public static final String ICEANDFIRE = "iceandfire";
 	public static final String LOSTCITIES = "lostcities";
 	public static final String LYCANITESMOBS = "lycanitesmobs";
+	public static final String MANTLE = "mantle";
 	public static final String MINECRAFT = "minecraft";
 	public static final String POTIONCORE = "potioncore";
 	public static final String RECURRENTCOMPLEX = "reccomplex";

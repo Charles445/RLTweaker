@@ -11,7 +11,9 @@ import com.charles445.rltweaker.asm.helper.ASMHelper;
 import com.charles445.rltweaker.asm.patch.IPatch;
 import com.charles445.rltweaker.asm.patch.PatchBetterCombatMountFix;
 import com.charles445.rltweaker.asm.patch.PatchConcurrentParticles;
+import com.charles445.rltweaker.asm.patch.PatchForgeNetwork;
 import com.charles445.rltweaker.asm.patch.PatchLessCollisions;
+import com.charles445.rltweaker.asm.patch.PatchRealBench;
 
 import net.minecraft.launchwrapper.IClassTransformer;
 
@@ -51,15 +53,27 @@ public class RLTweakerASM implements IClassTransformer
 		{
 			System.out.println("Patch exists for "+transformedName);
 			int flags = 0;
+			int oldFlags = 0;
+			
+			boolean ranAnyPatch = false;
 			
 			ClassNode clazzNode = ASMHelper.readClassFromBytes(basicClass);
 			
 			for(IPatch patch : transformMap.get(transformedName))
 			{
+				oldFlags = flags;
 				flags = flags | patch.getFlags();
 				try
 				{
 					patch.patch(clazzNode);
+					if(patch.isCancelled())
+					{
+						flags = oldFlags;
+					}
+					else
+					{
+						ranAnyPatch = true;
+					}
 				}
 				catch(Exception e)
 				{
@@ -71,9 +85,16 @@ public class RLTweakerASM implements IClassTransformer
 			}
 			
 			//TODO verbose
-			System.out.println("Writing class "+transformedName+" with flags "+flagsAsString(flags));
-			
-			return ASMHelper.writeClassToBytes(clazzNode, flags);
+			if(ranAnyPatch)
+			{
+				System.out.println("Writing class "+transformedName+" with flags "+flagsAsString(flags));
+				return ASMHelper.writeClassToBytes(clazzNode, flags);
+			}
+			else
+			{
+				System.out.println("All patches for class "+transformedName+" were cancelled, skipping...");
+				return basicClass;
+			}
 			
 		}
 		
@@ -125,6 +146,14 @@ public class RLTweakerASM implements IClassTransformer
 		{
 			new PatchBetterCombatMountFix();
 		}
+		
+		//realBenchDupeBugFix
+		if(ASMConfig.getBoolean("general.patches.realBenchDupeBugFix", true))
+		{
+			new PatchRealBench();
+		}
+		
+		//new PatchForgeNetwork();
 	}
 
 }

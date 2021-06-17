@@ -26,4 +26,8 @@ public class PatchConfig
 	@Config.RequiresMcRestart
 	@Config.Comment("Allows for mounted combat with BetterCombat")
 	public boolean betterCombatMountFix = true;
+	
+	@Config.RequiresMcRestart
+	@Config.Comment("Fixes RealBench dupe bug")
+	public boolean realBenchDupeBugFix = true;
 }

@@ -1,8 +1,8 @@
 package com.charles445.rltweaker.handler;
 
 import java.lang.reflect.InvocationTargetException;
-
-import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Map;
 
 import com.charles445.rltweaker.RLTweaker;
 import com.charles445.rltweaker.config.ModConfig;
@@ -10,11 +10,7 @@ import com.charles445.rltweaker.reflect.AquacultureReflect;
 import com.charles445.rltweaker.util.CriticalException;
 import com.charles445.rltweaker.util.ErrorUtil;
 
-import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraft.world.biome.Biome;
 
 public class AquacultureHandler
 {
@@ -31,6 +27,11 @@ public class AquacultureHandler
 				fixNeptunesBounty();
 			}
 			
+			if(ModConfig.server.aquaculture.fixFreshwaterBug)
+			{
+				fixFreshwaterBug();
+			}
+			
 			//No need for bus yet
 			//MinecraftForge.EVENT_BUS.register(this);
 		}
@@ -42,6 +43,44 @@ public class AquacultureHandler
 			//Crash on Critical
 			if(e instanceof CriticalException)
 				throw new RuntimeException(e);
+		}
+	}
+	
+	public void fixFreshwaterBug()
+	{
+		try
+		{
+			Map<Integer, ArrayList<Object>> biomeMap = reflector.getBiomeMap();
+			
+			if(biomeMap == null)
+			{
+				RLTweaker.logger.error("Aquaculture had null biomeMap, failed to fix freshwater bug");
+				ErrorUtil.logSilent("Aquaculture Fix Freshwater Bug Null BiomeMap");
+				return;
+			}
+			
+			Object freshwaterBiomeType = reflector.getFreshwaterBiomeType();
+			if(freshwaterBiomeType == null)
+			{
+				RLTweaker.logger.error("Aquaculture had null freshwater BiomeType, failed to fix freshwater bug");
+				ErrorUtil.logSilent("Aquaculture Fix Freshwater Bug Null Freshwater BiomeType");
+				return;
+			}
+			
+			for (Biome biome : Biome.REGISTRY)
+			{
+				int biomeID = Biome.getIdForBiome(biome);
+				if(!biomeMap.containsKey(biomeID))
+				{
+					biomeMap.put(biomeID, new ArrayList<>());
+					biomeMap.get(biomeID).add(freshwaterBiomeType);
+				}
+			}
+		}
+		catch (IllegalArgumentException | IllegalAccessException e)
+		{
+			e.printStackTrace();
+			ErrorUtil.logSilent("Aquaculture Fix Freshwater Bug Failure");
 		}
 	}
 	

@@ -1,59 +1,19 @@
-package com.charles445.rltweaker.asm.patch;
-
-import javax.annotation.Nullable;
+package com.charles445.rltweaker.asm.helper;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.MethodNode;
 
-import com.charles445.rltweaker.asm.helper.ASMHelper;
+import javax.annotation.Nullable;
 
-public abstract class Patch implements IPatch
+public abstract class PatchHelper
 {
-	protected String target;
-	protected int flags;
-	protected IPatchManager manager;
-	protected boolean cancelled;
-	
-	public Patch(IPatchManager manager, String target, int flags)
-	{
-		this.manager = manager;
-		this.target = target;
-		this.flags = flags;
-		this.cancelled = false;
-	}
-	
-	@Override
-	public String getTargetClazz()
-	{
-		return target;
-	}
-
-	@Override
-	public int getFlags()
-	{
-		return flags;
-	}
-	
-	@Override
-	public IPatchManager getPatchManager()
-	{
-		return manager;
-	}
-	
-	@Override
-	public boolean isCancelled()
-	{
-		return cancelled;
-	}
-
-	@Override
-	public abstract void patch(ClassNode clazzNode);
+	private PatchHelper() {}
 	
 	//Utility
 	
-	protected void announce(String s)
+	public static void announce(String s)
 	{
 		System.out.println("RLTweakerASM: "+s);
 	}
@@ -63,11 +23,11 @@ public abstract class Patch implements IPatch
 	/**
 	 * Finds the first method with the matching choice of names
 	 * @param classNode
-	 * @param methodName
+	 * @param methodNames
 	 * @return
 	 */
 	@Nullable
-	protected MethodNode findMethod(ClassNode classNode, String... methodNames)
+	public static MethodNode findMethod(ClassNode classNode, String... methodNames)
 	{
 		for(MethodNode m : classNode.methods)
 		{
@@ -82,7 +42,7 @@ public abstract class Patch implements IPatch
 	}
 	
 	@Nullable
-	protected MethodNode findMethodWithDesc(ClassNode classNode, String desc, String... methodNames)
+	public static MethodNode findMethodWithDesc(ClassNode classNode, String desc, String... methodNames)
 	{
 		for(MethodNode m : classNode.methods)
 		{
@@ -101,27 +61,27 @@ public abstract class Patch implements IPatch
 	
 	//FIRST
 	@Nullable
-	protected AbstractInsnNode first(MethodNode methodNode)
+	public static AbstractInsnNode first(MethodNode methodNode)
 	{
 		return ASMHelper.findFirstInstruction(methodNode);
 	}
 	
 	//LAST
 	@Nullable
-	protected AbstractInsnNode last(MethodNode methodNode)
+	public static AbstractInsnNode last(MethodNode methodNode)
 	{
 		return ASMHelper.getOrFindInstruction(methodNode.instructions.getLast(), true);
 	}
 	
 	//NEXT
 	@Nullable
-	protected AbstractInsnNode next(AbstractInsnNode node)
+	public static AbstractInsnNode next(AbstractInsnNode node)
 	{
 		return node.getNext();
 	}
 	
 	@Nullable
-	protected AbstractInsnNode next(AbstractInsnNode node, int count)
+	public static AbstractInsnNode next(AbstractInsnNode node, int count)
 	{
 		AbstractInsnNode anchor = node;
 		for(int i=0;i<count;i++)
@@ -135,13 +95,13 @@ public abstract class Patch implements IPatch
 	}
 	
 	@Nullable
-	protected AbstractInsnNode nextInsn(AbstractInsnNode node)
+	public static AbstractInsnNode nextInsn(AbstractInsnNode node)
 	{
 		return ASMHelper.findNextInstruction(node);
 	}
 	
 	@Nullable
-	protected AbstractInsnNode nextInsn(AbstractInsnNode node, int count)
+	public static AbstractInsnNode nextInsn(AbstractInsnNode node, int count)
 	{
 		AbstractInsnNode anchor = node;
 		for(int i=0;i<count;i++)
@@ -156,13 +116,13 @@ public abstract class Patch implements IPatch
 	
 	//PREVIOUS
 	@Nullable
-	protected AbstractInsnNode previous(AbstractInsnNode node)
+	public static AbstractInsnNode previous(AbstractInsnNode node)
 	{
 		return node.getPrevious();
 	}
 	
 	@Nullable
-	protected AbstractInsnNode previous(AbstractInsnNode node, int count)
+	public static AbstractInsnNode previous(AbstractInsnNode node, int count)
 	{
 		AbstractInsnNode anchor = node;
 		for(int i=0;i<count;i++)
@@ -176,13 +136,13 @@ public abstract class Patch implements IPatch
 	}
 	
 	@Nullable
-	protected AbstractInsnNode previousInsn(AbstractInsnNode node)
+	public static AbstractInsnNode previousInsn(AbstractInsnNode node)
 	{
 		return ASMHelper.findPreviousInstruction(node);
 	}
 	
 	@Nullable
-	protected AbstractInsnNode previousInsn(AbstractInsnNode node, int count)
+	public static AbstractInsnNode previousInsn(AbstractInsnNode node, int count)
 	{
 		AbstractInsnNode anchor = node;
 		for(int i=0;i<count;i++)
@@ -195,7 +155,7 @@ public abstract class Patch implements IPatch
 		return anchor;
 	}
 	
-	protected InsnList wrap(AbstractInsnNode... nodes)
+	public static InsnList wrap(AbstractInsnNode... nodes)
 	{
 		InsnList wrapper = new InsnList();
 		for(AbstractInsnNode node : nodes)

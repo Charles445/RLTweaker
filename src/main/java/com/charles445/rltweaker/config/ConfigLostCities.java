@@ -16,5 +16,5 @@ public class ConfigLostCities
 	@Config.Comment("How many entries the caches are allowed to get before they are cleared. Default is recommended.")
 	@Config.Name("GenerationCacheMaxCount")
 	@Config.RangeInt(min=0)
-	public int generationCacheMaxCount = 10000;
+	public int generationCacheMaxCount = 200;
 }

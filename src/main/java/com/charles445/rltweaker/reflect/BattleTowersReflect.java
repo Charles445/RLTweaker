@@ -32,6 +32,13 @@ public class BattleTowersReflect
 	public final Field f_AS_EntityGolemFireball_accelerationY;
 	public final Field f_AS_EntityGolemFireball_accelerationZ;
 	
+	public final Class c_WorldGenHandler;
+	public final Field f_WorldGenHandler_instance;
+	public final Method m_WorldGenHandler_getWorldHandle;
+
+	public final Class c_WorldGenHandler$WorldHandle;
+	public final Field f_WorldGenHandler$WorldHandle_disableGenerationHook;
+	
 	//Lycanites Mobs
 	private boolean isLycanitesAvailable;
 	@Nullable
@@ -69,6 +76,13 @@ public class BattleTowersReflect
 		f_AS_EntityGolemFireball_accelerationX = ReflectUtil.findField(c_AS_EntityGolemFireball, "accelerationX");
 		f_AS_EntityGolemFireball_accelerationY = ReflectUtil.findField(c_AS_EntityGolemFireball, "accelerationY");
 		f_AS_EntityGolemFireball_accelerationZ = ReflectUtil.findField(c_AS_EntityGolemFireball, "accelerationZ");
+		
+		c_WorldGenHandler = Class.forName("atomicstryker.battletowers.common.WorldGenHandler");
+		f_WorldGenHandler_instance = ReflectUtil.findField(c_WorldGenHandler, "instance");
+		m_WorldGenHandler_getWorldHandle = ReflectUtil.findMethod(c_WorldGenHandler, "getWorldHandle");
+		
+		c_WorldGenHandler$WorldHandle = Class.forName("atomicstryker.battletowers.common.WorldGenHandler$WorldHandle");
+		f_WorldGenHandler$WorldHandle_disableGenerationHook = ReflectUtil.findField(c_WorldGenHandler$WorldHandle, "disableGenerationHook");
 		
 		//Lycanites Compatibility Setup
 		if(Loader.isModLoaded(ModNames.LYCANITESMOBS))
@@ -131,6 +145,31 @@ public class BattleTowersReflect
 	public double getGolemFireballAccelerationZ(Object golemFireball) throws IllegalArgumentException, IllegalAccessException
 	{
 		return f_AS_EntityGolemFireball_accelerationZ.getDouble(golemFireball);
+	}
+	
+	private Object getWorldGenHandler() throws IllegalArgumentException, IllegalAccessException
+	{
+		return f_WorldGenHandler_instance.get(null);
+	}
+	
+	@Nullable
+	public Object getWorldHandle(World world) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException
+	{
+		Object wghInstance = getWorldGenHandler();
+		if(wghInstance == null)
+			return null;
+		
+		return m_WorldGenHandler_getWorldHandle.invoke(wghInstance, world);
+	}
+	
+	public boolean setWorldDisableGenerationHook(World world, int value) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException
+	{
+		Object wh = getWorldHandle(world);
+		if(wh == null)
+			return false;
+		
+		f_WorldGenHandler$WorldHandle_disableGenerationHook.setInt(wh, value);
+		return true;
 	}
 	
 	//Lycanites Compatibility

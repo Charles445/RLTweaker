@@ -23,6 +23,7 @@ public class GrapplemodHandler
 		{
 			reflector = new GrapplemodReflect();
 			
+			//TODO configurable wrapping?
 			CompatUtil.wrapSpecificHandler("GMLivingFallEvent", GMLivingFallEvent::new, "com.yyon.grapplinghook.CommonProxyClass", "onLivingFallEvent");
 			CompatUtil.wrapSpecificHandler("GMLivingFallEvent", GMLivingFallEvent::new, "com.yyon.grapplinghook.ServerProxyClass", "onLivingFallEvent");
 			CompatUtil.wrapSpecificHandler("GMLivingFallEvent", GMLivingFallEvent::new, "com.yyon.grapplinghook.ClientProxyClass", "onLivingFallEvent");

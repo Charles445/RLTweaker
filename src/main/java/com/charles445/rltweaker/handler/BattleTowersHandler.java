@@ -7,6 +7,7 @@ import java.util.Set;
 import com.charles445.rltweaker.RLTweaker;
 import com.charles445.rltweaker.config.ModConfig;
 import com.charles445.rltweaker.reflect.BattleTowersReflect;
+import com.charles445.rltweaker.util.CompatUtil;
 import com.charles445.rltweaker.util.CriticalException;
 import com.charles445.rltweaker.util.ErrorUtil;
 
@@ -16,7 +17,9 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
+import net.minecraftforge.fml.common.eventhandler.IEventListener;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
@@ -31,6 +34,10 @@ public class BattleTowersHandler
 		try
 		{
 			reflector = new BattleTowersReflect();
+			
+			if(ModConfig.server.battletowers.dimensionBlacklistEnabled)
+				CompatUtil.wrapSpecificHandler("BTWorldLoadEvent", BTWorldLoadEvent::new, "atomicstryker.battletowers.common.WorldGenHandler", "eventWorldLoad");
+			
 			MinecraftForge.EVENT_BUS.register(this);
 		}
 		catch(Exception e)
@@ -235,5 +242,57 @@ public class BattleTowersHandler
 			}
 			
 		}
+	}
+	
+	public class BTWorldLoadEvent
+	{
+		private IEventListener handler;
+		public BTWorldLoadEvent(IEventListener handler)
+		{
+			this.handler = handler;
+			MinecraftForge.EVENT_BUS.register(this);
+		}
+		
+		@SubscribeEvent
+		public void onWorldLoad(final WorldEvent.Load event)
+		{
+			handler.invoke(event);
+			if(ModConfig.server.battletowers.dimensionBlacklistEnabled)
+			{
+				int dimension = event.getWorld().provider.getDimension();
+				int[] blackListIds = ModConfig.server.battletowers.dimensionBlacklistIds;
+				boolean blacklistHasDimension = false;
+				
+				for(int i=0;i<blackListIds.length;i++)
+				{
+					if(blackListIds[i] == dimension)
+					{
+						blacklistHasDimension = true;
+						break;
+					}
+				}
+				
+				if(blacklistHasDimension != ModConfig.server.battletowers.dimensionBlacklistIsWhitelist)
+				{
+					//Block the dimension by sabotaging the WorldHandle
+					boolean success = false;
+					try
+					{
+						success = reflector.setWorldDisableGenerationHook(event.getWorld(), 1000);
+					}
+					catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e)
+					{
+						
+					}
+					
+					if(!success)
+					{
+						RLTweaker.logger.error("Failed to prevent Battletowers from spawning in loaded dimension: "+dimension);
+						ErrorUtil.logSilent("BT Dimension Blacklist Failure");
+					}
+				}
+			}
+		}
+		
 	}
 }

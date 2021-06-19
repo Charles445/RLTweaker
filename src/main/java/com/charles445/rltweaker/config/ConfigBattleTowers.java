@@ -24,7 +24,7 @@ public class ConfigBattleTowers
 	@Config.Comment("Max Golem XZ movement to make using tools like fishing rods harder. Set to a negative number to disable")
 	@Config.Name("Golem Speed Cap")
 	@Config.RangeDouble(min=-1.0d)
-	public double golemSpeedCap = 0.0625f;
+	public double golemSpeedCap = 0.125f;
 	
 	@Config.Comment("Prevent golems from riding anything, like boats or minecarts")
 	@Config.Name("Golem Auto Dismount")
@@ -32,7 +32,7 @@ public class ConfigBattleTowers
 	
 	@Config.Comment("Replace the golem's projectile with a LycanitesMobs Projectile (Requires LycanitesMobs)")
 	@Config.Name("Golem Lycanites Projectile")
-	public boolean golemLycanitesProjectile = true;
+	public boolean golemLycanitesProjectile = false;
 	
 	@Config.Comment("The name of the projectile to use")
 	@Config.Name("Golem Lycanites Projectile Name")
@@ -45,5 +45,20 @@ public class ConfigBattleTowers
 	@Config.Comment("Speed modifier for the lycanites projectile")
 	@Config.Name("Golem Lycanites Projectile Speed Modifier")
 	public double golemLycanitesProjectileSpeedModifier = 9.0d;
+	
+	@Config.Comment("Use dimension blacklist")
+	@Config.Name("Dimension Blacklist Enabled")
+	@Config.RequiresMcRestart
+	public boolean dimensionBlacklistEnabled = false;
+	
+	@Config.Comment("Dimension blacklist of dimension IDs")
+	@Config.Name("Dimension Blacklist")
+	@Config.RequiresMcRestart
+	public int[] dimensionBlacklistIds = {111};
+	
+	@Config.Comment("Whether the dimension blacklist is a whitelist")
+	@Config.Name("Dimension Blacklist Is Whitelist")
+	@Config.RequiresMcRestart
+	public boolean dimensionBlacklistIsWhitelist = false;
 	
 }

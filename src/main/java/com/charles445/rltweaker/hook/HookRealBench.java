@@ -135,7 +135,6 @@ public class HookRealBench
 		{
 			super(); //there isn't one
 			this.setup(con);
-			System.out.println("setupsetupsetupsetupsetup");
 		}
 		
 		private void setup(Container con)

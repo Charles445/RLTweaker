@@ -1,83 +1,53 @@
 package com.charles445.rltweaker.asm;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.objectweb.asm.tree.ClassNode;
-
 import com.charles445.rltweaker.asm.helper.ASMHelper;
-import com.charles445.rltweaker.asm.patch.IPatch;
 import com.charles445.rltweaker.asm.patch.PatchBetterCombatMountFix;
 import com.charles445.rltweaker.asm.patch.PatchConcurrentParticles;
-import com.charles445.rltweaker.asm.patch.PatchForgeNetwork;
 import com.charles445.rltweaker.asm.patch.PatchLessCollisions;
 import com.charles445.rltweaker.asm.patch.PatchRealBench;
-
 import net.minecraft.launchwrapper.IClassTransformer;
+import org.objectweb.asm.tree.ClassNode;
+
+import javax.annotation.Nullable;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.*;
+import java.util.function.BiFunction;
 
 public class RLTweakerASM implements IClassTransformer
 {
-	private boolean run = true;
+	private Map<String, List<PatchMeta>> transformMap = new HashMap<>();
 	
-	protected static Map<String, List<IPatch>> transformMap = new HashMap<>();
+	// TODO: Use MODID constant (It worked for ISeeDragons, but might not be safe if RLTweaker#<clinit> loads the wrong classes.
+	private static final ASMConfig config = new ASMConfig("rltweaker");
 	
 	public RLTweakerASM()
 	{
-		super();
-		
-		this.run = ASMConfig.getBoolean("general.patches.ENABLED", true);
-		
-		if(this.run)
-		{
-			System.out.println("Patcher is enabled");
-		}
-		else
-		{
-			System.out.println("Patcher has been disabled");
-			return;
-		}
-		
 		this.createPatches();
 	}
 	
 	@Override
 	public byte[] transform(String name, String transformedName, byte[] basicClass)
 	{
-		if(!this.run)
-			return basicClass;
-		
 		//Check for patches
 		if(transformMap.containsKey(transformedName))
 		{
 			System.out.println("Patch exists for "+transformedName);
-			int flags = 0;
-			int oldFlags = 0;
-			
-			boolean ranAnyPatch = false;
+			PatchResult result = PatchResult.NO_MUTATION;
 			
 			ClassNode clazzNode = ASMHelper.readClassFromBytes(basicClass);
 			
-			for(IPatch patch : transformMap.get(transformedName))
+			for(PatchMeta manager : transformMap.get(transformedName))
 			{
-				oldFlags = flags;
-				flags = flags | patch.getFlags();
 				try
 				{
-					patch.patch(clazzNode);
-					if(patch.isCancelled())
-					{
-						flags = oldFlags;
-					}
-					else
-					{
-						ranAnyPatch = true;
-					}
+					System.out.println("Applying patch [" + manager.name + "] " + manager.desc);
+					result = result.add(manager.patch.apply(this, clazzNode));
 				}
 				catch(Exception e)
 				{
-					System.out.println("Failed at patch "+patch.getPatchManager().getName());
+					// TODO: If there was an error, clazzNode may have been mutated into an undefined state.
+					System.out.println("Failed at patch "+manager.name);
 					System.out.println("Failed to write "+transformedName);
 					e.printStackTrace();
 					return basicClass;
@@ -85,75 +55,110 @@ public class RLTweakerASM implements IClassTransformer
 			}
 			
 			//TODO verbose
-			if(ranAnyPatch)
+			if(result.isMutated())
 			{
-				System.out.println("Writing class "+transformedName+" with flags "+flagsAsString(flags));
-				return ASMHelper.writeClassToBytes(clazzNode, flags);
+				System.out.println("Writing class "+transformedName+" with flags "+result);
+				return ASMHelper.writeClassToBytes(clazzNode, result.getFlags());
 			}
 			else
 			{
 				System.out.println("All patches for class "+transformedName+" were cancelled, skipping...");
 				return basicClass;
 			}
-			
 		}
-		
 		
 		return basicClass;
 	}
-	
-	public static String flagsAsString(int flags)
+
+	public void addPatcher(Class<?> clazz)
 	{
-		switch(flags)
-		{
-			case 0: return "None";
-			case 1: return "MAXS";
-			case 2: return "FRAMES";
-			case 3: return "MAXS | FRAMES";
-			default: return "(unknown "+flags+")";
+		@Nullable
+		Patcher patcher = clazz.getAnnotation(Patcher.class);
+		if (patcher == null) {
+			throw new IllegalArgumentException(clazz.getName() + " does not have an @Patcher annotation");
+		}
+		
+		for (Method m : clazz.getDeclaredMethods()) {
+			@Nullable
+			Patch patch = m.getAnnotation(Patch.class);
+			if (patch != null) {
+				if (!Modifier.isPublic(m.getModifiers()) || !Modifier.isStatic(m.getModifiers()) ||
+						!Arrays.equals(m.getParameterTypes(), new Class[]{RLTweakerASM.class, ClassNode.class}) ||
+						!m.getReturnType().equals(PatchResult.class)) {
+					throw new IllegalArgumentException(clazz.getName() + "#" + m.getName() + " is not declared correctly to be a @Patch");
+				}
+				
+				addPatch(patch.target(),
+						patcher.name().equals("") ? clazz.getSimpleName() : patcher.name(),
+						patch.desc(),
+						(tweaker, clazzNode) -> {
+							try {
+								return (PatchResult) m.invoke(null, tweaker, clazzNode);
+							} catch (ReflectiveOperationException e) {
+								// We sanitized the method already
+								throw new RuntimeException("This shouldn't have happened (blame xcube)", e);
+							}
+						});
+			}
 		}
 	}
 	
-	public static void addPatch(IPatch patch)
-	{
-		String target = patch.getTargetClazz();
-		
-		if(!transformMap.containsKey(target))
-			transformMap.put(target, new ArrayList<IPatch>());
-		
-		List<IPatch> patches = transformMap.get(target);
-		patches.add(patch);
+	public void addPatch(String target, String name, String desc, BiFunction<RLTweakerASM,ClassNode, PatchResult> patch) {
+		this.transformMap.computeIfAbsent(target, t -> new ArrayList<>())
+				.add(new PatchMeta(name, desc, patch));
+	}
+	
+	public void addPatch(String target, BiFunction<RLTweakerASM,ClassNode, PatchResult> patch) {
+		this.addPatch(target, "<anonymous>", "", patch);
 	}
 	
 	private void createPatches()
 	{
 		//Create all the patches
+		if(!config.getBoolean("general.patches.ENABLED", true))
+		{
+			System.out.println("Patcher has been disabled");
+			return;
+		}
+		System.out.println("Patcher is enabled");
 		
 		//particleThreading
-		if(ASMConfig.getBoolean("general.patches.particleThreading", true))
+		if(config.getBoolean("general.patches.particleThreading", true))
 		{
-			new PatchConcurrentParticles();
+			addPatcher(PatchConcurrentParticles.class);
 		}
 		
 		//lessCollisions
-		if(ASMConfig.getBoolean("general.patches.lessCollisions", true))
+		if(config.getBoolean("general.patches.lessCollisions", true))
 		{
-			new PatchLessCollisions();
+			addPatcher(PatchLessCollisions.class);
 		}
 		
 		//betterCombatMountFix
-		if(ASMConfig.getBoolean("general.patches.betterCombatMountFix", true))
+		if(config.getBoolean("general.patches.betterCombatMountFix", true))
 		{
-			new PatchBetterCombatMountFix();
+			addPatcher(PatchBetterCombatMountFix.class);
 		}
 		
 		//realBenchDupeBugFix
-		if(ASMConfig.getBoolean("general.patches.realBenchDupeBugFix", true))
+		if(config.getBoolean("general.patches.realBenchDupeBugFix", true))
 		{
-			new PatchRealBench();
+			addPatcher(PatchRealBench.class);
 		}
 		
-		//new PatchForgeNetwork();
+		//addPatcher(PatchForgeNetwork.class);
 	}
-
+	
+	private static final class PatchMeta {
+		
+		final String name;
+		final String desc;
+		final BiFunction<RLTweakerASM,ClassNode, PatchResult> patch;
+		
+		private PatchMeta(String name, String desc, BiFunction<RLTweakerASM,ClassNode, PatchResult> patch) {
+			this.name = name;
+			this.desc = desc;
+			this.patch = patch;
+		}
+	}
 }

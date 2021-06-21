@@ -1,19 +1,77 @@
 package com.charles445.rltweaker.asm.patch;
 
-import org.objectweb.asm.ClassWriter;
+import com.charles445.rltweaker.asm.Patch;
+import com.charles445.rltweaker.asm.PatchResult;
+import com.charles445.rltweaker.asm.Patcher;
+import com.charles445.rltweaker.asm.RLTweakerASM;
+import com.charles445.rltweaker.asm.util.ClassDisplayer;
+import com.charles445.rltweaker.asm.util.TransformUtil;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
-import com.charles445.rltweaker.asm.util.ClassDisplayer;
-import com.charles445.rltweaker.asm.util.TransformUtil;
+import static com.charles445.rltweaker.asm.helper.PatchHelper.*;
 
-public class PatchLessCollisions extends PatchManager
+@Patcher(name = "Less Collisions")
+public class PatchLessCollisions
 {
-	public PatchLessCollisions()
-	{
-		super("Less Collisions");
+	
+	//Possible issues:
+	//
+	//Explosion owner
+	//Projectiles that use ProjectileHelper forwardsRaycast
+	//Sponge compatible, 7.3.0
+	@Patch(target = "net.minecraft.world.World")
+	public static PatchResult patchWorldyAABBThingy(RLTweakerASM tweaker, ClassNode c_World) {
+		if(true) // func_72839_b getEntitiesWithinAABBExcludingEntity
+		{
+			MethodNode m_getEntWithAABBExclEntity = findMethodWithDesc(c_World, "(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/AxisAlignedBB;)Ljava/util/List;", "func_72839_b", "getEntitiesWithinAABBExcludingEntity");
+			
+			if(m_getEntWithAABBExclEntity == null)
+				throw new RuntimeException("Couldn't find getEntitiesWithinAABBExcludingEntity or func_72839_b with matching desc");
+			
+			MethodInsnNode getAABBCall = TransformUtil.findNextCallWithOpcodeAndName(first(m_getEntWithAABBExclEntity), Opcodes.INVOKEVIRTUAL, "func_175674_a","getEntitiesInAABBexcluding");
+			if(getAABBCall == null)
+			{
+				System.out.println("Unexpected error, please show the below wall of text to the RLTweaker developer, thanks! Couldn't find getEntitiesInAABBexcluding or func_175674_a");
+				ClassDisplayer.instance.printMethod(m_getEntWithAABBExclEntity);
+				throw new RuntimeException("Couldn't find getEntitiesInAABBexcluding or func_175674_a");
+			}
+			//Stack here should have everything needed for the static call, which is convenient.
+			getAABBCall.setOpcode(Opcodes.INVOKESTATIC);
+			getAABBCall.owner = "com/charles445/rltweaker/hook/HookWorld";
+			getAABBCall.name = "getEntitiesInAABBexcluding";
+			getAABBCall.desc = "(Lnet/minecraft/world/World;Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/AxisAlignedBB;Lcom/google/common/base/Predicate;)Ljava/util/List;";
+		}
+		return PatchResult.MAXS;
+	}
+	
+	@Patch(target = "net.minecraft.entity.EntityLivingBase")
+	public static PatchResult patchEntityLiving(RLTweakerASM tweaker, ClassNode c_EntityLivingBase) {
+		if(true) // func_85033_bc collideWithNearbyEntities
+		{
+			MethodNode m_collideWithNearbyEntities = findMethodWithDesc(c_EntityLivingBase, "()V", "func_85033_bc", "collideWithNearbyEntities");
+			
+			if(m_collideWithNearbyEntities == null)
+				throw new RuntimeException("Couldn't find collideWithNearbyEntities or func_85033_bc with matching desc");
+			
+			
+			MethodInsnNode getAABBCall = TransformUtil.findNextCallWithOpcodeAndName(first(m_collideWithNearbyEntities), Opcodes.INVOKEVIRTUAL, "func_175674_a", "getEntitiesInAABBexcluding");
+			if(getAABBCall == null)
+			{
+				System.out.println("Unexpected error, please show the below wall of text to the RLTweaker developer, thanks! Couldn't find getEntitiesInAABBexcluding or func_175674_a");
+				ClassDisplayer.instance.printMethod(m_collideWithNearbyEntities);
+				throw new RuntimeException("Couldn't find getEntitiesInAABBexcluding or func_175674_a");
+			}
+			//Stack here should have everything needed for the static call, which is convenient.
+			getAABBCall.setOpcode(Opcodes.INVOKESTATIC);
+			getAABBCall.owner = "com/charles445/rltweaker/hook/HookWorld";
+			getAABBCall.name = "getEntitiesInAABBexcluding";
+			getAABBCall.desc = "(Lnet/minecraft/world/World;Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/AxisAlignedBB;Lcom/google/common/base/Predicate;)Ljava/util/List;";
+		}
+		return PatchResult.MAXS;
+	}
 		
 		//Sponge overwrites this entirely, so it doesn't work
 		/*
@@ -65,73 +123,6 @@ public class PatchLessCollisions extends PatchManager
 		});
 		*/
 		
-		//Sponge compatible, 7.3.0
-		add(new Patch(this, "net.minecraft.world.World", ClassWriter.COMPUTE_MAXS)
-		{
-			//Possible issues:
-			//
-			//Explosion owner
-			//Projectiles that use ProjectileHelper forwardsRaycast
-			
-			@Override
-			public void patch(ClassNode c_World)
-			{
-				if(true) // func_72839_b getEntitiesWithinAABBExcludingEntity
-				{
-					MethodNode m_getEntWithAABBExclEntity = findMethodWithDesc(c_World, "(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/AxisAlignedBB;)Ljava/util/List;", "func_72839_b", "getEntitiesWithinAABBExcludingEntity");
-					
-					if(m_getEntWithAABBExclEntity == null)
-						throw new RuntimeException("Couldn't find getEntitiesWithinAABBExcludingEntity or func_72839_b with matching desc");
-					
-					MethodInsnNode getAABBCall = TransformUtil.findNextCallWithOpcodeAndName(first(m_getEntWithAABBExclEntity), Opcodes.INVOKEVIRTUAL, "func_175674_a","getEntitiesInAABBexcluding");
-					if(getAABBCall == null)
-					{
-						System.out.println("Unexpected error, please show the below wall of text to the RLTweaker developer, thanks! Couldn't find getEntitiesInAABBexcluding or func_175674_a");
-						ClassDisplayer.instance.printMethod(m_getEntWithAABBExclEntity);
-						throw new RuntimeException("Couldn't find getEntitiesInAABBexcluding or func_175674_a");
-					}
-					//Stack here should have everything needed for the static call, which is convenient.
-					getAABBCall.setOpcode(Opcodes.INVOKESTATIC);
-					getAABBCall.owner = "com/charles445/rltweaker/hook/HookWorld";
-					getAABBCall.name = "getEntitiesInAABBexcluding";
-					getAABBCall.desc = "(Lnet/minecraft/world/World;Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/AxisAlignedBB;Lcom/google/common/base/Predicate;)Ljava/util/List;";
-				}
-			}
-		});
-		
-		//Sponge compatible, 7.3.0
-		add(new Patch(this, "net.minecraft.entity.EntityLivingBase", ClassWriter.COMPUTE_MAXS)
-		{
-			@Override
-			public void patch(ClassNode c_EntityLivingBase)
-			{
-				if(true) // func_85033_bc collideWithNearbyEntities
-				{
-					MethodNode m_collideWithNearbyEntities = findMethodWithDesc(c_EntityLivingBase, "()V", "func_85033_bc", "collideWithNearbyEntities");
-					
-					if(m_collideWithNearbyEntities == null)
-						throw new RuntimeException("Couldn't find collideWithNearbyEntities or func_85033_bc with matching desc");
-					
-					
-					MethodInsnNode getAABBCall = TransformUtil.findNextCallWithOpcodeAndName(first(m_collideWithNearbyEntities), Opcodes.INVOKEVIRTUAL, "func_175674_a", "getEntitiesInAABBexcluding");
-					if(getAABBCall == null)
-					{
-						System.out.println("Unexpected error, please show the below wall of text to the RLTweaker developer, thanks! Couldn't find getEntitiesInAABBexcluding or func_175674_a");
-						ClassDisplayer.instance.printMethod(m_collideWithNearbyEntities);
-						throw new RuntimeException("Couldn't find getEntitiesInAABBexcluding or func_175674_a");
-					}
-					//Stack here should have everything needed for the static call, which is convenient.
-					getAABBCall.setOpcode(Opcodes.INVOKESTATIC);
-					getAABBCall.owner = "com/charles445/rltweaker/hook/HookWorld";
-					getAABBCall.name = "getEntitiesInAABBexcluding";
-					getAABBCall.desc = "(Lnet/minecraft/world/World;Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/AxisAlignedBB;Lcom/google/common/base/Predicate;)Ljava/util/List;";
-				}
-			}
-		});
-	}
-	
-	
-	
 	//Another implementation, this one works pretty well but isn't collisions specific...
 	/*
 	MethodNode m_getEntitiesInAABBexcluding = findMethod(c_World, "func_175674_a","getEntitiesInAABBexcluding");

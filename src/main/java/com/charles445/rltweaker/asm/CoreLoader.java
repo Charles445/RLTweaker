@@ -19,7 +19,6 @@ public class CoreLoader implements IFMLLoadingPlugin
 	@Override
 	public String[] getASMTransformerClass()
 	{
-		ASMConfig.setup();
 		return new String[] { "com.charles445.rltweaker.asm.RLTweakerASM" };
 	}
 

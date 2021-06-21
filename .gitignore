@@ -1,6 +1,7 @@
 #Folders
 .gradle/*
 .settings/*
+.idea/*
 bin/*
 build/*
 eclipse/*

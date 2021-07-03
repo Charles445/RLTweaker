@@ -84,6 +84,8 @@ public class MessageSendVersion implements IMessage
 					{
 						//RLTweaker.logger.info("Registering with UUID: "+netHandler.player.getGameProfile().getId());
 						//NetworkHandler.helloQueue.add(netHandler.player.getGameProfile().getId());
+						
+						//TODO verify that handling all of this stuff in this netty thread is acceptable
 						NetworkHandler.addClient(netHandler.player.getGameProfile().getId(), new VersionDelimiter(message.major, message.minor, message.patch));
 					}
 					else

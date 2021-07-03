@@ -14,15 +14,12 @@ public class PacketHandler
 	{
 		//0.2.0
 		instance.registerMessage(MessageUpdateEntityMovement.Handler.class, MessageUpdateEntityMovement.class, 0, Side.CLIENT);
-		instance.registerMessage(MessageUpdateDismountStatus.Handler.class, MessageUpdateDismountStatus.class, 1, Side.CLIENT);
 		
 		//0.3.0
-		instance.registerMessage(MessageUpdateAttackYaw.Handler.class, MessageUpdateAttackYaw.class, 2, Side.CLIENT);
+		instance.registerMessage(MessageUpdateDismountStatus.Handler.class, MessageUpdateDismountStatus.class, 1, Side.CLIENT);
 		
 		//0.4.0
+		instance.registerMessage(MessageUpdateAttackYaw.Handler.class, MessageUpdateAttackYaw.class, 2, Side.CLIENT);
 		instance.registerMessage(MessageSendVersion.Handler.class, MessageSendVersion.class, 3, Side.SERVER);
-		
-		
-		
 	}
 }

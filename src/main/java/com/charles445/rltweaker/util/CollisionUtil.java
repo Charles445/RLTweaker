@@ -17,11 +17,11 @@ public class CollisionUtil
 	
 	//Accessed by both logical client and logical server
 	//TODO split this up?
-	private Map<String, Double> stringReference = new ConcurrentHashMap<String, Double>();
+	private final Map<String, Double> stringReference = new ConcurrentHashMap<String, Double>();
 	
 	//These should be accessed individually, but might as well make them concurrent
-	private Map<Class, Double> collisionMapServer = new ConcurrentHashMap<Class, Double>();
-	private Map<Class, Double> collisionMapClient = new ConcurrentHashMap<Class, Double>();
+	private final Map<Class, Double> collisionMapServer = new ConcurrentHashMap<Class, Double>();
+	private final Map<Class, Double> collisionMapClient = new ConcurrentHashMap<Class, Double>();
 	
 	public CollisionUtil()
 	{
@@ -65,7 +65,7 @@ public class CollisionUtil
 		}
 		else
 		{
-			//Client
+			//Server
 			Double dub = collisionMapServer.get(entity.getClass());
 			if(dub!=null)
 				return dub;

@@ -47,7 +47,6 @@ public class MessageUpdateAttackYaw implements IMessage
 		{
 			if(ctx.side == Side.CLIENT)
 			{
-				//TODO check w/o scheduling?
 				Minecraft.getMinecraft().addScheduledTask(() -> 
 				{
 					fromMessage(message);

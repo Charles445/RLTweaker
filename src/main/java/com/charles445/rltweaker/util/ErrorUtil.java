@@ -1,7 +1,7 @@
 package com.charles445.rltweaker.util;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.charles445.rltweaker.RLTweaker;
 
@@ -9,7 +9,7 @@ import net.minecraft.enchantment.Enchantment;
 
 public class ErrorUtil
 {
-	public static final Map<String, Integer> errorCount = new HashMap<String,Integer>();
+	public static final Map<String, Integer> errorCount = new ConcurrentHashMap<String,Integer>();
 	
 	public static void logEnchantmentError(Enchantment enchantment)
 	{

@@ -78,7 +78,6 @@ public class MessageUpdateEntityMovement implements IMessage
 			{
 				Minecraft.getMinecraft().addScheduledTask(() -> 
 				{
-					//TODO include delay in the packet?
 					TaskScheduler.addClientTask(message, 0L);
 				});
 			}

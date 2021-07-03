@@ -57,4 +57,16 @@ public class ReflectUtil
 			return findField(clazz, nameB);
 		}
 	}
+	
+	public static Field[] findFields(Class clazz, String... names) throws Exception
+	{
+		Field[] fields = new Field[names.length];
+		
+		for(int i = 0; i < fields.length; i++)
+		{
+			fields[i] = findField(clazz,names[i]);
+		}
+		
+		return fields;
+	}
 }

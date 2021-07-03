@@ -43,6 +43,10 @@ public class ModConfig
 		@Config.Name("Battle Towers")
 		public ConfigBattleTowers battletowers = new ConfigBattleTowers();
 		
+		@Config.Comment("Charm tweaks")
+		@Config.Name("Charm")
+		public ConfigCharm charm = new ConfigCharm();
+		
 		@Config.Comment("Grappling Hook Mod tweaks")
 		@Config.Name("Grappling Hook Mod")
 		public ConfigGrapplemod grapplemod = new ConfigGrapplemod();

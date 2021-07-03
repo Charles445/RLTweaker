@@ -18,6 +18,7 @@ import com.charles445.rltweaker.config.JsonConfig;
 import com.charles445.rltweaker.config.ModConfig;
 import com.charles445.rltweaker.handler.AquacultureHandler;
 import com.charles445.rltweaker.handler.BattleTowersHandler;
+import com.charles445.rltweaker.handler.CharmHandler;
 import com.charles445.rltweaker.handler.GrapplemodHandler;
 import com.charles445.rltweaker.handler.LostCitiesHandler;
 import com.charles445.rltweaker.handler.MinecraftHandler;
@@ -146,6 +147,11 @@ public class RLTweaker
 		if(Loader.isModLoaded(ModNames.LOSTCITIES) && ModConfig.server.lostcities.enabled)
 		{
 			handlers.put(ModNames.LOSTCITIES, new LostCitiesHandler());
+		}
+		
+		if(Loader.isModLoaded(ModNames.CHARM) && ModConfig.server.charm.enabled)
+		{
+			handlers.put(ModNames.CHARM, new CharmHandler());
 		}
 		
 		JsonConfig.init();

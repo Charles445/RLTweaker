@@ -32,20 +32,25 @@ public class NetworkHandler
 	
 	public static boolean isVersionAtLeast(int major, int minor, EntityPlayer player)
 	{
-		return isVersionAtLeast(major, minor, player.getGameProfile().getId());
+		return isVersionAtLeast(major, minor, 0, player.getGameProfile().getId());
 	}
 	
-	public static boolean isVersionAtLeast(int major, int minor, UUID uuid)
+	public static boolean isVersionAtLeast(int major, int minor, int patch, EntityPlayer player)
+	{
+		return isVersionAtLeast(major, minor, patch, player.getGameProfile().getId());
+	}
+	
+	public static boolean isVersionAtLeast(int major, int minor, int patch, UUID uuid)
 	{
 		VersionDelimiter value = clients.get(uuid);
 		
 		if(value!=null)
 		{
-			return value.isSameOrNewerVersion(major, minor);
+			return value.isSameOrNewerVersion(major, minor, patch);
 		}
 		else
 		{
-			return RLTweaker.MINIMUM_VERSION.isSameOrNewerVersion(major, minor);
+			return RLTweaker.MINIMUM_VERSION.isSameOrNewerVersion(major, minor, patch);
 		}
 	}
 }

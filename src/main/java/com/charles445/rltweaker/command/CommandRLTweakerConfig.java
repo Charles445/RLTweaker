@@ -140,7 +140,7 @@ public class CommandRLTweakerConfig extends CommandBase
 				}
 				else if(FieldWrapper.hasWrapperFor(f))
 				{
-					RLTweaker.logger.warn("Unmarked default for: "+annotationClazz.getSimpleName()+" : "+instance.getClass().getSimpleName()+" : "+f.getType().getName()+" : "+f.getName());
+					RLTweaker.logger.debug("Unmarked default for: "+annotationClazz.getSimpleName()+" : "+instance.getClass().getSimpleName()+" : "+f.getType().getName()+" : "+f.getName());
 				}
 				else if(f.getType().getName().startsWith("com.charles445.rltweaker.config."))
 				{

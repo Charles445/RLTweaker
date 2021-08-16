@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
@@ -14,6 +15,7 @@ import com.charles445.rltweaker.RLTweaker;
 import com.charles445.rltweaker.config.ModConfig;
 
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.IWorldGenerator;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.eventhandler.ASMEventHandler;
@@ -31,6 +33,12 @@ public class CompatUtil
 	private final Field f_listeners;
 	private final Field f_busID;
 	
+	//GameRegistry
+	private final Class c_GameRegistry;
+	private final Method m_GameRegistry_registerWorldGenerator;
+	private final Field f_GameRegistry_worldGenerators;
+	private final Field f_GameRegistry_worldGeneratorIndex;
+	
 	public CompatUtil() throws Exception
 	{
 		c_EventBus = Class.forName("net.minecraftforge.fml.common.eventhandler.EventBus");
@@ -40,6 +48,11 @@ public class CompatUtil
 		f_listeners.setAccessible(true);
 		f_busID = c_EventBus.getDeclaredField("busID");
 		f_busID.setAccessible(true);
+		
+		c_GameRegistry = Class.forName("net.minecraftforge.fml.common.registry.GameRegistry");
+		m_GameRegistry_registerWorldGenerator = ReflectUtil.findMethod(c_GameRegistry, "registerWorldGenerator");
+		f_GameRegistry_worldGenerators = ReflectUtil.findField(c_GameRegistry, "worldGenerators");
+		f_GameRegistry_worldGeneratorIndex = ReflectUtil.findField(c_GameRegistry, "worldGeneratorIndex");
 	}
 	
 	/** Removes a specific handler from the event bus and creates a new handler.<br>
@@ -205,11 +218,14 @@ public class CompatUtil
 							}
 						}
 						
-						break;
+						//break;
+						//Normally this would break and be satisfied that it found the matching handler but no listener to wrap
+						//However, due to certain mods registering multiple handlers of the same class, continuing to the next handler is appropriate instead
+						RLTweaker.logger.debug("Instance Missing Specific EventListener, Continuing...");
 					}
 				}
 			}
-			
+			//TODO inform?
 			return null;
 		}
 		catch(Exception e)
@@ -223,5 +239,98 @@ public class CompatUtil
 				throw e;
 			}
 		}
+	}
+	
+	@Nullable
+	public static <W extends WorldGeneratorWrapper> W tryWrapWorldGenerator(final W wrapperIn, Class<?> targetGeneratorClazz) throws Exception
+	{
+		boolean criticalCrash = false;
+		
+		try
+		{
+			if(instance==null)
+				instance = new CompatUtil();
+			
+			//Reflect GameRegistry fields
+			Set<IWorldGenerator> worldGenerators = (Set<IWorldGenerator>) instance.f_GameRegistry_worldGenerators.get(null);
+			Map<IWorldGenerator, Integer> worldGeneratorIndex = (Map<IWorldGenerator, Integer>) instance.f_GameRegistry_worldGeneratorIndex.get(null);
+			
+			if(worldGenerators == null)
+			{
+				RLTweaker.logger.error("worldGenerators was null in tryWrapWorldGenerator");
+				ErrorUtil.logSilent("tryWrapWorldGenerator worldGenerators null");
+				return null;
+			}
+			
+			if(worldGeneratorIndex == null)
+			{
+				RLTweaker.logger.error("worldGeneratorIndex was null in tryWrapWorldGenerator");
+				ErrorUtil.logSilent("tryWrapWorldGenerator worldGeneratorIndex null");
+				return null;
+			}
+			
+			//Find the first matching class
+			IWorldGenerator foundGenerator = null;
+			for(IWorldGenerator generator : worldGenerators)
+			{
+				if(generator.getClass().equals(targetGeneratorClazz))
+				{
+					foundGenerator = generator;
+					break;
+				}
+			}
+			
+			//Quit if generator wasn't found
+			if(foundGenerator == null)
+			{
+				RLTweaker.logger.error("Could not find world generator of class: "+targetGeneratorClazz.getName());
+				ErrorUtil.logSilent("tryWrapWorldGenerator worldGenerators null");
+				return null;
+			}
+			
+			//Get the world generator's weight
+			Integer weight = worldGeneratorIndex.get(foundGenerator);
+			if(weight == null)
+			{
+				RLTweaker.logger.error("Found world generator of class but weight was null: "+targetGeneratorClazz.getName());
+				ErrorUtil.logSilent("tryWrapWorldGenerator weight null");
+				return null;
+			}
+			
+			//Desired generator was found, errors after this point are critical
+			criticalCrash = true;
+			
+			//Remove generator from set and map
+			if(!worldGenerators.remove(foundGenerator))
+			{
+				RLTweaker.logger.error("Failed to remove in worldGenerators with class: "+targetGeneratorClazz.getName());
+				return null;
+			}
+			
+			if(worldGeneratorIndex.remove(foundGenerator) == null)
+			{
+				RLTweaker.logger.error("Failed to remove in worldGeneratorIndex with class: "+targetGeneratorClazz.getName());
+				return null;
+			}
+			
+			//Register new generator
+			wrapperIn.setWrappedGenerator(foundGenerator);
+			instance.m_GameRegistry_registerWorldGenerator.invoke(null, wrapperIn, weight.intValue());
+			RLTweaker.logger.info("Wrapped IWorldGenerator of class "+targetGeneratorClazz.getName());
+			
+			return wrapperIn;
+		}
+		catch(Exception e)
+		{
+			if(criticalCrash)
+			{
+				throw new CriticalException(e);
+			}
+			else
+			{
+				throw e;
+			}
+		}
+		
 	}
 }

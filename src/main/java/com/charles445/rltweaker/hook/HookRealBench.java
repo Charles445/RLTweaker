@@ -42,7 +42,7 @@ public class HookRealBench
 		try
 		{
 			c_ASMHooks = Class.forName("pw.prok.realbench.asm.ASMHooks");
-			m_ASMHooks_getTile = ReflectUtil.findMethod(c_ASMHooks, "getTile");
+			m_ASMHooks_getTile = ReflectUtil.findMethod(c_ASMHooks, "getTile", ContainerWorkbench.class);
 			
 			c_WorkbenchTile = Class.forName("pw.prok.realbench.WorkbenchTile");
 			f_mResult = ReflectUtil.findField(c_WorkbenchTile, "mResult");

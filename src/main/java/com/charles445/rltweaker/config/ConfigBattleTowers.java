@@ -13,6 +13,10 @@ public class ConfigBattleTowers
 	@Config.Name("Change Tower Explosion Owner")
 	public boolean towerExplosionNoCredit = true;
 	
+	@Config.Comment("Golems who are attacked will get angry more consistently, and from farther away")
+	@Config.Name("Golem High Aggression")
+	public boolean golemHighAggression = true;
+	
 	@Config.Comment("Make golems stop building up speed when dormant")
 	@Config.Name("Golem Dormant Speed Fix")
 	public boolean golemDormantSpeedFix = true;
@@ -60,5 +64,11 @@ public class ConfigBattleTowers
 	@Config.Name("Dimension Blacklist Is Whitelist")
 	@Config.RequiresMcRestart
 	public boolean dimensionBlacklistIsWhitelist = false;
+	
+	@Config.Comment("Make towers generate consistently instead of as soon as possible, avoiding the need for the positions file. Be warned, this disables tower commands.")
+	@Config.Name("Consistent Tower Generation")
+	@Config.RequiresMcRestart
+	public boolean consistentTowerGeneration = false;
+	
 	
 }

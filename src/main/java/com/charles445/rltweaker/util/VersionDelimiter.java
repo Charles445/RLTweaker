@@ -44,10 +44,15 @@ public class VersionDelimiter
 	
 	public boolean isSameOrNewerVersion(VersionDelimiter vd)
 	{
-		return isSameOrNewerVersion(vd.major, vd.minor);
+		return isSameOrNewerVersion(vd.major, vd.minor, vd.patch);
 	}
 	
 	public boolean isSameOrNewerVersion(int major, int minor)
+	{
+		return isSameOrNewerVersion(major, minor, 0);
+	}
+	
+	public boolean isSameOrNewerVersion(int major, int minor, int patch)
 	{
 		if(this.major>major)
 		{
@@ -55,13 +60,20 @@ public class VersionDelimiter
 		}
 		else if(this.major==major)
 		{
-			if(this.minor>=minor)
+			if(this.minor>minor)
 			{
 				return true;
 			}
+			else if(this.minor==minor)
+			{
+				if(this.patch>=patch)
+				{
+					return true;
+				}
+			}
 		}
 		return false;
-	}
+	} 
 	
 	private void wipeVersion()
 	{

@@ -1,5 +1,7 @@
 package com.charles445.rltweaker.config;
 
+import com.charles445.rltweaker.config.annotation.RLConfig;
+
 import net.minecraftforge.common.config.Config;
 
 public class ConfigAquaculture
@@ -7,6 +9,7 @@ public class ConfigAquaculture
 	@Config.Comment("Master switch for this mod compatibility")
 	@Config.Name("ENABLED")
 	@Config.RequiresMcRestart
+	@RLConfig.ImprovementsOnly("true")
 	public boolean enabled = true;
 	
 	@Config.Comment("Fix Neptunes Bounty loot to properly drop neptunium bars")

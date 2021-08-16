@@ -51,6 +51,10 @@ public class ModConfig
 		@Config.Name("Grappling Hook Mod")
 		public ConfigGrapplemod grapplemod = new ConfigGrapplemod();
 		
+		@Config.Comment("Ice and Fire Mod tweaks")
+		@Config.Name("Ice and Fire")
+		public ConfigIceAndFire iceandfire = new ConfigIceAndFire();
+		
 		
 		@Config.Comment("Lost Cities tweaks")
 		@Config.Name("Lost Cities")

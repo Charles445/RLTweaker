@@ -5,6 +5,7 @@ import java.util.HashSet;
 
 import javax.annotation.Nullable;
 
+import com.charles445.rltweaker.util.ErrorUtil;
 import com.charles445.rltweaker.util.ReflectUtil;
 
 public class GrapplemodReflect
@@ -30,6 +31,7 @@ public class GrapplemodReflect
 			}
 			catch (IllegalArgumentException | IllegalAccessException e)
 			{
+				ErrorUtil.logSilent("Grapplemod Error getIsAttached");
 				return false;
 			}
 			

@@ -14,12 +14,14 @@ import com.charles445.rltweaker.capability.TweakerStorage;
 import com.charles445.rltweaker.command.CommandAdvisor;
 import com.charles445.rltweaker.command.CommandDebug;
 import com.charles445.rltweaker.command.CommandErrorReport;
+import com.charles445.rltweaker.command.CommandRLTweakerConfig;
 import com.charles445.rltweaker.config.JsonConfig;
 import com.charles445.rltweaker.config.ModConfig;
 import com.charles445.rltweaker.handler.AquacultureHandler;
 import com.charles445.rltweaker.handler.BattleTowersHandler;
 import com.charles445.rltweaker.handler.CharmHandler;
 import com.charles445.rltweaker.handler.GrapplemodHandler;
+import com.charles445.rltweaker.handler.IceAndFireHandler;
 import com.charles445.rltweaker.handler.LostCitiesHandler;
 import com.charles445.rltweaker.handler.MinecraftHandler;
 import com.charles445.rltweaker.handler.MotionCheckHandler;
@@ -128,6 +130,11 @@ public class RLTweaker
 			handlers.put(ModNames.GRAPPLEMOD, new GrapplemodHandler());
 		}
 		
+		if(Loader.isModLoaded(ModNames.ICEANDFIRE) && ModConfig.server.iceandfire.enabled)
+		{
+			handlers.put(ModNames.ICEANDFIRE, new IceAndFireHandler());
+		}
+		
 		if(Loader.isModLoaded(ModNames.RECURRENTCOMPLEX) && ModConfig.server.recurrentcomplex.enabled)
 		{
 			handlers.put(ModNames.RECURRENTCOMPLEX, new RecurrentHandler());
@@ -184,6 +191,7 @@ public class RLTweaker
 		event.registerServerCommand(new CommandAdvisor());
 		event.registerServerCommand(new CommandDebug());
 		event.registerServerCommand(new CommandErrorReport());
+		event.registerServerCommand(new CommandRLTweakerConfig());
 	}
 	
 	@NetworkCheckHandler

@@ -1,8 +1,10 @@
 package com.charles445.rltweaker.reflect;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Random;
 import java.util.Set;
 
 import javax.annotation.Nullable;
@@ -13,12 +15,17 @@ import com.charles445.rltweaker.util.ReflectUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraftforge.fml.common.Loader;
 
 public class BattleTowersReflect
 {
 	public final Class c_AS_BattleTowersCore;
 	public final Method m_AS_BattleTowersCore_getTowerDestroyers;
+	public final Field f_AS_BattleTowersCore_instance;
+	public final Field f_AS_BattleTowersCore_minDistanceFromSpawn;
+	public final Field f_AS_BattleTowersCore_minDistanceBetweenTowers;
 	
 	public final Class c_AS_EntityGolem;
 	public final Method m_AS_EntityGolem_getIsDormant;
@@ -34,10 +41,18 @@ public class BattleTowersReflect
 	
 	public final Class c_WorldGenHandler;
 	public final Field f_WorldGenHandler_instance;
+	public final Method m_WorldGenHandler_attemptToSpawnTower;
 	public final Method m_WorldGenHandler_getWorldHandle;
+	public final Method m_WorldGenHandler_getIsChunkProviderAllowed;
+	public final Method m_WorldGenHandler_getIsBiomeAllowed;
+	public final Method m_WorldGenHandler_getSurfaceBlockHeight;
 
+	public final Class c_WorldGenHandler$TowerPosition;
+	public final Constructor con_WorldGenHandler$TowerPosition;
+	
 	public final Class c_WorldGenHandler$WorldHandle;
 	public final Field f_WorldGenHandler$WorldHandle_disableGenerationHook;
+	
 	
 	//Lycanites Mobs
 	private boolean isLycanitesAvailable;
@@ -64,6 +79,9 @@ public class BattleTowersReflect
 		
 		c_AS_BattleTowersCore = Class.forName("atomicstryker.battletowers.common.AS_BattleTowersCore");
 		m_AS_BattleTowersCore_getTowerDestroyers = ReflectUtil.findMethod(c_AS_BattleTowersCore, "getTowerDestroyers");
+		f_AS_BattleTowersCore_instance = ReflectUtil.findField(c_AS_BattleTowersCore, "instance");
+		f_AS_BattleTowersCore_minDistanceFromSpawn = ReflectUtil.findField(c_AS_BattleTowersCore, "minDistanceFromSpawn");
+		f_AS_BattleTowersCore_minDistanceBetweenTowers = ReflectUtil.findField(c_AS_BattleTowersCore, "minDistanceBetweenTowers");
 		
 		c_AS_EntityGolem = Class.forName("atomicstryker.battletowers.common.AS_EntityGolem");
 		m_AS_EntityGolem_getIsDormant = ReflectUtil.findMethod(c_AS_EntityGolem, "getIsDormant");
@@ -79,7 +97,14 @@ public class BattleTowersReflect
 		
 		c_WorldGenHandler = Class.forName("atomicstryker.battletowers.common.WorldGenHandler");
 		f_WorldGenHandler_instance = ReflectUtil.findField(c_WorldGenHandler, "instance");
+		m_WorldGenHandler_attemptToSpawnTower = ReflectUtil.findMethod(c_WorldGenHandler, "attemptToSpawnTower");
 		m_WorldGenHandler_getWorldHandle = ReflectUtil.findMethod(c_WorldGenHandler, "getWorldHandle");
+		m_WorldGenHandler_getIsChunkProviderAllowed = ReflectUtil.findMethod(c_WorldGenHandler, "getIsChunkProviderAllowed");
+		m_WorldGenHandler_getIsBiomeAllowed =  ReflectUtil.findMethod(c_WorldGenHandler, "getIsBiomeAllowed");
+		m_WorldGenHandler_getSurfaceBlockHeight =  ReflectUtil.findMethod(c_WorldGenHandler, "getSurfaceBlockHeight");
+
+		c_WorldGenHandler$TowerPosition = Class.forName("atomicstryker.battletowers.common.WorldGenHandler$TowerPosition");
+		con_WorldGenHandler$TowerPosition = c_WorldGenHandler$TowerPosition.getDeclaredConstructor(c_WorldGenHandler, int.class, int.class, int.class, int.class, boolean.class);
 		
 		c_WorldGenHandler$WorldHandle = Class.forName("atomicstryker.battletowers.common.WorldGenHandler$WorldHandle");
 		f_WorldGenHandler$WorldHandle_disableGenerationHook = ReflectUtil.findField(c_WorldGenHandler$WorldHandle, "disableGenerationHook");
@@ -107,7 +132,7 @@ public class BattleTowersReflect
 		}
 	}
 	
-	public boolean isEntityGolem(EntityLivingBase entity)
+	public boolean isEntityGolem(Entity entity)
 	{
 		return c_AS_EntityGolem.isInstance(entity);
 	}
@@ -170,6 +195,46 @@ public class BattleTowersReflect
 		
 		f_WorldGenHandler$WorldHandle_disableGenerationHook.setInt(wh, value);
 		return true;
+	}
+	
+	public boolean getIsChunkProviderAllowed(Object worldGenHandler, IChunkProvider provider) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException
+	{	
+		return (boolean) m_WorldGenHandler_getIsChunkProviderAllowed.invoke(worldGenHandler, provider);
+	}
+	
+	public boolean getIsBiomeAllowed(Object worldGenHandler, Biome biome) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException
+	{	
+		return (boolean) m_WorldGenHandler_getIsBiomeAllowed.invoke(worldGenHandler, biome);
+	}
+	
+	public int getSurfaceBlockHeight(Object worldGenHandler, World world, int x, int z) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException
+	{	
+		return (int) m_WorldGenHandler_getSurfaceBlockHeight.invoke(worldGenHandler, world, x, z);
+	}
+	
+	public Object getModInstance() throws IllegalArgumentException, IllegalAccessException
+	{
+		return f_AS_BattleTowersCore_instance.get(null);
+	}
+	
+	public int getMinDistanceFromSpawn() throws IllegalArgumentException, IllegalAccessException
+	{
+		return (int) f_AS_BattleTowersCore_minDistanceFromSpawn.get(getModInstance());
+	}
+	
+	public int getMinDistanceBetweenTowers() throws IllegalArgumentException, IllegalAccessException
+	{
+		return (int) f_AS_BattleTowersCore_minDistanceBetweenTowers.get(getModInstance());
+	}
+	
+	public Object newTowerPosition(Object worldGenHandler, int x, int y, int z, int type, boolean underground) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException
+	{
+		return con_WorldGenHandler$TowerPosition.newInstance(worldGenHandler, x, y, z, type, underground);
+	}
+	
+	public boolean attemptToSpawnTower(Object worldGenHandler, World world, Object towerPosition, Random random, int x, int y, int z) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException
+	{
+		return (boolean) m_WorldGenHandler_attemptToSpawnTower.invoke(worldGenHandler, world, towerPosition, random, x, y, z);
 	}
 	
 	//Lycanites Compatibility

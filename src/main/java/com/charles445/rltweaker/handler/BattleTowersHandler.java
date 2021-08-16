@@ -2,22 +2,33 @@ package com.charles445.rltweaker.handler;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
+import java.util.Random;
 import java.util.Set;
 
 import com.charles445.rltweaker.RLTweaker;
 import com.charles445.rltweaker.config.ModConfig;
 import com.charles445.rltweaker.reflect.BattleTowersReflect;
+import com.charles445.rltweaker.util.AIUtil;
 import com.charles445.rltweaker.util.CompatUtil;
 import com.charles445.rltweaker.util.CriticalException;
 import com.charles445.rltweaker.util.ErrorUtil;
+import com.charles445.rltweaker.util.WorldGeneratorWrapper;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.ai.EntityAIHurtByTarget;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.chunk.IChunkProvider;
+import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.fml.common.IWorldGenerator;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.IEventListener;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -27,7 +38,7 @@ public class BattleTowersHandler
 {
 	public long tickedTime;
 	
-	private BattleTowersReflect reflector;
+	BattleTowersReflect reflector;
 	
 	public BattleTowersHandler()
 	{
@@ -35,8 +46,22 @@ public class BattleTowersHandler
 		{
 			reflector = new BattleTowersReflect();
 			
-			if(ModConfig.server.battletowers.dimensionBlacklistEnabled)
+			if(ModConfig.server.battletowers.dimensionBlacklistEnabled || ModConfig.server.battletowers.consistentTowerGeneration)
+			{
 				CompatUtil.wrapSpecificHandler("BTWorldLoadEvent", BTWorldLoadEvent::new, "atomicstryker.battletowers.common.WorldGenHandler", "eventWorldLoad");
+				//BattleTowers oversight means there are two WorldGenHandler instances on the event bus
+				CompatUtil.findAndRemoveHandlerFromEventBus("atomicstryker.battletowers.common.WorldGenHandler", "eventWorldLoad");
+			}
+			if(ModConfig.server.battletowers.consistentTowerGeneration)
+			{
+				CompatUtil.wrapSpecificHandler("BTWorldSaveEvent", BTWorldSaveEvent::new, "atomicstryker.battletowers.common.WorldGenHandler", "eventWorldSave");
+				//BattleTowers oversight means there are two WorldGenHandler instances on the event bus
+				CompatUtil.findAndRemoveHandlerFromEventBus("atomicstryker.battletowers.common.WorldGenHandler", "eventWorldSave");
+				
+				//Wrap generator
+				BTWorldGenerator generator = new BTWorldGenerator();
+				generator = CompatUtil.tryWrapWorldGenerator(generator, reflector.c_WorldGenHandler);
+			}
 			
 			MinecraftForge.EVENT_BUS.register(this);
 		}
@@ -54,6 +79,12 @@ public class BattleTowersHandler
 	@SubscribeEvent
 	public void onEntityJoinWorld(EntityJoinWorldEvent event)
 	{
+		if(ModConfig.server.battletowers.golemHighAggression && reflector.isEntityGolem(event.getEntity()))
+		{
+			EntityCreature golem = (EntityCreature)event.getEntity();
+			AIUtil.tryAndReplaceAllTasks(golem, golem.targetTasks, EntityAIHurtByTarget.class, (oldTask -> new GolemHurtByTarget(golem, false, new Class[0])));
+		}
+		
 		if(reflector.isLycanitesAvailable() && ModConfig.server.battletowers.golemLycanitesProjectile)
 		{
 			//LycanitesMobs is available, and the config is enabled
@@ -244,6 +275,27 @@ public class BattleTowersHandler
 		}
 	}
 	
+	public boolean isDimensionWhitelisted(World world)
+	{
+		if(!ModConfig.server.battletowers.dimensionBlacklistEnabled)
+			return true;
+		
+		int dimension = world.provider.getDimension();
+		int[] blackListIds = ModConfig.server.battletowers.dimensionBlacklistIds;
+		boolean blacklistHasDimension = false;
+		
+		for(int i=0;i<blackListIds.length;i++)
+		{
+			if(blackListIds[i] == dimension)
+			{
+				blacklistHasDimension = true;
+				break;
+			}
+		}
+		
+		return blacklistHasDimension == ModConfig.server.battletowers.dimensionBlacklistIsWhitelist;
+	}
+	
 	public class BTWorldLoadEvent
 	{
 		private IEventListener handler;
@@ -256,43 +308,181 @@ public class BattleTowersHandler
 		@SubscribeEvent
 		public void onWorldLoad(final WorldEvent.Load event)
 		{
+			//Disable world handle interactions if using consistent tower generation
+			if(ModConfig.server.battletowers.consistentTowerGeneration)
+				return;
 			handler.invoke(event);
-			if(ModConfig.server.battletowers.dimensionBlacklistEnabled)
+			
+			if(ModConfig.server.battletowers.dimensionBlacklistEnabled && !isDimensionWhitelisted(event.getWorld()))
 			{
-				int dimension = event.getWorld().provider.getDimension();
-				int[] blackListIds = ModConfig.server.battletowers.dimensionBlacklistIds;
-				boolean blacklistHasDimension = false;
-				
-				for(int i=0;i<blackListIds.length;i++)
+				//Block the dimension by sabotaging the WorldHandle
+				boolean success = false;
+				try
 				{
-					if(blackListIds[i] == dimension)
-					{
-						blacklistHasDimension = true;
-						break;
-					}
+					success = reflector.setWorldDisableGenerationHook(event.getWorld(), 1000);
+				}
+				catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e)
+				{
+					
 				}
 				
-				if(blacklistHasDimension != ModConfig.server.battletowers.dimensionBlacklistIsWhitelist)
+				if(!success)
 				{
-					//Block the dimension by sabotaging the WorldHandle
-					boolean success = false;
-					try
-					{
-						success = reflector.setWorldDisableGenerationHook(event.getWorld(), 1000);
-					}
-					catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e)
-					{
-						
-					}
-					
-					if(!success)
-					{
-						RLTweaker.logger.error("Failed to prevent Battletowers from spawning in loaded dimension: "+dimension);
-						ErrorUtil.logSilent("BT Dimension Blacklist Failure");
-					}
+					RLTweaker.logger.error("Failed to prevent Battletowers from spawning in loaded dimension: "+event.getWorld().provider.getDimension());
+					ErrorUtil.logSilent("BT Dimension Blacklist Failure");
 				}
 			}
 		}
-		
 	}
+	
+	public class BTWorldSaveEvent
+	{
+		private IEventListener handler;
+		public BTWorldSaveEvent(IEventListener handler)
+		{
+			this.handler = handler;
+			MinecraftForge.EVENT_BUS.register(this);
+		}
+		
+		@SubscribeEvent
+		public void onWorldSave(final WorldEvent.Save event)
+		{
+			//Disable world handle interactions if using consistent tower generation
+			if(ModConfig.server.battletowers.consistentTowerGeneration)
+				return;
+			handler.invoke(event);
+		}
+	}
+	
+	public class GolemHurtByTarget extends EntityAIHurtByTarget
+	{
+		public GolemHurtByTarget(EntityCreature creature, boolean entityCallsForHelp, Class<?>[] excludedReinforcements)
+		{
+			super(creature, entityCallsForHelp, excludedReinforcements);
+			this.shouldCheckSight = false;
+		}
+		
+		@Override
+		public double getTargetDistance()
+		{
+			double ret = super.getTargetDistance();
+			ret = 64.0d;
+			//DebugUtil.messageAll("GHBT getTargetDistance "+ret);
+			return ret;
+		}
+	}
+	
+	public class BTWorldGenerator extends WorldGeneratorWrapper
+	{
+		private int setup = -1; //-1 is init, 0 is failed, other is success
+		private Object worldGenHandler = null;
+		private int minDistanceFromSpawn;
+		private int minDistanceBetweenTowers;
+		private double minDistanceBetweenTowersArea;
+		
+		@Override
+		public void generate(Random random, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider)
+		{
+			//Guarantee battletowers generate on even chunks, to avoid certain troublesome cascading cases and tower collisions
+			int alignment = 2; 
+			
+			if(chunkX % alignment != 0)
+				return;
+			
+			if(chunkZ % alignment != 0)
+				return;
+			
+			if(setup == -1)
+			{
+				//First time setup
+				try
+				{
+					worldGenHandler = reflector.c_WorldGenHandler.cast(getWrappedGenerator());
+					minDistanceFromSpawn = reflector.getMinDistanceFromSpawn();
+					minDistanceBetweenTowers = reflector.getMinDistanceBetweenTowers();
+					minDistanceBetweenTowersArea = Math.PI * minDistanceBetweenTowers * minDistanceBetweenTowers / 1024.0d; //1024 = chunkSq * halfRadiusSq (16 * 16 * 2 * 2)
+					
+					//Adjust for alignment
+					minDistanceBetweenTowersArea /= alignment;
+					minDistanceBetweenTowersArea /= alignment;
+					
+					if(minDistanceBetweenTowersArea < 1.0d)
+						minDistanceBetweenTowersArea = 1.0d;
+					
+					//Succeeded in setup
+					setup = 1;
+				}
+				catch(ClassCastException | IllegalArgumentException | IllegalAccessException e)
+				{
+					//Failed
+					//TODO error
+					e.printStackTrace();
+					setup = 0;
+				}
+			}
+			
+			if(setup == 0)
+			{
+				//Failed, use default generator
+				this.generateWrapped(random, chunkX, chunkZ, world, chunkGenerator, chunkProvider);
+				return;
+			}
+			
+			if(!isDimensionWhitelisted(world))
+				return;
+			
+			try
+			{
+				//Check biome and provider
+				int blockX = chunkX * 16;
+				int blockZ = chunkZ * 16;
+				BlockPos blockPos = new BlockPos(blockX, 0, blockZ);
+				Biome biome = world.getBiome(blockPos.add(16, 0, 16));
+				BlockPos middlePos = blockPos.add(8, 0, 8);
+				
+				if (biome != Biome.getBiome(8) && reflector.getIsBiomeAllowed(worldGenHandler, biome) && reflector.getIsChunkProviderAllowed(worldGenHandler, chunkProvider))
+				{
+					//Check distance from spawn
+					BlockPos spawn = world.getSpawnPoint();
+					int xx = spawn.getX() - middlePos.getX();
+					int zz = spawn.getZ() - middlePos.getZ();
+					if(Math.sqrt((xx * xx) + (zz * zz)) < minDistanceFromSpawn)
+						return;
+					
+					//Check tower randomness based on minimum distance
+					double threshold = 1.0d / minDistanceBetweenTowersArea;
+					if(random.nextDouble() > threshold)
+						return;
+					
+					int blockY = reflector.getSurfaceBlockHeight(worldGenHandler, world, blockX, blockZ);
+					if(blockY <= 49)
+						return;
+					
+					//Construct new TowerPosition
+					Object towerPosition = reflector.newTowerPosition(worldGenHandler, blockX, 0, blockZ, 0, false);
+					
+					//BattleTowers uses world rand for some stuff, so we need to freshen up the world random seed a little bit
+					world.rand.setSeed(random.nextLong());
+					
+					//Spawn tower
+					boolean spawned = reflector.attemptToSpawnTower(worldGenHandler, world, towerPosition, random, middlePos.getX(), blockY, middlePos.getZ());
+					if(spawned)
+					{
+						RLTweaker.logger.trace("BattleTower generation success: "+middlePos.getX()+" "+middlePos.getZ());
+					}
+					else
+					{
+						RLTweaker.logger.trace("BattleTower generation failure: "+middlePos.getX()+" "+middlePos.getZ());
+					}
+				}
+			}
+			catch(IllegalArgumentException | IllegalAccessException | InvocationTargetException | InstantiationException e)
+			{
+				//TODO error once
+				this.generateWrapped(random, chunkX, chunkZ, world, chunkGenerator, chunkProvider);
+				return;
+			}
+		}
+	}
+	
 }

@@ -19,14 +19,22 @@ public class IceAndFireReflect
 	
 	public final Class c_ItemStoneStatue;
 	
+	public final Class c_EntityDragonBase;
+	
+	@Nullable
+	public Class c_ItemDragonHornStatic;
+	
 	//LLibrary
 	public final Class c_EntityPropertiesHandler;
 	public final Field f_EntityPropertiesHandler_INSTANCE;
 	public final Method m_EntityPropertiesHandler_getProperties;
 	public final Object o_EntityPropertiesHandler_INSTANCE;
 	
+	
 	public IceAndFireReflect() throws Exception
 	{
+		c_EntityDragonBase = Class.forName("com.github.alexthe666.iceandfire.entity.EntityDragonBase");
+		
 		c_StoneEntityProperties = Class.forName("com.github.alexthe666.iceandfire.entity.StoneEntityProperties");
 		f_StoneEntityProperties_isStone = ReflectUtil.findField(c_StoneEntityProperties, "isStone");
 		
@@ -37,6 +45,14 @@ public class IceAndFireReflect
 		m_EntityPropertiesHandler_getProperties = ReflectUtil.findMethod(c_EntityPropertiesHandler, "getProperties");
 		o_EntityPropertiesHandler_INSTANCE = f_EntityPropertiesHandler_INSTANCE.get(null); //public static final (Enum)
 		
+		try
+		{
+			c_ItemDragonHornStatic = Class.forName("com.github.alexthe666.iceandfire.item.ItemDragonHornStatic");
+		}
+		catch(Exception e)
+		{
+			c_ItemDragonHornStatic = null;
+		}
 	}
 	
 	public boolean getIsStone(Entity entity)

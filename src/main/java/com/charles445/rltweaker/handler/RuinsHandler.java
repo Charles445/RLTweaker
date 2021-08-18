@@ -8,13 +8,11 @@ import com.charles445.rltweaker.reflect.RuinsReflect;
 import com.charles445.rltweaker.util.CompatUtil;
 import com.charles445.rltweaker.util.CriticalException;
 import com.charles445.rltweaker.util.ErrorUtil;
-import com.charles445.rltweaker.util.ModNames;
 import com.charles445.rltweaker.util.ReflectUtil;
 
 import net.minecraft.world.World;
 import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class RuinsHandler

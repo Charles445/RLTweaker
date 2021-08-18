@@ -19,8 +19,9 @@ public class WaystoneReflect
 	public final Method m_getDimension;
 	
 	public final Class c_NameGenerator;
-	public final Method m_get;
-	public final Field f_usedNames;
+	public final Method m_NameGenerator_get;
+	public final Method m_NameGenerator_randomName;
+	public final Field f_NameGenerator_usedNames;
 	
 	public final Class c_RomanNumber;
 	public final Method m_toRoman;
@@ -44,8 +45,9 @@ public class WaystoneReflect
 		m_getDimension = ReflectUtil.findMethod(c_GenerateWaystoneNameEvent, "getDimension");
 		
 		c_NameGenerator = Class.forName("net.blay09.mods.waystones.worldgen.NameGenerator");
-		m_get = ReflectUtil.findMethod(c_NameGenerator, "get");
-		f_usedNames = ReflectUtil.findField(c_NameGenerator, "usedNames");
+		m_NameGenerator_get = ReflectUtil.findMethod(c_NameGenerator, "get");
+		m_NameGenerator_randomName = ReflectUtil.findMethod(c_NameGenerator, "randomName");
+		f_NameGenerator_usedNames = ReflectUtil.findField(c_NameGenerator, "usedNames");
 		
 		c_RomanNumber = Class.forName("net.blay09.mods.waystones.worldgen.RomanNumber");
 		m_toRoman = ReflectUtil.findMethod(c_RomanNumber, "toRoman");
@@ -76,10 +78,17 @@ public class WaystoneReflect
 		return (int)m_getDimension.invoke(event);
 	}
 	
+	public String getRandomName(int dimension) throws Exception
+	{
+		World world = DimensionManager.getWorld(dimension);
+		Object generator = m_NameGenerator_get.invoke(null, world);
+		return (String)m_NameGenerator_randomName.invoke(generator, world.rand);
+	}
+	
 	public Set<String> getUsedNames(int dimension) throws Exception
 	{
 		World world = DimensionManager.getWorld(dimension);
-		Object generator = m_get.invoke(null, world);
-		return (Set<String>) f_usedNames.get(generator);
+		Object generator = m_NameGenerator_get.invoke(null, world);
+		return (Set<String>) f_NameGenerator_usedNames.get(generator);
 	}
 }

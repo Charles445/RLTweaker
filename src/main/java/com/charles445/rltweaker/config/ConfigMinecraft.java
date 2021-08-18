@@ -63,6 +63,13 @@ public class ConfigMinecraft
 	@RLConfig.RLCraftTwoNine("true")
 	public boolean lessCollisions = true;
 	
+	@Config.Comment("Cleans up Mineshaft, Village, and Fortress .dat files regularly to lower RAM usage")
+	@Config.Name("Cleanup Worldgen Files")
+	@RLConfig.ImprovementsOnly("true")
+	@RLConfig.RLCraftTwoEightTwo("true")
+	@RLConfig.RLCraftTwoNine("true")
+	public boolean cleanupWorldgenFiles = true;
+	
 	@Config.Comment("Replace thrown witch potions with configured potions")
 	@Config.Name("Witch Potion Replacements")
 	@RLConfig.ImprovementsOnly("false")

@@ -68,18 +68,6 @@ public class WaystonesHandler
 		}
 	}
 	
-	private String combine(String[] split)
-	{
-		StringBuilder sb = new StringBuilder();
-		for(int i=0;i<split.length;i++)
-		{
-			sb.append(split);
-			if(i < split.length - 1)
-				sb.append(" ");
-		}
-		return sb.toString();
-	}
-	
 	private String cleanBiome(String s, int dimension, BlockPos pos)
 	{
 		try
@@ -98,63 +86,25 @@ public class WaystonesHandler
 			if(block!=Blocks.GLOWSTONE)
 				return s;
 			
+			//Get rid of the old name we do not need it
 			
+			//TODO allow custom names
+			String baseName = reflector.getRandomName(dimension);
 			
-			//TODO see how long this takes to process
-			//Looping through a string split might be faster, but it's unclear
-			//This is PROBABLY fast enough
+			String result = ""+baseName;
 			
-			String result = s;
-			result = result.replace(" Taiga", "");
-			result = result.replace(" Plains", "");
-			result = result.replace(" Island", "");
-			result = result.replace(" River", "");
-			result = result.replace(" Beach", "");
-			result = result.replace(" Forest", "");
-			result = result.replace(" Ocean", "");
-			result = result.replace(" Desert", "");
-			result = result.replace(" Hills", "");
-			result = result.replace(" Swamps", "");
-			result = result.replace(" Savanna", "");
-			result = result.replace(" Plateau", "");
-			result = result.replace(" Icelands", "");
-			result = result.replace(" Jungle", "");
-			result = result.replace(" Mesa", "");
-			result = result.replace(" Void", "");
-			result = result.replace(" Skies", "");
-			
-			//Now check the result in the current map
 			Set<String> usedNames = reflector.getUsedNames(dimension);
 			
-			if(usedNames.contains(result))
+			int roman = 1;
+			
+			while(usedNames.contains(result))
 			{
-				//Figure out what its new name is
-				String[] split = result.split(" ");
-				
-				if(split.length==1)
-				{
-					//First of its kind, add I and call it a day
-					return result + " I";
-				}
-	
-				int roman = 1;
-				int splitID = split.length-1;
-				
-				while(usedNames.contains(result))
-				{
-					split[splitID] = reflector.toRoman(roman);
-					roman++;
-					result = combine(split);
-				}
-
-				//RLTweaker.logger.debug("Converting Waystone "+s+" -> "+result+" at "+pos.toString());
-				return result;
+				result = baseName + " " + reflector.toRoman(roman);
+				roman++;
 			}
-			else
-			{
-				//RLTweaker.logger.debug("Converting Waystone "+s+" -> "+result+" at "+pos.toString());
-				return result;
-			}
+			
+			return result;
+			
 		}
 		catch(Exception e)
 		{
@@ -162,5 +112,4 @@ public class WaystonesHandler
 			return s;
 		}
 	}
-	
 }

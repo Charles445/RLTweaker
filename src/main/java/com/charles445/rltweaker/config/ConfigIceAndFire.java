@@ -27,4 +27,12 @@ public class ConfigIceAndFire
 	@RLConfig.RLCraftTwoEightTwo("true")
 	@RLConfig.RLCraftTwoNine("true")
 	public boolean statueDataFixes = true;
+	
+	@Config.Comment("Interact with dragons with only the right hand")
+	@Config.Name("Right Hand Dragon Interaction")
+	@Config.RequiresMcRestart
+	@RLConfig.ImprovementsOnly("true")
+	@RLConfig.RLCraftTwoEightTwo("true")
+	@RLConfig.RLCraftTwoNine("true")
+	public boolean rightHandDragonInteraction = true;
 }

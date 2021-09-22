@@ -46,6 +46,16 @@ public class ClassDisplayer
 		}
 	}
 	
+	public void printAllMethods(ClassNode clazzNode)
+	{
+		for(MethodNode m : clazzNode.methods)
+		{
+			System.out.println(m.name+" : "+m.desc);
+			printMethod(m);
+			System.out.println("");
+		}
+	}
+	
 	public void printMethod(MethodNode methodNode)
 	{
 		AbstractInsnNode anchor = methodNode.instructions.getFirst();

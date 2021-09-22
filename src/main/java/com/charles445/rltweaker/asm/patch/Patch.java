@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
 import com.charles445.rltweaker.asm.helper.ASMHelper;
@@ -203,5 +204,41 @@ public abstract class Patch implements IPatch
 			wrapper.add(node);
 		}
 		return wrapper;
+	}
+	
+	/** Inserts a list after a node in a method **/
+	protected void insert(MethodNode methodNode, AbstractInsnNode anchor, InsnList wrapOrList)
+	{
+		methodNode.instructions.insert(anchor, wrapOrList);
+	}
+	
+	/** Inserts a list before a node in a method **/
+	protected void insertBefore(MethodNode methodNode, AbstractInsnNode anchor, InsnList wrapOrList)
+	{
+		methodNode.instructions.insertBefore(anchor, wrapOrList);
+	}
+	
+	/** Inserts a node after a node in a method **/
+	protected void insert(MethodNode methodNode, AbstractInsnNode anchor, AbstractInsnNode added)
+	{
+		methodNode.instructions.insert(anchor, added);
+	}
+	
+	/** Inserts a node before a node in a method **/
+	protected void insertBefore(MethodNode methodNode, AbstractInsnNode anchor, AbstractInsnNode added)
+	{
+		methodNode.instructions.insertBefore(anchor, added);
+	}
+	
+	/** Creates an InsnNode after a node in a method **/
+	protected void insertInsn(MethodNode methodNode, AbstractInsnNode anchor, int opcode)
+	{
+		methodNode.instructions.insert(anchor, new InsnNode(opcode));
+	}
+	
+	/** Creates an InsnNode before a node in a method **/
+	protected void insertInsnBefore(MethodNode methodNode, AbstractInsnNode anchor, int opcode)
+	{
+		methodNode.instructions.insertBefore(anchor, new InsnNode(opcode));
 	}
 }

@@ -19,7 +19,10 @@ import com.charles445.rltweaker.config.JsonConfig;
 import com.charles445.rltweaker.config.ModConfig;
 import com.charles445.rltweaker.handler.AquacultureHandler;
 import com.charles445.rltweaker.handler.BattleTowersHandler;
+import com.charles445.rltweaker.handler.BetterSurvivalHandler;
+import com.charles445.rltweaker.handler.CarryOnHandler;
 import com.charles445.rltweaker.handler.CharmHandler;
+import com.charles445.rltweaker.handler.DynamicTreesHandler;
 import com.charles445.rltweaker.handler.GrapplemodHandler;
 import com.charles445.rltweaker.handler.IceAndFireHandler;
 import com.charles445.rltweaker.handler.LostCitiesHandler;
@@ -30,6 +33,7 @@ import com.charles445.rltweaker.handler.ReskillableHandler;
 import com.charles445.rltweaker.handler.RoguelikeHandler;
 import com.charles445.rltweaker.handler.RuinsHandler;
 import com.charles445.rltweaker.handler.SMEHandler;
+import com.charles445.rltweaker.handler.SpawnerControlHandler;
 import com.charles445.rltweaker.handler.TANHandler;
 import com.charles445.rltweaker.handler.WaystonesHandler;
 import com.charles445.rltweaker.network.NetworkHandler;
@@ -64,7 +68,7 @@ public class RLTweaker
 {
 	public static final String MODID = "rltweaker";
 	public static final String NAME = "RLTweaker";
-	public static final String VERSION = "0.4.2";
+	public static final String VERSION = "0.4.3";
 	public static final VersionDelimiter VERSION_DELIMITER = new VersionDelimiter(VERSION);
 	public static final VersionDelimiter MINIMUM_VERSION = new VersionDelimiter("0.3.0");
 	
@@ -145,6 +149,11 @@ public class RLTweaker
 			handlers.put(ModNames.TOUGHASNAILS, new TANHandler());
 		}
 		
+		if(Loader.isModLoaded(ModNames.SPAWNERCONTROL) && ModConfig.server.spawnercontrol.enabled)
+		{
+			handlers.put(ModNames.SPAWNERCONTROL, new SpawnerControlHandler());
+		}
+		
 		proxy.init();
 	}
 	
@@ -161,6 +170,16 @@ public class RLTweaker
 			handlers.put(ModNames.CHARM, new CharmHandler());
 		}
 		
+		if(Loader.isModLoaded(ModNames.CARRYON) && ModConfig.server.carryon.enabled)
+		{
+			handlers.put(ModNames.CARRYON, new CarryOnHandler());
+		}
+		
+		if(Loader.isModLoaded(ModNames.BETTERSURVIVAL) && ModConfig.server.bettersurvival.enabled)
+		{
+			handlers.put(ModNames.BETTERSURVIVAL, new BetterSurvivalHandler());
+		}
+		
 		JsonConfig.init();
 		
 		proxy.postInit();
@@ -169,9 +188,6 @@ public class RLTweaker
 	@Mod.EventHandler
 	public void loadComplete(FMLLoadCompleteEvent event)
 	{
-		//Motion Check Handler runs after everything else, that way the priority listed will always be after
-		new MotionCheckHandler();
-		
 		if(Loader.isModLoaded(ModNames.SOMANYENCHANTMENTS) && ModConfig.server.somanyenchantments.enabled)
 		{
 			handlers.put(ModNames.SOMANYENCHANTMENTS, new SMEHandler());
@@ -182,7 +198,15 @@ public class RLTweaker
 			handlers.put(ModNames.BATTLETOWERS, new BattleTowersHandler());
 		}
 		
+		if(Loader.isModLoaded(ModNames.DYNAMICTREES)) //FIXME config
+		{
+			handlers.put(ModNames.DYNAMICTREES,  new DynamicTreesHandler());
+		}
+		
 		proxy.loadComplete();
+		
+		//Motion Check Handler runs after everything else, that way the priority listed will always be after
+		new MotionCheckHandler();
 	}
 	
 	@Mod.EventHandler

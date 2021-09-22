@@ -7,7 +7,10 @@ import com.charles445.rltweaker.util.CompatUtil;
 import com.charles445.rltweaker.util.CriticalException;
 import com.charles445.rltweaker.util.ErrorUtil;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.projectile.EntityThrowable;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.fml.common.eventhandler.IEventListener;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -40,6 +43,48 @@ public class GrapplemodHandler
 				throw new RuntimeException(e);
 		}
 	}
+
+	@SubscribeEvent
+	public void onEntityJoinWorld(EntityJoinWorldEvent event)
+	{
+		if(!ModConfig.server.grapplemod.hinderGrapplingWhileFalling)
+			return;
+			
+		if(reflector.c_grappleArrow.isInstance(event.getEntity()))
+		{
+			if(event.getEntity() instanceof EntityThrowable)
+			{
+				EntityThrowable throwable = (EntityThrowable)event.getEntity();
+				
+				//Make sure it's moving downwards
+				if(throwable.motionY >= 0.0f)
+					return;
+				
+				Entity shooting = null;
+				
+				try
+				{
+					shooting = (Entity)reflector.f_grappleArrow_shootingEntity.get(reflector.c_grappleArrow.cast(throwable));
+				}
+				catch (IllegalArgumentException | IllegalAccessException | ClassCastException e)
+				{
+					ErrorUtil.logSilent("GrapplemodHandler shootingEntity Failure");
+					return;
+				}
+				
+				if(shooting == null)
+					return;
+				
+				//Make sure shooter is falling significantly
+				if(shooting.motionY >= -0.1f)
+					return;
+				
+				throwable.motionY = Math.min(shooting.motionY + 0.5f, 0.0f);
+				//DebugUtil.messageAll(""+throwable.motionY);
+			}
+		}
+	}
+	
 	/*
 	@SubscribeEvent
 	public void onPlayerTick(TickEvent.PlayerTickEvent event)

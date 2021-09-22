@@ -20,4 +20,12 @@ public class ConfigGrapplemod
 	@RLConfig.RLCraftTwoEightTwo("false")
 	@RLConfig.RLCraftTwoNine("true")
 	public boolean grapplingHookFallDamage = false;
+	
+	
+	@Config.Comment("Hinders the player grappling below themselves while falling")
+	@Config.Name("Hinder Grappling While Falling")
+	@RLConfig.ImprovementsOnly("false")
+	@RLConfig.RLCraftTwoEightTwo("false")
+	@RLConfig.RLCraftTwoNine("true")
+	public boolean hinderGrapplingWhileFalling = false;
 }

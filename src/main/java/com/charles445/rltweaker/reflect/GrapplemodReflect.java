@@ -14,11 +14,17 @@ public class GrapplemodReflect
 	public final Class c_grapplemod;
 	public final Field f_grapplemod_attached;
 	public HashSet<Integer> o_grapplemod_attached;
+
+	public final Class c_grappleArrow;
+	public final Field f_grappleArrow_shootingEntity;
 	
 	public GrapplemodReflect() throws Exception
 	{
 		c_grapplemod = Class.forName("com.yyon.grapplinghook.grapplemod");
 		f_grapplemod_attached = ReflectUtil.findField(c_grapplemod, "attached");
+		
+		c_grappleArrow = Class.forName("com.yyon.grapplinghook.entities.grappleArrow");
+		f_grappleArrow_shootingEntity = ReflectUtil.findField(c_grappleArrow, "shootingEntity");
 	}
 	
 	public boolean getIsAttached(int id)

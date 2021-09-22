@@ -21,4 +21,12 @@ public class ConfigReskillable
 	@RLConfig.RLCraftTwoEightTwo("false")
 	@RLConfig.RLCraftTwoNine("true")
 	public boolean customTransmutation = false;
+	
+	@Config.Comment("Enables toggling and refunding traits by clicking on them")
+	@Config.Name("Toggleable Traits")
+	@Config.RequiresMcRestart
+	@RLConfig.ImprovementsOnly("false")
+	@RLConfig.RLCraftTwoEightTwo("false")
+	@RLConfig.RLCraftTwoNine("true")
+	public boolean toggleableTraits = false;
 }

@@ -198,7 +198,7 @@ public class CompatUtil
 						while(elIterator.hasNext())
 						{
 							IEventListener eventListener = elIterator.next();
-							if(eventListener.toString().contains(specific))
+							if(eventListener.toString().contains(specific)) //TODO consider accuracy, or not, as this allows for desc usage as-is
 							{
 								//From this point on, any crash in here is a critical failure
 								criticalCrash = true;

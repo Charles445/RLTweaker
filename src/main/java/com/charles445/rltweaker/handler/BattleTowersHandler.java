@@ -448,6 +448,11 @@ public class BattleTowersHandler
 					if(Math.sqrt((xx * xx) + (zz * zz)) < minDistanceFromSpawn)
 						return;
 					
+					//Make the seed somewhat unique so our next random call doesn't overlap with other mods
+					//For example, waystones were showng up on towers a suspiciously high amount of the time
+					random.setSeed(((random.nextLong() * 4455743L) + 7L) * 4455743L);
+					
+					
 					//Check tower randomness based on minimum distance
 					double threshold = 1.0d / minDistanceBetweenTowersArea;
 					if(random.nextDouble() > threshold)

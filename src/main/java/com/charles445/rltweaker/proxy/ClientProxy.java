@@ -3,9 +3,12 @@ package com.charles445.rltweaker.proxy;
 import com.charles445.rltweaker.RLTweaker;
 import com.charles445.rltweaker.client.ClientCommandDebug;
 import com.charles445.rltweaker.client.FixedHatLayer;
+import com.charles445.rltweaker.client.gui.GuiDelegator;
+import com.charles445.rltweaker.client.gui.ReskillableGuiDelegate;
 import com.charles445.rltweaker.config.ModConfig;
 import com.charles445.rltweaker.handler.MantleHandlerClient;
 import com.charles445.rltweaker.handler.PotionCoreHandlerClient;
+import com.charles445.rltweaker.handler.ReskillableHandlerClient;
 import com.charles445.rltweaker.util.ModNames;
 
 import net.minecraft.client.Minecraft;
@@ -20,6 +23,9 @@ public class ClientProxy extends CommonProxy
 	{
 		super.postInit();
 		
+		//GuiDelegator
+		RLTweaker.clientHandlers.put("GuiDelegator", new GuiDelegator());
+		
 		ClientCommandHandler.instance.registerCommand(new ClientCommandDebug());
 		
 		if(Loader.isModLoaded(ModNames.POTIONCORE) && ModConfig.client.potioncore.enabled)
@@ -31,6 +37,11 @@ public class ClientProxy extends CommonProxy
 		{
 			if(ModConfig.client.classyhats.mobendsCompatibility)
 				FixedHatLayer.init();
+		}
+		
+		if(Loader.isModLoaded(ModNames.RESKILLABLE) && ModConfig.client.reskillable.enabled)
+		{
+			RLTweaker.clientHandlers.put(ModNames.RESKILLABLE, new ReskillableHandlerClient());
 		}
 	}
 	

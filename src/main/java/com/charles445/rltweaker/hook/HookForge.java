@@ -3,49 +3,87 @@ package com.charles445.rltweaker.hook;
 import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.BiConsumer;
 
 import javax.annotation.Nullable;
 
 import com.charles445.rltweaker.util.ReflectUtil;
+import com.charles445.rltweaker.util.TriConsumer;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 
 public class HookForge
 {
-	private static final Map<String, BiConsumer<IMessage, MessageContext>> serverExecutors = new ConcurrentHashMap<>();
+	private static final Map<String, MessageExecutor> serverExecutors = new ConcurrentHashMap<>();
 	private static final Map<Class, Field[]> serverFieldCaches = new ConcurrentHashMap<>();
-	
+
 	//net.minecraftforge.fml.common.network.simpleimpl.SimpleChannelHandlerWrapper
 	//channelRead0
 	
-	//com/charles445/rltweaker/hook/HookForge
-	//receiveMessage
-	//(Lnet/minecraftforge/fml/common/network/simpleimpl/IMessage;Lnet/minecraftforge/fml/common/network/simpleimpl/MessageContext;)V
-	public static void receiveMessage(IMessage message, MessageContext ctx) // channelRead0 throws Exception by itself
+	public static IMessage onMessage(IMessageHandler handler, IMessage message, MessageContext ctx)
 	{
-		//Observe same threading and class loading rules as IMessageHandler
-		//Whatever those are...
+		//Check server executors first, and if there is a match, schedule a task in the queue before the real handler  to manipulate the packet
+		//If the executor is an override, ask the executor for a reply instead of the default handler
+		
+		//Netty thread
+		//System.out.println(handler.getClass().getSimpleName()+" : "+message.getClass().getName()+" : "+ctx.getClass().getName());
 		if(ctx.side == Side.SERVER)
 		{
-			BiConsumer<IMessage, MessageContext> consumer = serverExecutors.get(message.getClass().getName());
-			if(consumer != null)
-				consumer.accept(message, ctx);
+			MessageExecutor executor = serverExecutors.get(message.getClass().getName());
+			if(executor != null && ctx.getServerHandler().player != null )
+			{
+				ctx.getServerHandler().player.getServerWorld().addScheduledTask(new Runnable()
+				{
+					@Override
+					public void run()
+					{
+						//Server thread
+						executor.consumer.accept(handler, message, ctx);
+					}
+				});
+				
+				if(executor.override)
+					return executor.reply();
+			}
 		}
-		//else if(ctx.side == Side.CLIENT)
-		//{
-		//	
-		//}
 		
-		//Cannot addScheduledTask to manipulate a packet because they use a Queue that polls
+		return handler.onMessage(message, ctx);
 	}
 	
-	private static void addServer(String name, BiConsumer<IMessage, MessageContext> consumer)
+	public static class MessageExecutor
 	{
-		serverExecutors.put(name, consumer);
+		boolean override;
+		TriConsumer<IMessageHandler, IMessage, MessageContext> consumer;
+		MessageExecutor(boolean override, TriConsumer<IMessageHandler, IMessage, MessageContext> consumer)
+		{
+			this.override = override;
+			this.consumer = consumer;
+		}
+		
+		IMessage reply()
+		{
+			return null;
+		}
+	}
+	
+	public static void addServer(String name, TriConsumer<IMessageHandler, IMessage, MessageContext> consumer)
+	{
+		addServer(name, consumer, false);
+	}
+	
+	public static void addServer(String name, TriConsumer<IMessageHandler, IMessage, MessageContext> consumer, boolean override)
+	{
+		addServer(name, new MessageExecutor(override, consumer));
+	}
+	
+	public static void addServer(String name, MessageExecutor executor)
+	{
+		serverExecutors.put(name, executor);
 	}
 	
 	@Nullable
@@ -83,6 +121,46 @@ public class HookForge
 	{
 		//Add executors here
 		//addServer("full.clazzname.Name", HookForge::receiveName)
+		//addServer("com.yyon.grapplinghook.network.PlayerMovementMessage", HookForge::grapplePack, true);
+	}
+	
+	private static void grapplePack(IMessageHandler handler, IMessage message, MessageContext ctx)
+	{
+		Field[] fields = getFieldsForMessage(message, "entityId", "x", "y", "z", "mx", "my", "mz");
+		
+		try
+		{
+			//Get values
+			//Object any = getParam(message, fields[0]);
+			int entityId = getParam(message, fields[0]);
+			World world = ctx.getServerHandler().player.world;
+			Entity entity = world.getEntityByID(entityId);
+			if(entity instanceof EntityPlayerMP)
+			{
+				EntityPlayerMP referencedPlayer = (EntityPlayerMP)entity;
+				if(ctx.getServerHandler().player.getGameProfile().equals(referencedPlayer.getGameProfile()))
+				{
+					double my = getParam(message, fields[5]);
+					
+					entity.posX = getParam(message, fields[1]);
+					entity.posY = getParam(message, fields[2]);
+					entity.posZ = getParam(message, fields[3]);
+					entity.motionX = getParam(message, fields[4]);
+					entity.motionY = my;
+					entity.motionZ = getParam(message, fields[6]);
+					if(!entity.onGround)
+					{
+						if(my >= 0)
+						{
+							entity.fallDistance = 0;
+						}
+						else
+							entity.fallDistance = (float) (Math.pow(my, 2) / 0.2);
+					}
+				}
+			}
+		}
+		catch(Exception e){e.printStackTrace();}
 	}
 	
 	//Executors have a simple format
@@ -99,10 +177,9 @@ public class HookForge
 			//Do whatever processing
 			
 			//Set values
-			setParam(message, field[0], any);
+			setParam(message, fields[0], any);
 		}
+		catch(Exception e){}
 	}
 	*/
-	
-	
 }

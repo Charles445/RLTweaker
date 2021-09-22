@@ -3,6 +3,7 @@ package com.charles445.rltweaker.config;
 import com.charles445.rltweaker.config.annotation.RLConfig;
 
 import net.minecraftforge.common.config.Config;
+import net.minecraftforge.common.config.Config.RangeDouble;
 
 public class ConfigMinecraft
 {
@@ -104,4 +105,34 @@ public class ConfigMinecraft
 	@RLConfig.RLCraftTwoEightTwo("minecraft:weakness")
 	@RLConfig.RLCraftTwoNine("minecraft:weakness")
 	public String[] witchWeaknessReplacements = {"minecraft:weakness"};
+	
+	@Config.Comment("Allows all zombies to break doors")
+	@Config.Name("All Zombies Break Doors")
+	@RLConfig.ImprovementsOnly("false")
+	@RLConfig.RLCraftTwoEightTwo("false")
+	@RLConfig.RLCraftTwoNine("true")
+	public boolean allZombiesBreakDoors = false;
+	
+	@Config.Comment("Distance in chunks lightning can be heard by a player. Default setting disables this tweak")
+	@Config.Name("Lightning Sound Chunk Distance")
+	@RangeDouble(min=2.0d, max=3000000.0d)
+	@RLConfig.ImprovementsOnly("10000.0")
+	@RLConfig.RLCraftTwoEightTwo("10000.0")
+	@RLConfig.RLCraftTwoNine("100.0")
+	public double lightningSoundChunkDistance = 10000.0d;
+	
+	@Config.Comment("REQUIRES Patch patchBroadcastSounds. Globally broadcasted sounds are only sent to players this close by, in blocks. Ignores dimension.")
+	@Config.Name("Broadcasted Sounds Distance Limit")
+	@RangeDouble(min=2.0d, max=40000000d)
+	@RLConfig.ImprovementsOnly("1000.0")
+	@RLConfig.RLCraftTwoEightTwo("1000.0")
+	@RLConfig.RLCraftTwoNine("1000.0")
+	public double broadcastedSoundsDistanceLimit = 1000.0d;
+	
+	@Config.Comment("REQUIRES Patch patchEnchantments. Blacklisted enchantments do not show up as random enchantments. May still show up via other mods.")
+	@Config.Name("Enchantment Blacklist")
+	@RLConfig.ImprovementsOnly("")
+	@RLConfig.RLCraftTwoEightTwo("")
+	@RLConfig.RLCraftTwoNine("")
+	public String[] blacklistedEnchantments = {};
 }

@@ -59,7 +59,7 @@ public class CollisionUtil
 			if(ModConfig.server.minecraft.debug)
 				RLTweaker.logger.debug("Adding "+entity.getClass().getName()+" with radius "+dub+" to client");
 			
-			collisionMapClient.put(entity.getClass(), dub);
+			collisionMapClient.put(entity.getClass(), Math.min(World.MAX_ENTITY_RADIUS, dub));
 			
 			return dub.doubleValue();
 		}
@@ -80,7 +80,7 @@ public class CollisionUtil
 			if(ModConfig.server.minecraft.debug)
 				RLTweaker.logger.debug("Adding "+entity.getClass().getName()+" with radius "+dub+" to server");
 			
-			collisionMapServer.put(entity.getClass(), dub);
+			collisionMapServer.put(entity.getClass(), Math.min(World.MAX_ENTITY_RADIUS, dub));
 			
 			return dub.doubleValue();
 		}

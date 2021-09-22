@@ -1,5 +1,7 @@
 package com.charles445.rltweaker.handler;
 
+import java.lang.reflect.InvocationTargetException;
+
 import com.charles445.rltweaker.RLTweaker;
 import com.charles445.rltweaker.config.ModConfig;
 import com.charles445.rltweaker.reflect.IceAndFireReflect;
@@ -14,6 +16,8 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.village.MerchantRecipe;
+import net.minecraft.village.MerchantRecipeList;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.EntityMobGriefingEvent;
@@ -131,6 +135,47 @@ public class IceAndFireHandler
 				}
 			}
 		}
+		
+		//Fix myrmex queen trades
+		if(ModConfig.server.iceandfire.myrmexQueenTradeFix && !event.getWorld().isRemote && reflector.c_EntityMyrmexQueen.isInstance(event.getEntity()))
+		{
+			Entity myrmexBase = event.getEntity();
+			
+			//Server side myrmex queen
+			try
+			{
+				MerchantRecipeList trades = reflector.getMyrmexTrades(myrmexBase);
+				if(trades != null)
+				{
+					boolean myrmexIsJungle = reflector.isMyrmexJungle(myrmexBase);
+					
+					boolean hasJungle = false;
+					boolean hasDesert = false;
+					
+					for(MerchantRecipe trade : trades)
+					{
+						String reg = trade.getItemToBuy().getItem().getRegistryName().toString();
+						if(reg.equals("iceandfire:myrmex_desert_resin"))
+							hasDesert = true;
+						else if(reg.equals("iceandfire:myrmex_jungle_resin"))
+							hasJungle = true;
+					}
+						
+					if((myrmexIsJungle && hasDesert) || (!myrmexIsJungle && hasJungle))
+					{
+						//FIXME move to debug
+						RLTweaker.logger.info("Clearing broken myrmex queen trades: "+myrmexBase.getPosition().toString());
+						reflector.resetMyrmexTrades(myrmexBase);
+					}
+				}
+			} 
+			catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e)
+			{
+				ErrorUtil.logSilent("IceAndFireHandler Myrmex Queen Trades Failure");
+			}
+		}
+		
+		
 	}
 	
 	public class IAFUseItem

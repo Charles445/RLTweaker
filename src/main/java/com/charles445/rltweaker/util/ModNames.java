@@ -4,9 +4,13 @@ public class ModNames
 {
 	public static final String AQUACULTURE = "aquaculture";
 	public static final String BATTLETOWERS = "battletowers";
+	public static final String BETTERCOMBAT = "bettercombatmod";
+	public static final String BETTERSURVIVAL = "mujmajnkraftsbettersurvival";
+	public static final String CARRYON = "carryon";
 	public static final String CHARM = "charm";
 	public static final String CLASSYHATS = "classyhats";
 	public static final String DEFILEDLANDS = "defiledlands";
+	public static final String DYNAMICTREES = "dynamictrees";
 	public static final String FAMILIARFAUNA = "familiarfauna";
 	public static final String GRAPPLEMOD = "grapplemod";
 	public static final String ICEANDFIRE = "iceandfire";
@@ -15,11 +19,13 @@ public class ModNames
 	public static final String MANTLE = "mantle";
 	public static final String MINECRAFT = "minecraft";
 	public static final String POTIONCORE = "potioncore";
+	public static final String QUARK = "quark";
 	public static final String RECURRENTCOMPLEX = "reccomplex";
 	public static final String RESKILLABLE = "reskillable";
 	public static final String ROGUELIKEDUNGEONS = "roguelike";
 	public static final String RUINS = "ruins";
 	public static final String SOMANYENCHANTMENTS = "somanyenchantments";
+	public static final String SPAWNERCONTROL = "spawnercontrol";
 	public static final String TOUGHASNAILS = "toughasnails";
 	public static final String TRUMPETSKELETON = "trumpetskeleton";
 	public static final String TUMBLEWEED = "tumbleweed";

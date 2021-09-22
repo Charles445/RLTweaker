@@ -35,4 +35,11 @@ public class ConfigIceAndFire
 	@RLConfig.RLCraftTwoEightTwo("true")
 	@RLConfig.RLCraftTwoNine("true")
 	public boolean rightHandDragonInteraction = true;
+	
+	@Config.Comment("Fixes Myrmex Queen trades that generate with the wrong type of resin")
+	@Config.Name("Myrmex Queen Trade Fix")
+	@RLConfig.ImprovementsOnly("true")
+	@RLConfig.RLCraftTwoEightTwo("true")
+	@RLConfig.RLCraftTwoNine("true")
+	public boolean myrmexQueenTradeFix = true;
 }

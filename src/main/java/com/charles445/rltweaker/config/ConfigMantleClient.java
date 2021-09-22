@@ -16,9 +16,9 @@ public class ConfigMantleClient
 	
 	@Config.Comment("Whether to remove Mantle's health bar override")
 	@Config.Name("Remove Mantle Health Bar")
+	@Config.RequiresMcRestart
 	@RLConfig.ImprovementsOnly("false")
 	@RLConfig.RLCraftTwoEightTwo("true")
 	@RLConfig.RLCraftTwoNine("true")
-	@Config.RequiresMcRestart
 	public boolean removeMantleHealthBar = true;
 }

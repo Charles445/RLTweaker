@@ -21,5 +21,10 @@ public class PacketHandler
 		//0.4.0
 		instance.registerMessage(MessageUpdateAttackYaw.Handler.class, MessageUpdateAttackYaw.class, 2, Side.CLIENT);
 		instance.registerMessage(MessageSendVersion.Handler.class, MessageSendVersion.class, 3, Side.SERVER);
+		
+		//0.4.3
+		instance.registerMessage(MessageReskillableLockSkill.Handler.class, MessageReskillableLockSkill.class, 4, Side.SERVER);
 	}
+	
+	
 }

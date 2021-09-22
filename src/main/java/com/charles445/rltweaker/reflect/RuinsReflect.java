@@ -4,14 +4,10 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.charles445.rltweaker.RLTweaker;
 import com.charles445.rltweaker.util.CompatUtil;
 import com.charles445.rltweaker.util.CriticalException;
 import com.charles445.rltweaker.util.ModNames;
 import com.charles445.rltweaker.util.ReflectUtil;
-
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.Mod;
 
 public class RuinsReflect
 {

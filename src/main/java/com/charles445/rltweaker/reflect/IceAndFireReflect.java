@@ -10,6 +10,7 @@ import com.charles445.rltweaker.util.ErrorUtil;
 import com.charles445.rltweaker.util.ReflectUtil;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.village.MerchantRecipeList;
 
 public class IceAndFireReflect
 {
@@ -21,6 +22,13 @@ public class IceAndFireReflect
 	
 	public final Class c_EntityDragonBase;
 	
+	public final Class c_EntityMyrmexQueen;
+	
+	public final Class c_EntityMyrmexBase;
+	public final Field f_EntityMyrmexBase_buyingList;
+	public final Method m_EntityMyrmexBase_populateBuyingList;
+	public final Method m_EntityMyrmexBase_isJungle;
+	
 	@Nullable
 	public Class c_ItemDragonHornStatic;
 	
@@ -30,9 +38,9 @@ public class IceAndFireReflect
 	public final Method m_EntityPropertiesHandler_getProperties;
 	public final Object o_EntityPropertiesHandler_INSTANCE;
 	
-	
 	public IceAndFireReflect() throws Exception
 	{
+		//Ice And Fire
 		c_EntityDragonBase = Class.forName("com.github.alexthe666.iceandfire.entity.EntityDragonBase");
 		
 		c_StoneEntityProperties = Class.forName("com.github.alexthe666.iceandfire.entity.StoneEntityProperties");
@@ -40,11 +48,20 @@ public class IceAndFireReflect
 		
 		c_ItemStoneStatue = Class.forName("com.github.alexthe666.iceandfire.item.ItemStoneStatue");
 		
+		c_EntityMyrmexQueen = Class.forName("com.github.alexthe666.iceandfire.entity.EntityMyrmexQueen");
+		
+		c_EntityMyrmexBase = Class.forName("com.github.alexthe666.iceandfire.entity.EntityMyrmexBase");
+		f_EntityMyrmexBase_buyingList = ReflectUtil.findField(c_EntityMyrmexBase, "buyingList");
+		m_EntityMyrmexBase_populateBuyingList = ReflectUtil.findMethod(c_EntityMyrmexBase, "populateBuyingList");
+		m_EntityMyrmexBase_isJungle = ReflectUtil.findMethod(c_EntityMyrmexBase, "isJungle");
+
+		//LLibrary
 		c_EntityPropertiesHandler = Class.forName("net.ilexiconn.llibrary.server.entity.EntityPropertiesHandler");
 		f_EntityPropertiesHandler_INSTANCE = ReflectUtil.findField(c_EntityPropertiesHandler, "INSTANCE");
 		m_EntityPropertiesHandler_getProperties = ReflectUtil.findMethod(c_EntityPropertiesHandler, "getProperties");
 		o_EntityPropertiesHandler_INSTANCE = f_EntityPropertiesHandler_INSTANCE.get(null); //public static final (Enum)
 		
+		//Ice And Fire
 		try
 		{
 			c_ItemDragonHornStatic = Class.forName("com.github.alexthe666.iceandfire.item.ItemDragonHornStatic");
@@ -81,5 +98,22 @@ public class IceAndFireReflect
 	protected Object getProperties(Entity entity, Class propertiesClazz) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException
 	{
 		return m_EntityPropertiesHandler_getProperties.invoke(o_EntityPropertiesHandler_INSTANCE, entity, propertiesClazz);
+	}
+	
+	@Nullable
+	public MerchantRecipeList getMyrmexTrades(Object myrmexBase) throws IllegalArgumentException, IllegalAccessException
+	{
+		return (MerchantRecipeList) f_EntityMyrmexBase_buyingList.get(myrmexBase);
+	}
+	
+	public void resetMyrmexTrades(Object myrmexBase) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException
+	{
+		f_EntityMyrmexBase_buyingList.set(myrmexBase, null);
+		m_EntityMyrmexBase_populateBuyingList.invoke(myrmexBase);
+	}
+	
+	public boolean isMyrmexJungle(Object myrmexBase) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException
+	{
+		return (boolean) m_EntityMyrmexBase_isJungle.invoke(myrmexBase);
 	}
 }

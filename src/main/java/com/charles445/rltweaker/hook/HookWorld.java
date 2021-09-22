@@ -13,12 +13,15 @@ import com.google.common.base.Predicate;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.World;
 
 public class HookWorld
 {
 	public static boolean warnItemHook = false;
+	
+	public static boolean warnSearchHook = false;
 	
 	//HOOK into World.getCollisionBoxes
 	public static List<Entity> getEntitiesWithinAABBExcludingEntity(World world, @Nullable Entity entity, AxisAlignedBB bb)
@@ -73,6 +76,29 @@ public class HookWorld
 		return world.getEntitiesInAABBexcluding(entity, bb, predicate);
 	}
 	
+	//HOOK into World.getEntitiesWithinAABB
+	public static List<Entity> getEntitiesWithinAABB(World world, Class<Entity> clazz, AxisAlignedBB bb, @Nullable Predicate <? super Entity > predicate)
+	{
+		try
+		{
+			if(clazz.equals(EntityItem.class) || clazz.equals(EntityPlayer.class))
+			{
+				return WorldRadiusUtil.instance.getEntitiesWithinAABB(world, clazz, bb, predicate, 2.0d);
+			}
+		}
+		catch(Exception e)
+		{
+			if(!warnSearchHook)
+			{
+				warnSearchHook = true;
+				RLTweaker.logger.error("Error running ReducedSearchSize!",e);
+				ErrorUtil.logSilent("ReducedSearchSize Critical Failure");
+			}
+		}
+		
+		
+		return world.getEntitiesWithinAABB(clazz, bb, predicate);
+	}
 	
 	//UNUSED
 	//HOOK

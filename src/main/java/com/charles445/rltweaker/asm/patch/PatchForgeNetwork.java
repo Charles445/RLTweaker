@@ -10,13 +10,14 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
+import com.charles445.rltweaker.asm.util.ClassDisplayer;
 import com.charles445.rltweaker.asm.util.TransformUtil;
 
 public class PatchForgeNetwork extends PatchManager
 {
 	public PatchForgeNetwork()
 	{
-		super("Patch Forge Network");
+		super("Forge Network");
 		
 		add(new Patch(this, "net.minecraftforge.fml.common.network.simpleimpl.SimpleChannelHandlerWrapper", ClassWriter.COMPUTE_MAXS)
 		{
@@ -28,6 +29,19 @@ public class PatchForgeNetwork extends PatchManager
 				if(m_channelRead0 == null)
 					throw new RuntimeException("Couldn't findMethod channelRead0");
 				
+				ClassDisplayer.instance.printAllMethods(clazzNode);
+				
+				MethodInsnNode callOnMessage = TransformUtil.findNextCallWithOpcodeAndName(first(m_channelRead0), Opcodes.INVOKEINTERFACE, "onMessage");
+				
+				if(callOnMessage == null)
+					throw new RuntimeException("Couldn't find onMessage in channelRead0");
+				
+				callOnMessage.setOpcode(Opcodes.INVOKESTATIC);
+				callOnMessage.owner = "com/charles445/rltweaker/hook/HookForge";
+				callOnMessage.name = "onMessage";
+				callOnMessage.desc = "(Lnet/minecraftforge/fml/common/network/simpleimpl/IMessageHandler;Lnet/minecraftforge/fml/common/network/simpleimpl/IMessage;Lnet/minecraftforge/fml/common/network/simpleimpl/MessageContext;)Lnet/minecraftforge/fml/common/network/simpleimpl/IMessage;";
+				callOnMessage.itf = false;
+				/*
 				LocalVariableNode lvn_context = TransformUtil.findLocalVariableWithName(m_channelRead0, "context");
 				
 				if(lvn_context == null)
@@ -72,6 +86,7 @@ public class PatchForgeNetwork extends PatchManager
 						false));
 				
 				m_channelRead0.instructions.insert(anchor, insert);
+				*/
 			}
 		});
 	}

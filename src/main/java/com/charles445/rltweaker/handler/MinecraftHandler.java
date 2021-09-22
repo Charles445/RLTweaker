@@ -14,13 +14,17 @@ import com.charles445.rltweaker.network.MessageUpdateEntityMovement;
 import com.charles445.rltweaker.network.NetworkHandler;
 import com.charles445.rltweaker.network.PacketHandler;
 import com.charles445.rltweaker.network.TaskScheduler;
+import com.charles445.rltweaker.util.CompatUtil;
 
+import net.minecraft.entity.EntityList;
 import net.minecraft.entity.monster.EntityWitch;
+import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.entity.projectile.EntityPotion;
 import net.minecraft.init.PotionTypes;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
@@ -40,6 +44,7 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.EntityMountEvent;
+import net.minecraftforge.event.entity.PlaySoundAtEntityEvent;
 import net.minecraftforge.event.entity.living.LivingKnockBackEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -55,6 +60,37 @@ public class MinecraftHandler
 	public MinecraftHandler()
 	{
 		MinecraftForge.EVENT_BUS.register(this);
+	}
+	
+	@SubscribeEvent
+	public void onEntityJoinWorldEvent(EntityJoinWorldEvent event)
+	{
+		if(event.getWorld().isRemote)
+			return;
+		
+		//FIXME remove for releases, server only fix to stop overworld parasites
+		ResourceLocation rl = EntityList.getKey(event.getEntity());
+		if(rl == null)
+		{
+			;
+		}
+		else
+		{
+			if(rl.getResourceDomain().equals("srparasites"))
+			{
+				int dimension = event.getEntity().dimension;
+				if(dimension == 0 || dimension == 1 || dimension == -1)
+				{
+					event.setCanceled(true);
+				}
+			}
+		}
+		
+		
+		if(ModConfig.server.minecraft.allZombiesBreakDoors && event.getEntity() instanceof EntityZombie)
+		{
+			((EntityZombie)event.getEntity()).setBreakDoorsAItask(true);
+		}
 	}
 	
 	@SubscribeEvent
@@ -381,7 +417,7 @@ public class MinecraftHandler
 	}
 	
 	@SubscribeEvent
-	public void onKnockback (LivingKnockBackEvent event)
+	public void onKnockback(LivingKnockBackEvent event)
 	{
 		if(!ModConfig.server.minecraft.damageTilt)
 			return;
@@ -395,6 +431,15 @@ public class MinecraftHandler
 			//Server Side
 			if(NetworkHandler.isVersionAtLeast(0, 4, player))
 				PacketHandler.instance.sendTo(new MessageUpdateAttackYaw(player), (EntityPlayerMP) player);
+		}
+	}
+
+	@SubscribeEvent
+	public void onPlaySoundAtEntity(PlaySoundAtEntityEvent event)
+	{
+		if(event.getSound() == SoundEvents.ENTITY_LIGHTNING_THUNDER && ModConfig.server.minecraft.lightningSoundChunkDistance != 10000.0d)
+		{
+			event.setVolume((float)ModConfig.server.minecraft.lightningSoundChunkDistance);
 		}
 	}
 }

@@ -10,10 +10,15 @@ import org.objectweb.asm.tree.ClassNode;
 import com.charles445.rltweaker.asm.helper.ASMHelper;
 import com.charles445.rltweaker.asm.patch.IPatch;
 import com.charles445.rltweaker.asm.patch.PatchBetterCombatMountFix;
+import com.charles445.rltweaker.asm.patch.PatchBroadcastSounds;
 import com.charles445.rltweaker.asm.patch.PatchConcurrentParticles;
-import com.charles445.rltweaker.asm.patch.PatchForgeNetwork;
+import com.charles445.rltweaker.asm.patch.PatchDoorPathfinding;
+import com.charles445.rltweaker.asm.patch.PatchEnchant;
 import com.charles445.rltweaker.asm.patch.PatchLessCollisions;
+import com.charles445.rltweaker.asm.patch.PatchLycanitesDupe;
+import com.charles445.rltweaker.asm.patch.PatchMyrmexQueenHiveSpam;
 import com.charles445.rltweaker.asm.patch.PatchRealBench;
+import com.charles445.rltweaker.asm.patch.PatchReducedSearchSize;
 
 import net.minecraft.launchwrapper.IClassTransformer;
 
@@ -152,6 +157,52 @@ public class RLTweakerASM implements IClassTransformer
 		{
 			new PatchRealBench();
 		}
+		
+		//iafFixMyrmexQueenHiveSpam
+		if(ASMConfig.getBoolean("general.patches.iafFixMyrmexQueenHiveSpam", true))
+		{
+			new PatchMyrmexQueenHiveSpam();
+		}
+		
+		//lycanitesPetDupeFix
+		if(ASMConfig.getBoolean("general.patches.lycanitesPetDupeFix", true))
+		{
+			new PatchLycanitesDupe();
+		}
+		
+		//doorPathfindingFix
+		if(ASMConfig.getBoolean("general.patches.doorPathfindingFix", true))
+		{
+			new PatchDoorPathfinding();
+		}
+		
+		//reducedSearchSize
+		if(ASMConfig.getBoolean("general.patches.reducedSearchSize", false))
+		{
+			new PatchReducedSearchSize();
+		}
+		
+		//patchBroadcastSounds
+		if(ASMConfig.getBoolean("general.patches.patchBroadcastSounds", false))
+		{
+			new PatchBroadcastSounds();
+		}
+		
+		//patchEnchantments
+		if(ASMConfig.getBoolean("general.patches.patchEnchantments", false))
+		{
+			new PatchEnchant();
+		}
+		
+		/*
+		//levelUpOldStealthFix
+		if(ASMConfig.getBoolean("general.patches.levelUpOldStealthFix", true))
+		{
+			new PatchLevelUpStealth();
+		}
+		*/
+		
+		//new PatchDebug();
 		
 		//new PatchForgeNetwork();
 	}

@@ -43,6 +43,14 @@ public class ModConfig
 		@Config.Name("Battle Towers")
 		public ConfigBattleTowers battletowers = new ConfigBattleTowers();
 		
+		@Config.Comment("Better Survival tweaks")
+		@Config.Name("Better Survival")
+		public ConfigBetterSurvival bettersurvival = new ConfigBetterSurvival();
+		
+		@Config.Comment("Carry On tweaks")
+		@Config.Name("Carry On")
+		public ConfigCarryOn carryon = new ConfigCarryOn();
+		
 		@Config.Comment("Charm tweaks")
 		@Config.Name("Charm")
 		public ConfigCharm charm = new ConfigCharm();
@@ -79,6 +87,10 @@ public class ModConfig
 		@Config.Comment("So Many Enchantments tweaks")
 		@Config.Name("So Many Enchantments")
 		public ConfigSME somanyenchantments = new ConfigSME();
+
+		@Config.Comment("Spawner Control tweaks")
+		@Config.Name("Spawner Control")
+		public ConfigSpawnerControl spawnercontrol = new ConfigSpawnerControl();
 		
 		@Config.Comment("Tough As Nails tweaks")
 		@Config.Name("Tough As Nails")
@@ -102,6 +114,10 @@ public class ModConfig
 		@Config.Comment("Potion Core tweaks")
 		@Config.Name("Potion Core")
 		public ConfigPotionCoreClient potioncore = new ConfigPotionCoreClient();
+		
+		@Config.Comment("Reskillable tweaks")
+		@Config.Name("Reskillable")
+		public ConfigReskillableClient reskillable = new ConfigReskillableClient();
 	}
 	
 	@Mod.EventBusSubscriber(modid = RLTweaker.MODID)

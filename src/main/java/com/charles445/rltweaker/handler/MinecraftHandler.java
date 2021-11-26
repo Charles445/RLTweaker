@@ -120,11 +120,20 @@ public class MinecraftHandler
 		if(world.isRemote)
 			return;
 		
-		if(ModConfig.server.minecraft.cleanupWorldgenFiles)
+		//TODO other worldgen
+		//Uf you enter an area for the first time, leave, world saves twice, come back, the area will be broken
+		//This is very uncommon, but it's still a possibility
+		//They seem to regenerate when the game is restarted, which is very peculiar, but could also be incredibly helpful
+		//It may be possible to run these cleanups on server stopping, or something similar
+		//
+		//Nobody uses Mineshafts, though, so that cleaner gets to stay for now
+		
+		
+		if(ModConfig.server.minecraft.cleanupMineshaftWorldgenFiles)
 		{
 			cleanMapGenStructureData(world, "Mineshaft", false, true);
-			cleanMapGenStructureData(world, "Village", false, true);
-			cleanMapGenStructureData(world, "Fortress", false, true);
+			//cleanMapGenStructureData(world, "Village", false, true);
+			//cleanMapGenStructureData(world, "Fortress", false, true);
 		}
 	}
 	

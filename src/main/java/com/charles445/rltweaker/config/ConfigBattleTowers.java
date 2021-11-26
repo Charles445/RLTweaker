@@ -42,6 +42,27 @@ public class ConfigBattleTowers
 	@RLConfig.RLCraftTwoNine("true")
 	public boolean golemDrowningFix = false;
 	
+	@Config.Comment("Prevent golems from suffocating in walls")
+	@Config.Name("Golem Suffocating Fix")
+	@RLConfig.ImprovementsOnly("false")
+	@RLConfig.RLCraftTwoEightTwo("false")
+	@RLConfig.RLCraftTwoNine("true")
+	public boolean golemSuffocatingFix = false;
+	
+	@Config.Comment("Prevent falling block damage for golems")
+	@Config.Name("Golem Falling Block Fix")
+	@RLConfig.ImprovementsOnly("false")
+	@RLConfig.RLCraftTwoEightTwo("false")
+	@RLConfig.RLCraftTwoNine("true")
+	public boolean golemFallingBlockFix = false;
+	
+	@Config.Comment("Prevent anvil damage for golems")
+	@Config.Name("Golem Anvil Fix")
+	@RLConfig.ImprovementsOnly("false")
+	@RLConfig.RLCraftTwoEightTwo("false")
+	@RLConfig.RLCraftTwoNine("true")
+	public boolean golemAnvilFix = false;
+	
 	@Config.Comment("Max Golem XZ movement to make using tools like fishing rods harder. Set to a negative number to disable")
 	@Config.Name("Golem Speed Cap")
 	@RLConfig.ImprovementsOnly("-1.0")
@@ -49,6 +70,14 @@ public class ConfigBattleTowers
 	@RLConfig.RLCraftTwoNine("0.125d")
 	@Config.RangeDouble(min=-1.0d)
 	public double golemSpeedCap = -1.0d;
+	
+	@Config.Comment("Max Golem Y movement (upwards) to make launching him harder. Set to a negative number to disable")
+	@Config.Name("Golem Speed Cap Upwards")
+	@RLConfig.ImprovementsOnly("-1.0")
+	@RLConfig.RLCraftTwoEightTwo("-1.0")
+	@RLConfig.RLCraftTwoNine("-1.0")
+	@Config.RangeDouble(min=-1.0d)
+	public double golemSpeedCapUpwards = -1.0d;
 	
 	@Config.Comment("Prevent golems from riding anything, like boats or minecarts")
 	@Config.Name("Golem Auto Dismount")

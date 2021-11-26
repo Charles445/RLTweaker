@@ -235,4 +235,10 @@ public class TransformUtil
 		
 		return new LocalVariableNode(name,desc,null,l1,l2,index);
 	}
+	
+	@Nullable
+	public static AbstractInsnNode gotoLabel(final MethodNode methodNode, LabelNode label)
+	{
+		return ASMHelper.find(methodNode.instructions.getFirst(), label);
+	}
 }

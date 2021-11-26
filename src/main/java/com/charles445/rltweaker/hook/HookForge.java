@@ -124,45 +124,6 @@ public class HookForge
 		//addServer("com.yyon.grapplinghook.network.PlayerMovementMessage", HookForge::grapplePack, true);
 	}
 	
-	private static void grapplePack(IMessageHandler handler, IMessage message, MessageContext ctx)
-	{
-		Field[] fields = getFieldsForMessage(message, "entityId", "x", "y", "z", "mx", "my", "mz");
-		
-		try
-		{
-			//Get values
-			//Object any = getParam(message, fields[0]);
-			int entityId = getParam(message, fields[0]);
-			World world = ctx.getServerHandler().player.world;
-			Entity entity = world.getEntityByID(entityId);
-			if(entity instanceof EntityPlayerMP)
-			{
-				EntityPlayerMP referencedPlayer = (EntityPlayerMP)entity;
-				if(ctx.getServerHandler().player.getGameProfile().equals(referencedPlayer.getGameProfile()))
-				{
-					double my = getParam(message, fields[5]);
-					
-					entity.posX = getParam(message, fields[1]);
-					entity.posY = getParam(message, fields[2]);
-					entity.posZ = getParam(message, fields[3]);
-					entity.motionX = getParam(message, fields[4]);
-					entity.motionY = my;
-					entity.motionZ = getParam(message, fields[6]);
-					if(!entity.onGround)
-					{
-						if(my >= 0)
-						{
-							entity.fallDistance = 0;
-						}
-						else
-							entity.fallDistance = (float) (Math.pow(my, 2) / 0.2);
-					}
-				}
-			}
-		}
-		catch(Exception e){e.printStackTrace();}
-	}
-	
 	//Executors have a simple format
 	/*
 	private static void receiveName(IMessage message, MessageContext ctx)

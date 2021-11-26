@@ -131,8 +131,36 @@ public class ConfigMinecraft
 	
 	@Config.Comment("REQUIRES Patch patchEnchantments. Blacklisted enchantments do not show up as random enchantments. May still show up via other mods.")
 	@Config.Name("Enchantment Blacklist")
-	@RLConfig.ImprovementsOnly("")
-	@RLConfig.RLCraftTwoEightTwo("")
-	@RLConfig.RLCraftTwoNine("")
-	public String[] blacklistedEnchantments = {};
+	@RLConfig.ImprovementsOnly("examplemod:enchantment")
+	@RLConfig.RLCraftTwoEightTwo("examplemod:enchantment")
+	@RLConfig.RLCraftTwoNine("examplemod:enchantment")
+	public String[] blacklistedEnchantments = {"examplemod:enchantment"};
+	
+	@Config.Comment("Container class names to enforce player distance (to prevent dupes and other glitchy behavior). Must be the full qualified class name of the containers.")
+	@Config.Name("Container Distance Classes")
+	@RLConfig.ImprovementsOnly("examplemod.container.ExampleContainer")
+	@RLConfig.RLCraftTwoEightTwo("examplemod.container.ExampleContainer")
+	@RLConfig.RLCraftTwoNine("examplemod.container.ExampleContainer")
+	public String[] containerDistanceClasses = {"examplemod.container.ExampleContainer"};
+	
+	@Config.Comment("REQUIRES patch patchEntityBlockDestroy. Prevents entities from destroying these blocks.")
+	@Config.Name("Entity Block Destroy Blacklist")
+	@RLConfig.ImprovementsOnly("examplemod:block")
+	@RLConfig.RLCraftTwoEightTwo("examplemod:block")
+	@RLConfig.RLCraftTwoNine("bountiful:bountyboard|waystones:waystone")
+	public String[] entityBlockDestroyBlacklist = {"examplemod:block"};
+	
+	@Config.Comment("REQUIRES patch patchPushReaction. Prevents specified entities from being pushed by pistons.")
+	@Config.Name("Entity Push Prevention")
+	@RLConfig.ImprovementsOnly("examplemod:entity")
+	@RLConfig.RLCraftTwoEightTwo("examplemod:entity")
+	@RLConfig.RLCraftTwoNine("battletowers:golem")
+	public String[] entityPushPrevention = {"examplemod:entity"};
+	
+	@Config.Comment("REQUIRES patch patchHopper. Prevents hoppers from pulling from or inserting into specific blocks.")
+	@Config.Name("Hopper Block Blacklist")
+	@RLConfig.ImprovementsOnly("examplemod:block")
+	@RLConfig.RLCraftTwoEightTwo("examplemod:block")
+	@RLConfig.RLCraftTwoNine("bountiful:bountyboard") //TODO fix all these
+	public String[] hopperBlockBlacklist = {"examplemod:block"};
 }

@@ -43,6 +43,10 @@ public class ModConfig
 		@Config.Name("Battle Towers")
 		public ConfigBattleTowers battletowers = new ConfigBattleTowers();
 		
+		@Config.Comment("Baubles tweaks")
+		@Config.Name("Baubles")
+		public ConfigBaubles baubles = new ConfigBaubles();
+		
 		@Config.Comment("Better Survival tweaks")
 		@Config.Name("Better Survival")
 		public ConfigBetterSurvival bettersurvival = new ConfigBetterSurvival();
@@ -59,14 +63,21 @@ public class ModConfig
 		@Config.Name("Grappling Hook Mod")
 		public ConfigGrapplemod grapplemod = new ConfigGrapplemod();
 		
-		@Config.Comment("Ice and Fire Mod tweaks")
+		@Config.Comment("Ice and Fire tweaks")
 		@Config.Name("Ice and Fire")
 		public ConfigIceAndFire iceandfire = new ConfigIceAndFire();
 		
+		@Config.Comment("Level Up Reloaded tweaks")
+		@Config.Name("Level Up Reloaded")
+		public ConfigLevelUpTwo leveluptwo = new ConfigLevelUpTwo();
 		
 		@Config.Comment("Lost Cities tweaks")
 		@Config.Name("Lost Cities")
 		public ConfigLostCities lostcities = new ConfigLostCities();
+		
+		@Config.Comment("Quark tweaks")
+		@Config.Name("Quark")
+		public ConfigQuark quark = new ConfigQuark();
 		
 		@Config.Comment("Recurrent Complex tweaks")
 		@Config.Name("Recurrent Complex")
@@ -84,6 +95,10 @@ public class ModConfig
 		@Config.Name("Ruins")
 		public ConfigRuins ruins = new ConfigRuins();
 		
+		@Config.Comment("Scape and Run Parasites tweaks")
+		@Config.Name("Scape and Run Parasites")
+		public ConfigSRParasites srparasites = new ConfigSRParasites();
+		
 		@Config.Comment("So Many Enchantments tweaks")
 		@Config.Name("So Many Enchantments")
 		public ConfigSME somanyenchantments = new ConfigSME();
@@ -95,6 +110,12 @@ public class ModConfig
 		@Config.Comment("Tough As Nails tweaks")
 		@Config.Name("Tough As Nails")
 		public ConfigTAN toughasnails = new ConfigTAN();
+		
+		/*
+		@Config.Comment("Varied Commodities tweaks")
+		@Config.Name("Varied Commodities")
+		public ConfigVariedCommodities variedcommodities = new ConfigVariedCommodities();
+		*/
 		
 		@Config.Comment("Waystones tweaks")
 		@Config.Name("Waystones")
@@ -110,6 +131,10 @@ public class ModConfig
 		@Config.Comment("Mantle tweaks")
 		@Config.Name("Mantle")
 		public ConfigMantleClient mantle = new ConfigMantleClient();
+		
+		@Config.Comment("Minecraft tweaks")
+		@Config.Name("Minecraft")
+		public ConfigMinecraftClient minecraft = new ConfigMinecraftClient();
 		
 		@Config.Comment("Potion Core tweaks")
 		@Config.Name("Potion Core")

@@ -86,7 +86,7 @@ public class CommandAdvisor extends CommandBase
 				inform("Improvement patch, set patches / iafFixMyrmexQueenHiveSpam to true", sender);
 		}
 		
-		//lycanitesPetDupeFix //temporary
+		//lycanitesPetDupeFix //temporary, don't give advice
 		
 		if(!ModConfig.patches.doorPathfindingFix)
 		{
@@ -107,13 +107,51 @@ public class CommandAdvisor extends CommandBase
 			inform("Optional patch, set patches / patchBroadcastSounds to true", sender);
 		}
 		
-		if(ModConfig.patches.patchEnchantments && ModConfig.server.minecraft.blacklistedEnchantments.length == 0)
+		if(ModConfig.patches.patchEnchantments && hasExamplesOnly(ModConfig.server.minecraft.blacklistedEnchantments))
 		{
 			inform("Unnecessary patch, set patches / patchEnchantments to false", sender);
 		}
-		else if(!ModConfig.patches.patchEnchantments && ModConfig.server.minecraft.blacklistedEnchantments.length > 0)
+		else if(!ModConfig.patches.patchEnchantments && !hasExamplesOnly(ModConfig.server.minecraft.blacklistedEnchantments))
 		{
 			inform("Necessary patch for blacklisting enchantments, set patches / patchEnchantments to true", sender);
+		}
+		
+		if(!ModConfig.patches.aggressiveMotionChecker)
+		{
+			inform("Improvement patch, set patches / aggressiveMotionChecker to true", sender);
+		}
+		
+		if(ModConfig.patches.patchEntityBlockDestroy && hasExamplesOnly(ModConfig.server.minecraft.entityBlockDestroyBlacklist))
+		{
+			inform("Unnecessary patch, set patches / patchEntityBlockDestroy to false", sender);
+		}
+		else if(!ModConfig.patches.patchEntityBlockDestroy && !hasExamplesOnly(ModConfig.server.minecraft.entityBlockDestroyBlacklist))
+		{
+			inform("Necessary patch for blacklisting entity block destruction, set patches / patchEntityBlockDestroy to true", sender);
+		}
+		
+		if(!ModConfig.patches.patchItemFrameDupe)
+		{
+			inform("Improvement patch, set patches patchItemFrameDupe to true", sender);
+		}
+		
+		if(ModConfig.patches.patchPushReaction && hasExamplesOnly(ModConfig.server.minecraft.entityPushPrevention))
+		{
+			inform("Unnecessary patch, set patches / patchPushReaction to false", sender);
+		}
+		else if(!ModConfig.patches.patchPushReaction && !hasExamplesOnly(ModConfig.server.minecraft.entityPushPrevention))
+		{
+			inform("Necessary patch for entity push prevention, set patches / patchPushReaction to true", sender);
+		}
+		
+		if(!ModConfig.patches.patchAnvilDupe)
+		{
+			inform("Improvement patch, set patches / patchAnvilDupe to true", sender);
+		}
+		
+		if(!ModConfig.patches.patchOverlayMessage)
+		{
+			inform("Optional patch, set patches / patchOverlayMessage to true", sender);
 		}
 		
 		if(!ModConfig.patches.ENABLED)
@@ -123,6 +161,20 @@ public class CommandAdvisor extends CommandBase
 		
 		//No advisory to set ENABLED to false
 		
+	}
+	
+	private boolean hasExamplesOnly(String[] list)
+	{
+		if(list.length == 0)
+			return true;
+		
+		for(String s : list)
+		{
+			if(!s.startsWith("example"))
+				return false;
+		}
+		
+		return true;
 	}
 	
 	public void inform(String s, ICommandSender sender)

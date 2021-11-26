@@ -9,14 +9,21 @@ import org.objectweb.asm.tree.ClassNode;
 
 import com.charles445.rltweaker.asm.helper.ASMHelper;
 import com.charles445.rltweaker.asm.patch.IPatch;
+import com.charles445.rltweaker.asm.patch.PatchAggressiveMotionChecker;
+import com.charles445.rltweaker.asm.patch.PatchAnvilDupe;
 import com.charles445.rltweaker.asm.patch.PatchBetterCombatMountFix;
 import com.charles445.rltweaker.asm.patch.PatchBroadcastSounds;
 import com.charles445.rltweaker.asm.patch.PatchConcurrentParticles;
 import com.charles445.rltweaker.asm.patch.PatchDoorPathfinding;
 import com.charles445.rltweaker.asm.patch.PatchEnchant;
+import com.charles445.rltweaker.asm.patch.PatchEntityBlockDestroy;
+import com.charles445.rltweaker.asm.patch.PatchHopper;
+import com.charles445.rltweaker.asm.patch.PatchItemFrameDupe;
 import com.charles445.rltweaker.asm.patch.PatchLessCollisions;
 import com.charles445.rltweaker.asm.patch.PatchLycanitesDupe;
 import com.charles445.rltweaker.asm.patch.PatchMyrmexQueenHiveSpam;
+import com.charles445.rltweaker.asm.patch.PatchOverlayMessage;
+import com.charles445.rltweaker.asm.patch.PatchPushReaction;
 import com.charles445.rltweaker.asm.patch.PatchRealBench;
 import com.charles445.rltweaker.asm.patch.PatchReducedSearchSize;
 
@@ -25,6 +32,8 @@ import net.minecraft.launchwrapper.IClassTransformer;
 public class RLTweakerASM implements IClassTransformer
 {
 	private boolean run = true;
+	
+	//private boolean debug = true;
 	
 	protected static Map<String, List<IPatch>> transformMap = new HashMap<>();
 	
@@ -53,6 +62,9 @@ public class RLTweakerASM implements IClassTransformer
 		if(!this.run)
 			return basicClass;
 		
+		//if(this.debug)
+		//	PatchDebug.transformAll(basicClass);
+		
 		//Check for patches
 		if(transformMap.containsKey(transformedName))
 		{
@@ -64,6 +76,7 @@ public class RLTweakerASM implements IClassTransformer
 			
 			ClassNode clazzNode = ASMHelper.readClassFromBytes(basicClass);
 			
+			//TODO backup old classnode state and flags for safer exception handling?
 			for(IPatch patch : transformMap.get(transformedName))
 			{
 				oldFlags = flags;
@@ -94,6 +107,7 @@ public class RLTweakerASM implements IClassTransformer
 			{
 				System.out.println("Writing class "+transformedName+" with flags "+flagsAsString(flags));
 				return ASMHelper.writeClassToBytes(clazzNode, flags);
+				//return ASMHelper.writeClassToBytes(clazzNode, ClassWriter.COMPUTE_FRAMES|ClassWriter.COMPUTE_MAXS);
 			}
 			else
 			{
@@ -194,13 +208,47 @@ public class RLTweakerASM implements IClassTransformer
 			new PatchEnchant();
 		}
 		
-		/*
-		//levelUpOldStealthFix
-		if(ASMConfig.getBoolean("general.patches.levelUpOldStealthFix", true))
+		//aggressiveMotionChecker
+		if(ASMConfig.getBoolean("general.patches.aggressiveMotionChecker", true))
 		{
-			new PatchLevelUpStealth();
+			new PatchAggressiveMotionChecker();
 		}
-		*/
+
+		//patchEntityBlockDestroy
+		if(ASMConfig.getBoolean("general.patches.patchEntityBlockDestroy", false))
+		{
+			new PatchEntityBlockDestroy();
+		}
+		
+		//patchItemFrameDupe
+		if(ASMConfig.getBoolean("general.patches.patchItemFrameDupe", true))
+		{
+			new PatchItemFrameDupe();
+		}
+		
+		//patchPushReaction
+		if(ASMConfig.getBoolean("general.patches.patchPushReaction", false))
+		{
+			new PatchPushReaction();
+		}
+		
+		//patchOverlayMessage
+		if(ASMConfig.getBoolean("general.patches.patchOverlayMessage", false))
+		{
+			new PatchOverlayMessage();
+		}
+		
+		//patchAnvilDupe
+		if(ASMConfig.getBoolean("general.patches.patchAnvilDupe", true))
+		{
+			new PatchAnvilDupe();
+		}
+		
+		//patchHopper
+		if(ASMConfig.getBoolean("general.patches.patchHopper", false))
+		{
+			new PatchHopper();
+		}
 		
 		//new PatchDebug();
 		

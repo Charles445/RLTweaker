@@ -75,9 +75,9 @@ public class ReskillableGuiDelegate extends GuiDelegateBase
 						((IForgeRegistryEntry.Impl<?>)unlockable).getRegistryName()
 				);
 				
-				//FIXME server version check
+				if(NetworkHandler.serverVersion.isSameOrNewerVersion(0, 4, 3))
+					PacketHandler.instance.sendToServer(outbound);
 				
-				PacketHandler.instance.sendToServer(outbound);
 				return true;
 			}
 			catch (Exception e)

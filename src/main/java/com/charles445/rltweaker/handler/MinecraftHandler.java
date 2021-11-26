@@ -2,6 +2,9 @@ package com.charles445.rltweaker.handler;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.charles445.rltweaker.RLTweaker;
 import com.charles445.rltweaker.capability.RLCapabilities;
@@ -14,7 +17,6 @@ import com.charles445.rltweaker.network.MessageUpdateEntityMovement;
 import com.charles445.rltweaker.network.NetworkHandler;
 import com.charles445.rltweaker.network.PacketHandler;
 import com.charles445.rltweaker.network.TaskScheduler;
-import com.charles445.rltweaker.util.CompatUtil;
 
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.monster.EntityWitch;
@@ -22,6 +24,7 @@ import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.projectile.EntityArrow;
+import net.minecraft.entity.projectile.EntityFireball;
 import net.minecraft.entity.projectile.EntityPotion;
 import net.minecraft.init.PotionTypes;
 import net.minecraft.init.SoundEvents;
@@ -31,6 +34,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.PotionType;
 import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.ChunkProviderServer;
@@ -45,7 +49,9 @@ import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.EntityMountEvent;
 import net.minecraftforge.event.entity.PlaySoundAtEntityEvent;
+import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingKnockBackEvent;
+import net.minecraftforge.event.entity.player.PlayerContainerEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -57,9 +63,36 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class MinecraftHandler
 {
+	public Map<UUID, BlockPos> containerEnforcedPlayers = new ConcurrentHashMap<>();
+	
 	public MinecraftHandler()
 	{
 		MinecraftForge.EVENT_BUS.register(this);
+	}
+	
+	@SubscribeEvent
+	public void onPlayerUpdate(LivingUpdateEvent event)
+	{
+		if(event.getEntity() instanceof EntityPlayer)
+		{
+			
+			EntityPlayer player = (EntityPlayer)event.getEntity();
+			World world = player.world;
+			
+			if(!world.isRemote && player.openContainer != null && !player.openContainer.equals(player.inventoryContainer))
+			{
+				//Server side
+				//Enforce container distance
+				UUID playerId = player.getUUID(player.getGameProfile());
+				BlockPos usedPosition = containerEnforcedPlayers.get(playerId);
+				if(usedPosition != null && usedPosition.distanceSq(player.getPosition()) > 65.0d)
+				{
+					//Enforce!
+					containerEnforcedPlayers.remove(playerId);
+					player.closeScreen();
+				}
+			}
+		}
 	}
 	
 	@SubscribeEvent
@@ -67,25 +100,6 @@ public class MinecraftHandler
 	{
 		if(event.getWorld().isRemote)
 			return;
-		
-		//FIXME remove for releases, server only fix to stop overworld parasites
-		ResourceLocation rl = EntityList.getKey(event.getEntity());
-		if(rl == null)
-		{
-			;
-		}
-		else
-		{
-			if(rl.getResourceDomain().equals("srparasites"))
-			{
-				int dimension = event.getEntity().dimension;
-				if(dimension == 0 || dimension == 1 || dimension == -1)
-				{
-					event.setCanceled(true);
-				}
-			}
-		}
-		
 		
 		if(ModConfig.server.minecraft.allZombiesBreakDoors && event.getEntity() instanceof EntityZombie)
 		{
@@ -441,5 +455,49 @@ public class MinecraftHandler
 		{
 			event.setVolume((float)ModConfig.server.minecraft.lightningSoundChunkDistance);
 		}
+	}
+
+	@SubscribeEvent
+	public void onContainerOpen(PlayerContainerEvent.Open event)
+	{
+		if(event.getEntityPlayer() == null)
+			return;
+		
+		if(event.getContainer() == null)
+			return;
+		
+		EntityPlayer player = event.getEntityPlayer();
+		UUID playerId = player.getUUID(player.getGameProfile());
+		
+		String containerClazz = event.getContainer().getClass().getName();
+		
+		String[] distanceClazzes = ModConfig.server.minecraft.containerDistanceClasses;
+		
+		for(int i = 0; i < distanceClazzes.length; i++)
+		{
+			if(containerClazz.equals(distanceClazzes[i]))
+			{
+				containerEnforcedPlayers.put(playerId, player.getPosition());
+				return;
+			}
+		}
+		
+		//If this portion was reached, the container is not enforced
+		//Might as well remove any enforcement still pending if there was an error with the close event
+		containerEnforcedPlayers.remove(playerId);
+	}
+
+	@SubscribeEvent
+	public void onContainerClosed(PlayerContainerEvent.Close event)
+	{
+		if(event.getEntityPlayer() == null)
+			return;
+		
+		if(event.getContainer() == null)
+			return;
+		
+		EntityPlayer player = event.getEntityPlayer();
+		
+		containerEnforcedPlayers.remove(player.getUUID(player.getGameProfile()));
 	}
 }

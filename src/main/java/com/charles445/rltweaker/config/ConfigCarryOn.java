@@ -21,4 +21,12 @@ public class ConfigCarryOn
 	@RLConfig.RLCraftTwoEightTwo("true")
 	@RLConfig.RLCraftTwoNine("true")
 	public boolean quarkChestFix = true;
+	
+	@Config.Comment("More safety checks for dropping tile entities in the world")
+	@Config.Name("Tile Entity Drop Safety Check")
+	@Config.RequiresMcRestart
+	@RLConfig.ImprovementsOnly("true")
+	@RLConfig.RLCraftTwoEightTwo("true")
+	@RLConfig.RLCraftTwoNine("true")
+	public boolean tileEntityDropSafetyCheck = true;
 }

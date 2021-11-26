@@ -90,6 +90,55 @@ public class PatchConfig
 	@RLConfig.RLCraftTwoNine("true")
 	public boolean patchEnchantments = false;
 	
+	@Config.RequiresMcRestart
+	@Config.Comment("Makes the motion checker even more aggressive.")
+	@RLConfig.ImprovementsOnly("true")
+	@RLConfig.RLCraftTwoEightTwo("true")
+	@RLConfig.RLCraftTwoNine("true")
+	public boolean aggressiveMotionChecker = true;
+	
+	@Config.RequiresMcRestart
+	@Config.Comment("Enables Entity Block Destroy Blacklist")
+	@RLConfig.ImprovementsOnly("false")
+	@RLConfig.RLCraftTwoEightTwo("false")
+	@RLConfig.RLCraftTwoNine("true")
+	public boolean patchEntityBlockDestroy = false;
+	
+	@Config.RequiresMcRestart
+	@Config.Comment("Patches a dupe with modded item frames, specifically Quark")
+	@RLConfig.ImprovementsOnly("true")
+	@RLConfig.RLCraftTwoEightTwo("true")
+	@RLConfig.RLCraftTwoNine("true")
+	public boolean patchItemFrameDupe = true;
+	
+	@Config.RequiresMcRestart
+	@Config.Comment("Enables Entity Push Prevention")
+	@RLConfig.ImprovementsOnly("false")
+	@RLConfig.RLCraftTwoEightTwo("false")
+	@RLConfig.RLCraftTwoNine("true")
+	public boolean patchPushReaction = false;
+	
+	@Config.RequiresMcRestart
+	@Config.Comment("Fixes some mod related anvil dupes")
+	@RLConfig.ImprovementsOnly("true")
+	@RLConfig.RLCraftTwoEightTwo("true")
+	@RLConfig.RLCraftTwoNine("true)")
+	public boolean patchAnvilDupe = true;
+	
+	@Config.RequiresMcRestart
+	@Config.Comment("Allows for client side overlay text configuration")
+	@RLConfig.ImprovementsOnly("false")
+	@RLConfig.RLCraftTwoEightTwo("false")
+	@RLConfig.RLCraftTwoNine("true")
+	public boolean patchOverlayMessage = false;
+	
+	@Config.RequiresMcRestart
+	@Config.Comment("Allows for some hopper tweaks")
+	@RLConfig.ImprovementsOnly("false")
+	@RLConfig.RLCraftTwoEightTwo("false")
+	@RLConfig.RLCraftTwoNine("true")
+	public boolean patchHopper = true;
+	
 	/*
 	@Config.RequiresMcRestart
 	@Config.Comment("Fixes Myrmex Queen trades")

@@ -17,28 +17,33 @@ import com.charles445.rltweaker.command.CommandErrorReport;
 import com.charles445.rltweaker.command.CommandRLTweakerConfig;
 import com.charles445.rltweaker.config.JsonConfig;
 import com.charles445.rltweaker.config.ModConfig;
+import com.charles445.rltweaker.debug.DebugUtil;
 import com.charles445.rltweaker.handler.AquacultureHandler;
 import com.charles445.rltweaker.handler.BattleTowersHandler;
+import com.charles445.rltweaker.handler.BaublesHandler;
 import com.charles445.rltweaker.handler.BetterSurvivalHandler;
 import com.charles445.rltweaker.handler.CarryOnHandler;
 import com.charles445.rltweaker.handler.CharmHandler;
-import com.charles445.rltweaker.handler.DynamicTreesHandler;
 import com.charles445.rltweaker.handler.GrapplemodHandler;
 import com.charles445.rltweaker.handler.IceAndFireHandler;
+import com.charles445.rltweaker.handler.LevelUpTwoHandler;
 import com.charles445.rltweaker.handler.LostCitiesHandler;
 import com.charles445.rltweaker.handler.MinecraftHandler;
 import com.charles445.rltweaker.handler.MotionCheckHandler;
+import com.charles445.rltweaker.handler.QuarkHandler;
 import com.charles445.rltweaker.handler.RecurrentHandler;
 import com.charles445.rltweaker.handler.ReskillableHandler;
 import com.charles445.rltweaker.handler.RoguelikeHandler;
 import com.charles445.rltweaker.handler.RuinsHandler;
 import com.charles445.rltweaker.handler.SMEHandler;
+import com.charles445.rltweaker.handler.SRParasitesHandler;
 import com.charles445.rltweaker.handler.SpawnerControlHandler;
 import com.charles445.rltweaker.handler.TANHandler;
 import com.charles445.rltweaker.handler.WaystonesHandler;
 import com.charles445.rltweaker.network.NetworkHandler;
 import com.charles445.rltweaker.network.PacketHandler;
 import com.charles445.rltweaker.proxy.CommonProxy;
+import com.charles445.rltweaker.util.CompatUtil;
 import com.charles445.rltweaker.util.ModNames;
 import com.charles445.rltweaker.util.VersionDelimiter;
 
@@ -180,6 +185,11 @@ public class RLTweaker
 			handlers.put(ModNames.BETTERSURVIVAL, new BetterSurvivalHandler());
 		}
 		
+		if(Loader.isModLoaded(ModNames.BAUBLES) && ModConfig.server.baubles.enabled)
+		{
+			handlers.put(ModNames.BAUBLES, new BaublesHandler());
+		}
+		
 		JsonConfig.init();
 		
 		proxy.postInit();
@@ -188,6 +198,11 @@ public class RLTweaker
 	@Mod.EventHandler
 	public void loadComplete(FMLLoadCompleteEvent event)
 	{
+		if(Loader.isModLoaded(ModNames.SRPARASITES) && ModConfig.server.srparasites.enabled)
+		{
+			handlers.put(ModNames.SRPARASITES, new SRParasitesHandler());
+		}
+		
 		if(Loader.isModLoaded(ModNames.SOMANYENCHANTMENTS) && ModConfig.server.somanyenchantments.enabled)
 		{
 			handlers.put(ModNames.SOMANYENCHANTMENTS, new SMEHandler());
@@ -198,15 +213,30 @@ public class RLTweaker
 			handlers.put(ModNames.BATTLETOWERS, new BattleTowersHandler());
 		}
 		
-		if(Loader.isModLoaded(ModNames.DYNAMICTREES)) //FIXME config
+		if(Loader.isModLoaded(ModNames.LEVELUPTWO) && ModConfig.server.leveluptwo.enabled)
 		{
-			handlers.put(ModNames.DYNAMICTREES,  new DynamicTreesHandler());
+			handlers.put(ModNames.LEVELUPTWO, new LevelUpTwoHandler());
 		}
+		
+		if(Loader.isModLoaded(ModNames.QUARK) && ModConfig.server.quark.enabled)
+		{
+			handlers.put(ModNames.QUARK, new QuarkHandler());
+		}
+		
+		/*
+		if(Loader.isModLoaded(ModNames.VARIEDCOMMODITIES) && ModConfig.server.variedcommodities.enabled)
+		{
+			handlers.put(ModNames.VARIEDCOMMODITIES, new VariedCommoditiesHandler());
+		}
+		*/
 		
 		proxy.loadComplete();
 		
 		//Motion Check Handler runs after everything else, that way the priority listed will always be after
-		new MotionCheckHandler();
+		handlers.put("MotionCheckHandler", new MotionCheckHandler());
+		
+		//Run any loadComplete debug routines
+		DebugUtil.loadCompleteDebugRoutine();
 	}
 	
 	@Mod.EventHandler

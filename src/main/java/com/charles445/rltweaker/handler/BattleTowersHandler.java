@@ -26,7 +26,9 @@ import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.IEventListener;
@@ -150,15 +152,51 @@ public class BattleTowersHandler
 	}
 	
 	@SubscribeEvent
+	public void onLivingAttack(LivingAttackEvent event)
+	{
+		boolean suffocationFix = ModConfig.server.battletowers.golemSuffocatingFix;
+		boolean fallingBlockFix = ModConfig.server.battletowers.golemFallingBlockFix;
+		boolean anvilFix = ModConfig.server.battletowers.golemAnvilFix;
+		
+		//Check applicable config
+		if(!suffocationFix && !fallingBlockFix && !anvilFix)
+			return;
+		
+		String damageType = event.getSource().getDamageType();
+		
+		//Suffocation
+		if(suffocationFix && damageType.equals("inWall") && reflector.isEntityGolem(event.getEntityLiving()))
+		{
+			event.setCanceled(true);
+			return;
+		}
+		
+		//Falling Blocks
+		if(fallingBlockFix && damageType.equals("fallingBlock") && reflector.isEntityGolem(event.getEntityLiving()))
+		{
+			event.setCanceled(true);
+			return;
+		}
+		
+		//Anvil
+		if(anvilFix && damageType.equals("anvil") && reflector.isEntityGolem(event.getEntityLiving()))
+		{
+			event.setCanceled(true);
+			return;
+		}
+	}
+	
+	@SubscribeEvent
 	public void onLivingUpdate(LivingUpdateEvent event)
 	{
 		//Golem Dormant Speed Fix / Golem Drowning Fix / Golem Speed Cap / Golem Dismount Fix
 		boolean dormantSpeedFix = ModConfig.server.battletowers.golemDormantSpeedFix;
 		boolean drownFix = ModConfig.server.battletowers.golemDrowningFix;
 		double golemSpeedCap = ModConfig.server.battletowers.golemSpeedCap;
+		double golemSpeedCapUpwards = ModConfig.server.battletowers.golemSpeedCapUpwards;
 		boolean dismountFix = ModConfig.server.battletowers.golemAutoDismount;
 		
-		if(!dormantSpeedFix && !drownFix && !dismountFix && golemSpeedCap < 0.0d)
+		if(!dormantSpeedFix && !drownFix && !dismountFix && golemSpeedCap < 0.0d && golemSpeedCapUpwards < 0.0d)
 			return;
 		
 		//Check if the updating entity is a golem
@@ -204,6 +242,14 @@ public class BattleTowersHandler
 					golem.motionY = golemSpeedCap;
 				}
 				*/
+			}
+			
+			if(golemSpeedCapUpwards >= 0.0d)
+			{
+				if(golem.motionY > golemSpeedCapUpwards)
+				{
+					golem.motionY = golemSpeedCapUpwards;
+				}
 			}
 			
 			if(dormantSpeedFix)

@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.charles445.rltweaker.RLTweaker;
 import com.charles445.rltweaker.config.JsonConfig;
+import com.charles445.rltweaker.config.ModConfig;
 import com.charles445.rltweaker.config.json.JsonDoubleBlockState;
 import com.charles445.rltweaker.debug.DebugUtil;
 import com.charles445.rltweaker.network.IServerMessageReceiver;
@@ -33,8 +34,8 @@ public class ReskillableHandler
 		{
 			reflector = new ReskillableReflect();
 			
-			//FIXME config, again
-			ServerMessageHandler.registerMessage(MessageReskillableLockSkill.class, new LockSkillReceiver());
+			if(ModConfig.server.reskillable.toggleableTraits)
+				ServerMessageHandler.registerMessage(MessageReskillableLockSkill.class, new LockSkillReceiver());
 			
 			MinecraftForge.EVENT_BUS.register(this);
 		}

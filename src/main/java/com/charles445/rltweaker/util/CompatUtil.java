@@ -333,4 +333,33 @@ public class CompatUtil
 		}
 		
 	}
+	
+	/**Gets the mod instance that corresponds to an IEventListener <br>
+	 * DO NOT RUN THIS ON STATIC HANDLERS! <br>
+	 * Will return null on failure <br>
+	 * Possibly performance intensive as no reflection is being cached, so cache the result where possible<br>
+	 **/
+	@Nullable
+	public static Object getSubscriberInstance(IEventListener eventListener)
+	{
+		try
+		{
+			if(eventListener instanceof ASMEventHandler)
+			{
+				IEventListener customHandler = (IEventListener) ReflectUtil.findField(ASMEventHandler.class, "handler").get(eventListener);
+				return ReflectUtil.findField(customHandler.getClass(), "instance").get(customHandler);
+			}
+			else
+			{
+				//Other forms of event handler wrapper not supported
+				return null;
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			return null;
+		}
+
+	}
 }

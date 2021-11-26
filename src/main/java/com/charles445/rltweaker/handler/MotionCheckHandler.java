@@ -15,6 +15,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
+import net.minecraftforge.event.entity.living.LivingKnockBackEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
@@ -210,5 +211,18 @@ public class MotionCheckHandler
 		}
 		
 		return sb.toString();
+	}
+	
+	@SubscribeEvent(priority = EventPriority.LOWEST)
+	public void onKnockback(LivingKnockBackEvent event)
+	{
+		if(!ModConfig.server.minecraft.motionChecker)
+			return;
+		
+		if(event.getRatioX() == 0.0d && event.getRatioZ() == 0.0d)
+		{
+			ErrorUtil.logSilent("Motion Checker Knockback Same Position");
+			event.setCanceled(true);
+		}
 	}
 }

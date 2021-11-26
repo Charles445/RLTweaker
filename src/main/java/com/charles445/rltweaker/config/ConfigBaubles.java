@@ -4,7 +4,7 @@ import com.charles445.rltweaker.config.annotation.RLConfig;
 
 import net.minecraftforge.common.config.Config;
 
-public class ConfigCharm
+public class ConfigBaubles
 {
 	@Config.Comment("Master switch for this mod compatibility")
 	@Config.Name("ENABLED")
@@ -14,18 +14,10 @@ public class ConfigCharm
 	@RLConfig.RLCraftTwoNine("true")
 	public boolean enabled = true;
 	
-	@Config.Comment("Fix enchantments appearing on incompatible items")
-	@Config.Name("Fix Incorrect Item Enchantments")
-	@Config.RequiresMcRestart
+	@Config.Comment("Fixes Miner's Ring Dupe")
+	@Config.Name("Miner's Ring Dupe Fix")
 	@RLConfig.ImprovementsOnly("true")
 	@RLConfig.RLCraftTwoEightTwo("true")
 	@RLConfig.RLCraftTwoNine("true")
-	public boolean fixIncorrectItemEnchantments = true;
-	
-	@Config.Comment("Fix Salvage not being removed from villager trades when disabled")
-	@Config.Name("Fix Salvage Trade")
-	@RLConfig.ImprovementsOnly("true")
-	@RLConfig.RLCraftTwoEightTwo("true")
-	@RLConfig.RLCraftTwoNine("true")
-	public boolean fixSalvageTrade = true;
+	public boolean minersRingDupeFix = true;
 }

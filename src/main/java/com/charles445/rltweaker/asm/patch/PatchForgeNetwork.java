@@ -29,7 +29,7 @@ public class PatchForgeNetwork extends PatchManager
 				if(m_channelRead0 == null)
 					throw new RuntimeException("Couldn't findMethod channelRead0");
 				
-				ClassDisplayer.instance.printAllMethods(clazzNode);
+				//ClassDisplayer.instance.printAllMethods(clazzNode);
 				
 				MethodInsnNode callOnMessage = TransformUtil.findNextCallWithOpcodeAndName(first(m_channelRead0), Opcodes.INVOKEINTERFACE, "onMessage");
 				

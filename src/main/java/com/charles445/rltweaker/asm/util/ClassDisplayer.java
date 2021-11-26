@@ -12,6 +12,7 @@ import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
+import org.objectweb.asm.tree.LocalVariableNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
@@ -63,6 +64,29 @@ public class ClassDisplayer
 		{
 			System.out.println(nodeToString(anchor));
 			anchor = anchor.getNext();
+		}
+	}
+	
+	public void printMethodLocalVariables(MethodNode methodNode)
+	{
+		if(methodNode.localVariables!=null)
+		{
+			for(LocalVariableNode lvn : methodNode.localVariables)
+			{
+				StringBuilder sb = new StringBuilder();
+				sb.append(lvn.index);
+				sb.append(" : ");
+				sb.append(lvn.start.getLabel().toString());
+				sb.append(" -> ");
+				sb.append(lvn.end.getLabel().toString());
+				sb.append(" : ");
+				sb.append("\t");
+				sb.append(lvn.name);
+				sb.append("(");
+				sb.append(lvn.desc);
+				sb.append(")");
+				System.out.println(sb.toString());
+			}
 		}
 	}
 	

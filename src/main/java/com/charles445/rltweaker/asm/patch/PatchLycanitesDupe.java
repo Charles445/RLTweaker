@@ -34,12 +34,22 @@ public class PatchLycanitesDupe extends PatchManager
 			public void patch(ClassNode clazzNode)
 			{
 				System.out.println("Patching InventoryCreature");
+				System.out.println("If your game crashes immediately after this, change the config rltweaker/patches/lycanitesPetDupeFix to false!");
 				
 				AbstractInsnNode anchor = null;
 				
 				String deathsave = "DEATHSAVE";
 				String deathsave_T = "I";
 				
+				for(FieldNode f : clazzNode.fields)
+				{
+					if(f != null && f.name.equals("DEATHSAVE"))
+					{
+						System.out.println("Dupe has already been patched! Skipping...");
+						this.cancelled = true;
+						return;
+					}
+				}
 				
 				//Create a new public integer DEATHSAVE
 				clazzNode.fields.add(new FieldNode(Opcodes.ACC_PUBLIC, deathsave, deathsave_T, null, 0));

@@ -56,11 +56,11 @@ public class PatchConfig
 	public boolean iafFixMyrmexQueenHiveSpam = true;
 	
 	@Config.RequiresMcRestart
-	@Config.Comment("Fixes Lycanites Pet Dupe")
-	@RLConfig.ImprovementsOnly("true")
-	@RLConfig.RLCraftTwoEightTwo("true")
-	@RLConfig.RLCraftTwoNine("true")
-	public boolean lycanitesPetDupeFix = true;
+	@Config.Comment("Fixes Lycanites Pet Dupe in older LycanitesMobs versions than 2.0.8.0, may cause crashes in newer versions.")
+	@RLConfig.ImprovementsOnly("false")
+	@RLConfig.RLCraftTwoEightTwo("false")
+	@RLConfig.RLCraftTwoNine("false")
+	public boolean lycanitesPetDupeFix = false;
 	
 	@Config.RequiresMcRestart
 	@Config.Comment("Fixes mobs having trouble pathing through open doors")

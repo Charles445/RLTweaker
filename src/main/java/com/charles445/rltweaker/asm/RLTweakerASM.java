@@ -179,7 +179,7 @@ public class RLTweakerASM implements IClassTransformer
 		}
 		
 		//lycanitesPetDupeFix
-		if(ASMConfig.getBoolean("general.patches.lycanitesPetDupeFix", true))
+		if(ASMConfig.getBoolean("general.patches.lycanitesPetDupeFix", false))
 		{
 			new PatchLycanitesDupe();
 		}

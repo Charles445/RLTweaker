@@ -39,7 +39,7 @@ public class PatchConfig
 	@RLConfig.ImprovementsOnly("true")
 	@RLConfig.RLCraftTwoEightTwo("false") //Tragic, really. It's client side so we don't want anyone getting confused.
 	@RLConfig.RLCraftTwoNine("true")
-	public boolean betterCombatMountFix = false;
+	public boolean betterCombatMountFix = true;
 	
 	@Config.RequiresMcRestart
 	@Config.Comment("Fixes RealBench dupe bug")
@@ -137,22 +137,19 @@ public class PatchConfig
 	@RLConfig.ImprovementsOnly("false")
 	@RLConfig.RLCraftTwoEightTwo("false")
 	@RLConfig.RLCraftTwoNine("true")
-	public boolean patchHopper = true;
+	public boolean patchHopper = false;
 	
-	/*
 	@Config.RequiresMcRestart
-	@Config.Comment("Fixes Myrmex Queen trades")
+	@Config.Comment("Allows for critical events with BetterCombat")
 	@RLConfig.ImprovementsOnly("true")
-	@RLConfig.RLCraftTwoEightTwo("true")
+	@RLConfig.RLCraftTwoEightTwo("false") //Has balancing implications
 	@RLConfig.RLCraftTwoNine("true")
-	public boolean iafFixMyrmexQueenTrades = true;
-	*/
-	/*
+	public boolean betterCombatCriticalsFix = true;
+	
 	@Config.RequiresMcRestart
-	@Config.Comment("Fixes stealth mechanics in older versions of Level Up")
-	@RLConfig.ImprovementsOnly("true")
-	@RLConfig.RLCraftTwoEightTwo("true")
+	@Config.Comment("Fixes hippocampus issues in Ice and Fire 1.7.1, do not enable this patch for other versions!")
+	@RLConfig.ImprovementsOnly("false")
+	@RLConfig.RLCraftTwoEightTwo("false")
 	@RLConfig.RLCraftTwoNine("true")
-	public boolean levelUpOldStealthFix = true;
-	*/
+	public boolean fixOldHippocampus = false;
 }

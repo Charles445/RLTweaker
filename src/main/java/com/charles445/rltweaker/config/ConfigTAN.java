@@ -44,4 +44,20 @@ public class ConfigTAN
 	@RLConfig.RLCraftTwoNine("20")
 	public int extraThirstPacketFrequency = 20;
 	
+	@Config.Comment("Prevents Tough As Nails from creating an extra attack entity event. Does nothing if ISeeDragons is in the pack.")
+	@Config.Name("Fix Extra Attack Bug")
+	@Config.RequiresMcRestart
+	@RLConfig.ImprovementsOnly("false") //Packs are balanced around this glitch by default.
+	@RLConfig.RLCraftTwoEightTwo("false") //Handled by ISeeDragons
+	@RLConfig.RLCraftTwoNine("false") //Handled by ISeeDragons
+	public boolean fixExtraAttackBug = false;
+	
+	@Config.Comment("Fixes TAN bug where holding spacebar after dismounting glitches your jump and drains your thirst")
+	@Config.Name("Fix Dismount Thirst Drain Bug")
+	@RLConfig.ImprovementsOnly("true")
+	@RLConfig.RLCraftTwoEightTwo("false") //Handled by ISeeDragons
+	@RLConfig.RLCraftTwoNine("false")
+	public boolean fixDismountThirstDrainBug = true;
+	
+	
 }

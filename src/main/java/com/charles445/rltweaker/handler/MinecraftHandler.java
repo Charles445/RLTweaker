@@ -18,16 +18,16 @@ import com.charles445.rltweaker.network.NetworkHandler;
 import com.charles445.rltweaker.network.PacketHandler;
 import com.charles445.rltweaker.network.TaskScheduler;
 
-import net.minecraft.entity.EntityList;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntityWitch;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.projectile.EntityArrow;
-import net.minecraft.entity.projectile.EntityFireball;
 import net.minecraft.entity.projectile.EntityPotion;
 import net.minecraft.init.PotionTypes;
 import net.minecraft.init.SoundEvents;
+import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
@@ -48,6 +48,7 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.EntityMountEvent;
+import net.minecraftforge.event.entity.EntityStruckByLightningEvent;
 import net.minecraftforge.event.entity.PlaySoundAtEntityEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingKnockBackEvent;
@@ -63,6 +64,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class MinecraftHandler
 {
+	public static Map<String, IContainerValidator> containerValidators = new ConcurrentHashMap<>();
+	
 	public Map<UUID, BlockPos> containerEnforcedPlayers = new ConcurrentHashMap<>();
 	
 	public MinecraftHandler()
@@ -82,12 +85,21 @@ public class MinecraftHandler
 			if(!world.isRemote && player.openContainer != null && !player.openContainer.equals(player.inventoryContainer))
 			{
 				//Server side
-				//Enforce container distance
+				
 				UUID playerId = player.getUUID(player.getGameProfile());
+				
+				//Enforce Validator
+				IContainerValidator validator = containerValidators.get(player.openContainer.getClass().getName());
+				if(validator != null && !validator.isValid(player.openContainer))
+				{
+					containerEnforcedPlayers.remove(playerId);
+					player.closeScreen();
+				}
+				
+				//Enforce container distance
 				BlockPos usedPosition = containerEnforcedPlayers.get(playerId);
 				if(usedPosition != null && usedPosition.distanceSq(player.getPosition()) > 65.0d)
 				{
-					//Enforce!
 					containerEnforcedPlayers.remove(playerId);
 					player.closeScreen();
 				}
@@ -508,5 +520,17 @@ public class MinecraftHandler
 		EntityPlayer player = event.getEntityPlayer();
 		
 		containerEnforcedPlayers.remove(player.getUUID(player.getGameProfile()));
+	}
+	
+	@SubscribeEvent
+	public void onLightningStruckEntity(EntityStruckByLightningEvent event)
+	{
+		if(!ModConfig.server.minecraft.lightningDestroysItems && event.getEntity() instanceof EntityItem)
+			event.setCanceled(true);
+	}
+	
+	public static interface IContainerValidator
+	{
+		public boolean isValid(Container container);
 	}
 }

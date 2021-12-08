@@ -27,6 +27,9 @@ public class TANReflect
 	public final Class c_PacketHandler;
 	public final Field f_PacketHandler_instance;
 	
+	public final Class c_ThirstHandler;
+	public final Method m_ThirstHandler_addExhaustion;
+	
 	public TANReflect() throws Exception
 	{
 		c_ThirstHelper = Class.forName("toughasnails.api.thirst.ThirstHelper");
@@ -43,6 +46,9 @@ public class TANReflect
 		
 		c_PacketHandler = Class.forName("toughasnails.handler.PacketHandler");
 		f_PacketHandler_instance = ReflectUtil.findField(c_PacketHandler, "instance");
+		
+		c_ThirstHandler = Class.forName("toughasnails.thirst.ThirstHandler");
+		m_ThirstHandler_addExhaustion = ReflectUtil.findMethod(c_ThirstHandler, "addExhaustion");
 	}
 	
 	public Object getThirstData(EntityPlayer player) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException
@@ -78,5 +84,15 @@ public class TANReflect
 	public IMessage createUpdateMessageWithStat(Object stat) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException
 	{
 		return (IMessage) m_IPlayerStat_createUpdateMessage.invoke(stat);
+	}
+	
+	public boolean isThirstHandlerInstance(Object obj)
+	{
+		return c_ThirstHandler.isInstance(c_ThirstHandler);
+	}
+	
+	public void addExhaustion(Object thirstHandler, float exhaustion) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException
+	{
+		m_ThirstHandler_addExhaustion.invoke(thirstHandler, exhaustion);
 	}
 }

@@ -75,6 +75,10 @@ public class ModConfig
 		@Config.Name("Lost Cities")
 		public ConfigLostCities lostcities = new ConfigLostCities();
 		
+		@Config.Comment("Lycanites Mobs tweaks")
+		@Config.Name("Lycanites Mobs")
+		public ConfigLycanites lycanitesmobs = new ConfigLycanites();
+		
 		@Config.Comment("Quark tweaks")
 		@Config.Name("Quark")
 		public ConfigQuark quark = new ConfigQuark();
@@ -94,6 +98,10 @@ public class ModConfig
 		@Config.Comment("Ruins tweaks")
 		@Config.Name("Ruins")
 		public ConfigRuins ruins = new ConfigRuins();
+		
+		@Config.Comment("Rustic tweaks")
+		@Config.Name("Rustic")
+		public ConfigRustic rustic = new ConfigRustic();
 		
 		@Config.Comment("Scape and Run Parasites tweaks")
 		@Config.Name("Scape and Run Parasites")

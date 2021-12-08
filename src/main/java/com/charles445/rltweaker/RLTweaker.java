@@ -28,6 +28,7 @@ import com.charles445.rltweaker.handler.GrapplemodHandler;
 import com.charles445.rltweaker.handler.IceAndFireHandler;
 import com.charles445.rltweaker.handler.LevelUpTwoHandler;
 import com.charles445.rltweaker.handler.LostCitiesHandler;
+import com.charles445.rltweaker.handler.LycanitesHandler;
 import com.charles445.rltweaker.handler.MinecraftHandler;
 import com.charles445.rltweaker.handler.MotionCheckHandler;
 import com.charles445.rltweaker.handler.QuarkHandler;
@@ -35,6 +36,7 @@ import com.charles445.rltweaker.handler.RecurrentHandler;
 import com.charles445.rltweaker.handler.ReskillableHandler;
 import com.charles445.rltweaker.handler.RoguelikeHandler;
 import com.charles445.rltweaker.handler.RuinsHandler;
+import com.charles445.rltweaker.handler.RusticHandler;
 import com.charles445.rltweaker.handler.SMEHandler;
 import com.charles445.rltweaker.handler.SRParasitesHandler;
 import com.charles445.rltweaker.handler.SpawnerControlHandler;
@@ -43,11 +45,12 @@ import com.charles445.rltweaker.handler.WaystonesHandler;
 import com.charles445.rltweaker.network.NetworkHandler;
 import com.charles445.rltweaker.network.PacketHandler;
 import com.charles445.rltweaker.proxy.CommonProxy;
-import com.charles445.rltweaker.util.CompatUtil;
+import com.charles445.rltweaker.util.ErrorUtil;
 import com.charles445.rltweaker.util.ModNames;
 import com.charles445.rltweaker.util.VersionDelimiter;
 
 import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -73,7 +76,7 @@ public class RLTweaker
 {
 	public static final String MODID = "rltweaker";
 	public static final String NAME = "RLTweaker";
-	public static final String VERSION = "0.4.3";
+	public static final String VERSION = "0.4.4";
 	public static final VersionDelimiter VERSION_DELIMITER = new VersionDelimiter(VERSION);
 	public static final VersionDelimiter MINIMUM_VERSION = new VersionDelimiter("0.3.0");
 	
@@ -95,6 +98,8 @@ public class RLTweaker
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event)
 	{
+		FMLCommonHandler.instance().registerCrashCallable(new ErrorUtil.CrashCallable());
+		
 		jsonDirectory = new File(event.getModConfigurationDirectory(), RLTweaker.MODID);
 		
 		PacketHandler.init();
@@ -221,6 +226,16 @@ public class RLTweaker
 		if(Loader.isModLoaded(ModNames.QUARK) && ModConfig.server.quark.enabled)
 		{
 			handlers.put(ModNames.QUARK, new QuarkHandler());
+		}
+		
+		if(Loader.isModLoaded(ModNames.RUSTIC) && ModConfig.server.rustic.enabled)
+		{
+			handlers.put(ModNames.RUSTIC, new RusticHandler());
+		}
+		
+		if(Loader.isModLoaded(ModNames.LYCANITESMOBS) && ModConfig.server.lycanitesmobs.enabled)
+		{
+			handlers.put(ModNames.LYCANITESMOBS, new LycanitesHandler());
 		}
 		
 		/*

@@ -10,6 +10,7 @@ import com.charles445.rltweaker.util.CriticalException;
 import com.charles445.rltweaker.util.ErrorUtil;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
@@ -200,10 +201,10 @@ public class LevelUpTwoHandler
 				if(!reflector.skillIsActive(skill))
 					return;
 				
-				if(event.getTarget() instanceof EntityPlayer && event.getEntityLiving() instanceof EntityMob)
+				if(event.getTarget() instanceof EntityPlayer && event.getEntityLiving() instanceof EntityLiving && isLivingStealth((EntityLiving)event.getEntityLiving()))
 				{
 					EntityPlayer player = (EntityPlayer) event.getTarget();
-					EntityMob mob = (EntityMob) event.getEntityLiving();
+					EntityLiving mob = (EntityLiving) event.getEntityLiving();
 					
 					//Don't interfere if the mob is seeking revenge on the player
 					if(mob.getRevengeTarget() == player)
@@ -232,6 +233,20 @@ public class LevelUpTwoHandler
 				ErrorUtil.logSilent("LevelUp2 Stealth Overhaul Invocation");
 				handler.invoke(event);
 			}
+		}
+		
+		/** Whether to apply stealth mechanics to this EntityLiving **/
+		private boolean isLivingStealth(EntityLiving living)
+		{
+			//Always return true if extends EntityMob
+			if(living instanceof EntityMob)
+				return true;
+			
+			//Lycanites Mobs
+			if(reflector.isLycanitesAvailable() && ModConfig.server.leveluptwo.stealthOverhaulLycanites && reflector.canLycanitesStealth(living))
+				return true;
+			
+			return false;
 		}
 		
 		private float calculateStealthDistance(int skillLevel)

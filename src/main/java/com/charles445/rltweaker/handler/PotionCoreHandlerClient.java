@@ -20,7 +20,6 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.util.math.MathHelper;
-import net.minecraftforge.client.GuiIngameForge;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Loader;
@@ -49,6 +48,9 @@ public class PotionCoreHandlerClient
 		{
 			reflector = new PotionCoreClientReflect();
 			
+			//FIXME This is supposed to run before rustic, otherwise rustic's "Extra Armor HUD" will cancel it
+			//This wrapping will cause it to run after rustic, AKA never
+			//This will cause the resistance to stop showing when it otherwise would
 			//Wrap the pre GUI handler
 			CompatUtil.wrapSpecificHandler("PCRenderOverlaysPre", PCRenderOverlaysPre::new, "com.tmtravlr.potioncore.PotionCoreEventHandlerClient", "renderOverlaysPre");
 			

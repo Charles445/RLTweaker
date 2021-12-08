@@ -29,7 +29,7 @@ import net.minecraftforge.common.config.FieldWrapper;
 public class CommandRLTweakerConfig extends CommandBase
 {
 	private final List<String> tabCompletionsCommands = Arrays.asList(new String[]{
-			"rlcraft29",
+			//"rlcraft29",
 			"rlcraft282",
 			"improvementsonly"
 	});
@@ -68,7 +68,7 @@ public class CommandRLTweakerConfig extends CommandBase
 				inform("Sets RLTweaker config to default values based on the config type given",sender);
 				inform("Available config types are:\nimprovementsonly\nrlcraft282\nrlcraft29",sender); //TODO loop
 				break;
-			case "rlcraft29": updateConfigDefaultsWithAnnotation(RLConfig.RLCraftTwoNine.class, sender); break;
+			//case "rlcraft29": updateConfigDefaultsWithAnnotation(RLConfig.RLCraftTwoNine.class, sender); break;
 			case "rlcraft282": updateConfigDefaultsWithAnnotation(RLConfig.RLCraftTwoEightTwo.class, sender); break;
 			case "improvementsonly": updateConfigDefaultsWithAnnotation(RLConfig.ImprovementsOnly.class, sender); break;
 			

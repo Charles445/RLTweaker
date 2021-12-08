@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.charles445.rltweaker.RLTweaker;
 
 import net.minecraft.enchantment.Enchantment;
+import net.minecraftforge.fml.common.ICrashCallable;
 
 public class ErrorUtil
 {
@@ -49,5 +50,31 @@ public class ErrorUtil
 		{
 			errorCount.put(key, got + 1);
 		}
+	}
+	
+	public static class CrashCallable implements ICrashCallable
+	{
+		@Override
+		public String call() throws Exception
+		{
+			StringBuilder sb = new StringBuilder();
+			sb.append("\n ");
+			for(Map.Entry<String, Integer> entry : errorCount.entrySet())
+			{
+				sb.append(entry.getKey());
+				sb.append(" : ");
+				sb.append(entry.getValue());
+				sb.append("\n ");
+			}
+			
+			return sb.toString();
+		}
+
+		@Override
+		public String getLabel()
+		{
+			return "RLTweaker Error Report";
+		}
+		
 	}
 }

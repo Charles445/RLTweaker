@@ -20,5 +20,5 @@ public class ConfigMantleClient
 	@RLConfig.ImprovementsOnly("false")
 	@RLConfig.RLCraftTwoEightTwo("true")
 	@RLConfig.RLCraftTwoNine("true")
-	public boolean removeMantleHealthBar = true;
+	public boolean removeMantleHealthBar = false;
 }

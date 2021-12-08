@@ -1,6 +1,7 @@
 package com.charles445.rltweaker.handler;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 import com.charles445.rltweaker.RLTweaker;
 import com.charles445.rltweaker.config.ModConfig;
@@ -8,6 +9,7 @@ import com.charles445.rltweaker.reflect.IceAndFireReflect;
 import com.charles445.rltweaker.util.CompatUtil;
 import com.charles445.rltweaker.util.CriticalException;
 import com.charles445.rltweaker.util.ErrorUtil;
+import com.charles445.rltweaker.util.LootUtil.DoNothingFunction;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
@@ -18,7 +20,14 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
+import net.minecraft.world.storage.loot.LootEntry;
+import net.minecraft.world.storage.loot.LootEntryItem;
+import net.minecraft.world.storage.loot.LootPool;
+import net.minecraft.world.storage.loot.LootTable;
+import net.minecraft.world.storage.loot.functions.LootFunction;
+import net.minecraft.world.storage.loot.functions.LootingEnchantBonus;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.EntityMobGriefingEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -173,8 +182,79 @@ public class IceAndFireHandler
 			{
 				ErrorUtil.logSilent("IceAndFireHandler Myrmex Queen Trades Failure");
 			}
-		}
+		}	
+	}
+	
+	@SubscribeEvent
+	public void onLootTableLoad(LootTableLoadEvent event)
+	{
+		if(!ModConfig.server.iceandfire.deathwormEggsIgnoreLooting)
+			return;
 		
+		switch(event.getName().toString())
+		{
+			case "iceandfire:deathworm_red_giant":
+			case "iceandfire:deathworm_red":
+			case "iceandfire:deathworm_tan_giant":
+			case "iceandfire:deathworm_tan":
+			case "iceandfire:deathworm_white_giant":
+			case "iceandfire:deathworm_white":
+				removeDeathWormEggLooting(event, event.getName());
+				break;
+			default:
+				break;
+		}
+	}
+	
+	private void removeDeathWormEggLooting(LootTableLoadEvent event, ResourceLocation resource)
+	{
+		LootTable table = event.getTable();
+		if(table == null)
+			return;
+		
+		try
+		{
+			List<LootPool> pools = reflector.getPools(table);
+			if(pools == null)
+				return;
+			
+			for(LootPool pool : pools)
+			{
+				if(pool.getName().equals(resource.getResourcePath()))
+				{
+					List<LootEntry> poolEntries = reflector.getEntries(pool);
+					if(poolEntries != null)
+					{
+						for(LootEntry entry : poolEntries)
+						{
+							if(entry != null)
+							{
+								if(entry instanceof LootEntryItem && entry.getEntryName().contains("deathworm_egg"))
+								{
+									final LootFunction[] functions = reflector.getFunctions((LootEntryItem)entry);
+									if(functions != null)
+									{
+										for(int i=0; i < functions.length; i++)
+										{
+											LootFunction function = functions[i];
+											if(function instanceof LootingEnchantBonus)
+											{
+												functions[i] = new DoNothingFunction();
+												RLTweaker.logger.debug("Removed LootingEnchantBonus for deathworm egg: "+resource.toString());
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		catch (IllegalArgumentException | IllegalAccessException e)
+		{
+			ErrorUtil.logSilent("IAF Death Worm Egg Looting Invocation");
+		}
 		
 	}
 	

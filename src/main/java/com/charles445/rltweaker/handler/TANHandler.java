@@ -7,13 +7,20 @@ import com.charles445.rltweaker.capability.ITweakerCapability;
 import com.charles445.rltweaker.capability.RLCapabilities;
 import com.charles445.rltweaker.config.ModConfig;
 import com.charles445.rltweaker.reflect.TANReflect;
+import com.charles445.rltweaker.util.CompatUtil;
 import com.charles445.rltweaker.util.CriticalException;
 import com.charles445.rltweaker.util.ErrorUtil;
+import com.charles445.rltweaker.util.ModNames;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.EntityMountEvent;
+import net.minecraftforge.event.entity.player.AttackEntityEvent;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.eventhandler.IEventListener;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
@@ -31,6 +38,19 @@ public class TANHandler
 		{
 			reflector = new TANReflect();
 			
+			if(ModConfig.server.toughasnails.fixExtraAttackBug)
+			{
+				if(Loader.isModLoaded(ModNames.ISEEDRAGONS))
+				{
+					RLTweaker.logger.info("Skipping Tough as Nails Fix Extra Attack Bug, as ISeeDragons is in the pack.");
+					RLTweaker.logger.info("Configure this option in ISeeDragons instead.");
+				}
+				else
+				{
+					CompatUtil.wrapSpecificHandler("TANAttackEntity", TANAttackEntity::new, "toughasnails.handler.thirst.ThirstStatHandler", "onAttackEntity");
+				}
+			}
+			
 			MinecraftForge.EVENT_BUS.register(this);
 		}
 		catch (Exception e)
@@ -41,6 +61,16 @@ public class TANHandler
 			//Crash on Critical
 			if(e instanceof CriticalException)
 				throw new RuntimeException(e);
+		}
+	}
+	
+	@SubscribeEvent
+	public void onDismount(EntityMountEvent event)
+	{
+		if(event.isDismounting() && event.getEntityMounting() instanceof EntityPlayer)
+		{
+			if(ModConfig.server.toughasnails.fixDismountThirstDrainBug)
+				((EntityPlayer) event.getEntityMounting()).setJumping(false);
 		}
 	}
 	
@@ -110,6 +140,45 @@ public class TANHandler
 				RLTweaker.logger.error("Error in onPlayerTick TANHandler Invoke", e);
 				ErrorUtil.logSilent("TANHandler onPlayerTick");
 				throw new RuntimeException(e);
+			}
+		}
+	}
+	
+	public class TANAttackEntity
+	{
+		private IEventListener handler;
+		public TANAttackEntity(IEventListener handler)
+		{
+			this.handler = handler;
+			MinecraftForge.EVENT_BUS.register(this);
+		}
+		
+		@SubscribeEvent
+		public void onAttackEntity(AttackEntityEvent event)
+		{
+			EntityPlayer player = event.getEntityPlayer();
+			Entity monster = event.getTarget();
+			if(monster == null || player == null)
+				return;
+			
+			World world = monster.getEntityWorld();
+			if(world == null || world.isRemote)
+				return;
+			
+			//Server Side
+			
+			if(monster.canBeAttackedWithItem() && !player.isCreative() && !monster.hitByEntity(player))
+			{
+				try
+				{
+					Object thirstHandler = reflector.getThirstData(player);
+					if(reflector.isThirstHandlerInstance(thirstHandler))
+						reflector.addExhaustion(thirstHandler, 0.3F);
+				}
+				catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
+				{
+					ErrorUtil.logSilent("TANHandler Extra Attack Invocation");
+				}
 			}
 		}
 	}

@@ -42,4 +42,11 @@ public class ConfigIceAndFire
 	@RLConfig.RLCraftTwoEightTwo("true")
 	@RLConfig.RLCraftTwoNine("true")
 	public boolean myrmexQueenTradeFix = true;
+	
+	@Config.Comment("Stop deathworm egg drops from being affected by looting")
+	@Config.Name("Deathworm Eggs Ignore Looting")
+	@RLConfig.ImprovementsOnly("false")
+	@RLConfig.RLCraftTwoEightTwo("false")
+	@RLConfig.RLCraftTwoNine("true")
+	public boolean deathwormEggsIgnoreLooting = false;
 }

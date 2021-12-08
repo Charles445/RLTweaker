@@ -55,7 +55,7 @@ public class ConfigMinecraft
 	@RLConfig.ImprovementsOnly("false")	//If people want it they can turn it on, no need to force it in front of them
 	@RLConfig.RLCraftTwoEightTwo("true") //Except people who update their tweakers for 2.8.2 servers then heck yeah
 	@RLConfig.RLCraftTwoNine("true")
-	public boolean damageTilt = true;
+	public boolean damageTilt = false;
 	
 	@Config.Comment("Requires lessCollisions patch, change that config value instead, don't change this unless you are benchmarking")
 	@Config.Name("Less Collisions")
@@ -163,4 +163,11 @@ public class ConfigMinecraft
 	@RLConfig.RLCraftTwoEightTwo("examplemod:block")
 	@RLConfig.RLCraftTwoNine("bountiful:bountyboard") //TODO fix all these
 	public String[] hopperBlockBlacklist = {"examplemod:block"};
+	
+	@Config.Comment("Whether lightning should destroy items")
+	@Config.Name("Lightning Destroys Items")
+	@RLConfig.ImprovementsOnly("true")
+	@RLConfig.RLCraftTwoEightTwo("false") //Already handled by ISeeDragons
+	@RLConfig.RLCraftTwoNine("false") //Already handled by ISeeDragons
+	public boolean lightningDestroysItems = true;
 }

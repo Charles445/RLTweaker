@@ -3,6 +3,7 @@ package com.charles445.rltweaker.reflect;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
 
 import javax.annotation.Nullable;
 
@@ -11,6 +12,12 @@ import com.charles445.rltweaker.util.ReflectUtil;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.village.MerchantRecipeList;
+import net.minecraft.world.storage.loot.LootEntry;
+import net.minecraft.world.storage.loot.LootEntryItem;
+import net.minecraft.world.storage.loot.LootPool;
+import net.minecraft.world.storage.loot.LootTable;
+import net.minecraft.world.storage.loot.conditions.LootCondition;
+import net.minecraft.world.storage.loot.functions.LootFunction;
 
 public class IceAndFireReflect
 {
@@ -37,6 +44,13 @@ public class IceAndFireReflect
 	public final Field f_EntityPropertiesHandler_INSTANCE;
 	public final Method m_EntityPropertiesHandler_getProperties;
 	public final Object o_EntityPropertiesHandler_INSTANCE;
+	
+	//Vanilla
+	private final Field f_LootTable_pools;
+	private final Field f_LootPool_lootEntries;
+	private final Field f_LootEntry_conditions;
+	private final Field f_LootEntryItem_functions;
+	
 	
 	public IceAndFireReflect() throws Exception
 	{
@@ -70,6 +84,12 @@ public class IceAndFireReflect
 		{
 			c_ItemDragonHornStatic = null;
 		}
+		
+		//Vanilla
+		f_LootTable_pools = ReflectUtil.findFieldAny(LootTable.class, "field_186466_c", "pools");
+		f_LootPool_lootEntries = ReflectUtil.findFieldAny(LootPool.class, "field_186453_a", "lootEntries");
+		f_LootEntry_conditions = ReflectUtil.findFieldAny(LootEntry.class, "field_186366_e", "conditions");
+		f_LootEntryItem_functions = ReflectUtil.findFieldAny(LootEntryItem.class, "field_186369_b", "functions");
 	}
 	
 	public boolean getIsStone(Entity entity)
@@ -115,5 +135,40 @@ public class IceAndFireReflect
 	public boolean isMyrmexJungle(Object myrmexBase) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException
 	{
 		return (boolean) m_EntityMyrmexBase_isJungle.invoke(myrmexBase);
+	}
+	
+	@Nullable
+	public List<LootPool> getPools(LootTable table) throws IllegalArgumentException, IllegalAccessException
+	{
+		if(table == null)
+			return null;
+		
+		return (List<LootPool>) f_LootTable_pools.get(table);
+	}
+	
+	@Nullable
+	public List<LootEntry> getEntries(LootPool pool) throws IllegalArgumentException, IllegalAccessException
+	{
+		if(pool == null)
+			return null;
+		
+		return (List<LootEntry>) f_LootPool_lootEntries.get(pool);
+	}
+	
+	@Nullable
+	public LootCondition[] getConditions(LootEntry entry) throws IllegalArgumentException, IllegalAccessException
+	{
+		if(entry == null)
+			return null;
+		
+		return (LootCondition[]) f_LootEntry_conditions.get(entry);
+	}
+	
+	public LootFunction[] getFunctions(LootEntryItem entry) throws IllegalArgumentException, IllegalAccessException
+	{
+		if(entry == null)
+			return null;
+		
+		return (LootFunction[]) f_LootEntryItem_functions.get(entry);
 	}
 }

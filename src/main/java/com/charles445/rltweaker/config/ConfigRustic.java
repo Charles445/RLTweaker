@@ -4,7 +4,7 @@ import com.charles445.rltweaker.config.annotation.RLConfig;
 
 import net.minecraftforge.common.config.Config;
 
-public class ConfigAquaculture
+public class ConfigRustic
 {
 	@Config.Comment("Master switch for this mod compatibility")
 	@Config.Name("ENABLED")
@@ -14,19 +14,18 @@ public class ConfigAquaculture
 	@RLConfig.RLCraftTwoNine("true")
 	public boolean enabled = true;
 	
-	@Config.Comment("Fix Neptunes Bounty loot to properly drop neptunium bars")
-	@Config.Name("Fix Neptunes Bounty Loot")
+	@Config.Comment("Fix for rustic log and wood not having their tool set to axe. May act strangely if not matched on the client.")
+	@Config.Name("Wood Harvest Tool Fix")
 	@Config.RequiresMcRestart
-	@RLConfig.ImprovementsOnly("true")
+	@RLConfig.ImprovementsOnly("false")
 	@RLConfig.RLCraftTwoEightTwo("false")
 	@RLConfig.RLCraftTwoNine("true")
-	public boolean fixNeptunesBounty = true;
+	public boolean woodHarvestToolFix = false;
 	
-	@Config.Comment("Fix modded biomes causing other biomes to become freshwater")
-	@Config.Name("Fix Freshwater Bug")
-	@Config.RequiresMcRestart
+	@Config.Comment("Validates containers when players have the UI open to prevent dupes")
+	@Config.Name("Validate Containers")
 	@RLConfig.ImprovementsOnly("true")
-	@RLConfig.RLCraftTwoEightTwo("false")
+	@RLConfig.RLCraftTwoEightTwo("true")
 	@RLConfig.RLCraftTwoNine("true")
-	public boolean fixFreshwaterBug = true;
+	public boolean validateContainers = true;
 }

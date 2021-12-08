@@ -28,6 +28,13 @@ public class ConfigLevelUpTwo
 	@RLConfig.RLCraftTwoNine("true")
 	public boolean stealthOverhaul = false;
 	
+	@Config.Comment("Should stealth overhaul apply to Lycanites Mobs. Only does anything if Stealth Overhaul is enabled")
+	@Config.Name("Stealth Overhaul Lycanites")
+	@RLConfig.ImprovementsOnly("true")
+	@RLConfig.RLCraftTwoEightTwo("true")
+	@RLConfig.RLCraftTwoNine("true")
+	public boolean stealthOverhaulLycanites = true;
+	
 	@Config.Comment("Base distance mobs can see you at while sneaking for stealth calculations. Only applies if stealth level is over zero.")
 	@Config.Name("Stealth Overhaul Base Distance")
 	@RLConfig.ImprovementsOnly("16.0")

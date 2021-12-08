@@ -154,6 +154,22 @@ public class CommandAdvisor extends CommandBase
 			inform("Optional patch, set patches / patchOverlayMessage to true", sender);
 		}
 		
+		if(ModConfig.patches.patchHopper && hasExamplesOnly(ModConfig.server.minecraft.hopperBlockBlacklist))
+		{
+			inform("Unnecessary patch, set patches / patchHopper to false", sender);
+		}
+		else if(!ModConfig.patches.patchHopper && !hasExamplesOnly(ModConfig.server.minecraft.hopperBlockBlacklist))
+		{
+			inform("Necessary patch for hopper blacklist, set patches / patchHopper to true", sender);
+		}
+		
+		if(!ModConfig.patches.betterCombatCriticalsFix && Loader.isModLoaded(ModNames.BETTERCOMBAT))
+		{
+			inform("Improvement patch, set patches / betterCombatCriticalsFix to true", sender);
+		}
+		
+		//Might not do an advisory for fixOldHippocampus...
+		
 		if(!ModConfig.patches.ENABLED)
 		{
 			inform("All patches disabled, set patches / ENABLED to true", sender);

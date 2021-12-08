@@ -11,12 +11,14 @@ import com.charles445.rltweaker.asm.helper.ASMHelper;
 import com.charles445.rltweaker.asm.patch.IPatch;
 import com.charles445.rltweaker.asm.patch.PatchAggressiveMotionChecker;
 import com.charles445.rltweaker.asm.patch.PatchAnvilDupe;
+import com.charles445.rltweaker.asm.patch.PatchBetterCombatCriticalsFix;
 import com.charles445.rltweaker.asm.patch.PatchBetterCombatMountFix;
 import com.charles445.rltweaker.asm.patch.PatchBroadcastSounds;
 import com.charles445.rltweaker.asm.patch.PatchConcurrentParticles;
 import com.charles445.rltweaker.asm.patch.PatchDoorPathfinding;
 import com.charles445.rltweaker.asm.patch.PatchEnchant;
 import com.charles445.rltweaker.asm.patch.PatchEntityBlockDestroy;
+import com.charles445.rltweaker.asm.patch.PatchFixOldHippocampus;
 import com.charles445.rltweaker.asm.patch.PatchHopper;
 import com.charles445.rltweaker.asm.patch.PatchItemFrameDupe;
 import com.charles445.rltweaker.asm.patch.PatchLessCollisions;
@@ -248,6 +250,18 @@ public class RLTweakerASM implements IClassTransformer
 		if(ASMConfig.getBoolean("general.patches.patchHopper", false))
 		{
 			new PatchHopper();
+		}
+
+		//betterCombatCriticalsFix
+		if(ASMConfig.getBoolean("general.patches.betterCombatCriticalsFix", true))
+		{
+			new PatchBetterCombatCriticalsFix();
+		}
+		
+		//fixOldHippocampus
+		if(ASMConfig.getBoolean("general.patches.fixOldHippocampus", false))
+		{
+			new PatchFixOldHippocampus();
 		}
 		
 		//new PatchDebug();

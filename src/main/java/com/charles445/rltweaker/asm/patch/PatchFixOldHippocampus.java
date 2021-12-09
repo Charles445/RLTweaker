@@ -7,8 +7,6 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
-import com.charles445.rltweaker.asm.helper.ASMHelper;
-import com.charles445.rltweaker.asm.util.ClassDisplayer;
 import com.charles445.rltweaker.asm.util.TransformUtil;
 
 public class PatchFixOldHippocampus extends PatchManager
@@ -34,8 +32,6 @@ public class PatchFixOldHippocampus extends PatchManager
 				//We're here, but we need to make sure this version is bugged before doing any transformation
 				//The telltale sign that the function is bugged is the initial world remote check
 				//If it checks for remote, then it's bugged
-				
-				ClassDisplayer.instance.printMethod(m_openGUI);
 				
 				//Find the remote node
 				AbstractInsnNode anchor = TransformUtil.findNextFieldWithOpcodeAndName(first(m_openGUI), Opcodes.GETFIELD, "field_72995_K", "isRemote");

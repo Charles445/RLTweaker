@@ -68,6 +68,8 @@ public class MinecraftHandler
 	
 	public Map<UUID, BlockPos> containerEnforcedPlayers = new ConcurrentHashMap<>();
 	
+	//public Set<UUID> teleportingEntities = ConcurrentHashMap.newKeySet();
+	
 	public MinecraftHandler()
 	{
 		MinecraftForge.EVENT_BUS.register(this);
@@ -528,6 +530,44 @@ public class MinecraftHandler
 		if(!ModConfig.server.minecraft.lightningDestroysItems && event.getEntity() instanceof EntityItem)
 			event.setCanceled(true);
 	}
+
+	/*
+	//Run on LOWEST priority to try and run after other handlers
+	//That way if a handler cancels, it won't reach this event and cause trouble later
+	@SubscribeEvent(priority = EventPriority.LOWEST)
+	public void onTravelToDimension(EntityTravelToDimensionEvent event)
+	{
+		Entity entity = event.getEntity();
+		if(entity == null || entity instanceof EntityPlayer)
+			return;
+		
+		this.teleportingEntities.add(entity.getUniqueID());
+	}
+	
+	@SubscribeEvent
+	public void onWorldTick(TickEvent.ServerTickEvent event)
+	{
+		if(event.phase == TickEvent.Phase.END)
+			return;
+		
+		if(this.teleportingEntities.size() > 0)
+			this.teleportingEntities.clear();
+	}
+	
+	@SubscribeEvent
+	public void onTeleportingDeath(LivingDeathEvent event)
+	{
+		EntityLivingBase living = event.getEntityLiving();
+		if(living == null)
+			return;
+		
+		if(this.teleportingEntities.contains(living.getUniqueID()))
+		{
+			DebugUtil.messageAll("MATCHING Teleporter Death: "+living.getUniqueID());
+			RLTweaker.logger.debug("MATCHING Teleporter Death: "+living.getUniqueID());
+		}
+	}
+	*/
 	
 	public static interface IContainerValidator
 	{

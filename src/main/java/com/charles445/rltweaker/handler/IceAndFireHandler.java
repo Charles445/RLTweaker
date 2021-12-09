@@ -30,6 +30,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.EntityMobGriefingEvent;
+import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.IEventListener;
@@ -255,7 +256,22 @@ public class IceAndFireHandler
 		{
 			ErrorUtil.logSilent("IAF Death Worm Egg Looting Invocation");
 		}
+	}
+	
+	@SubscribeEvent
+	public void onLivingSetAttackTarget(LivingSetAttackTargetEvent event)
+	{
+		//Prevent gorgons from targeting old player statues
+		if(!ModConfig.server.iceandfire.stopGorgonTargetingPlayerStatues)
+			return;
 		
+		if(reflector.c_EntityGorgon.isInstance(event.getEntity()) && reflector.c_EntityStoneStatue.isInstance(event.getTarget()))
+		{
+			if(event.getEntityLiving() instanceof EntityLiving)
+			{
+				((EntityLiving)event.getEntityLiving()).setAttackTarget(null);
+			}
+		}
 	}
 	
 	public class IAFUseItem

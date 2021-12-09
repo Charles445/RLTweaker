@@ -36,6 +36,10 @@ public class IceAndFireReflect
 	public final Method m_EntityMyrmexBase_populateBuyingList;
 	public final Method m_EntityMyrmexBase_isJungle;
 	
+	public final Class c_EntityGorgon;
+
+	public final Class c_EntityStoneStatue;
+	
 	@Nullable
 	public Class c_ItemDragonHornStatic;
 	
@@ -68,6 +72,9 @@ public class IceAndFireReflect
 		f_EntityMyrmexBase_buyingList = ReflectUtil.findField(c_EntityMyrmexBase, "buyingList");
 		m_EntityMyrmexBase_populateBuyingList = ReflectUtil.findMethod(c_EntityMyrmexBase, "populateBuyingList");
 		m_EntityMyrmexBase_isJungle = ReflectUtil.findMethod(c_EntityMyrmexBase, "isJungle");
+
+		c_EntityGorgon = Class.forName("com.github.alexthe666.iceandfire.entity.EntityGorgon");
+		c_EntityStoneStatue = Class.forName("com.github.alexthe666.iceandfire.entity.EntityStoneStatue");
 
 		//LLibrary
 		c_EntityPropertiesHandler = Class.forName("net.ilexiconn.llibrary.server.entity.EntityPropertiesHandler");

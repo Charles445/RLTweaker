@@ -5,6 +5,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import javax.annotation.Nullable;
+
 import com.charles445.rltweaker.util.ReflectUtil;
 
 import net.minecraft.block.state.IBlockState;
@@ -24,6 +26,7 @@ public class ReskillableReflect
 	public final Field f_ReskillableRegistries_UNLOCKABLES;
 	
 	public final Class c_Unlockable;
+	public final Method m_Unlockable_getKey;
 	
 	public final Class c_PlayerData;
 	public final Method m_PlayerData_getSkillInfo;
@@ -35,6 +38,9 @@ public class ReskillableReflect
 	public final Class c_PlayerSkillInfo;
 	public final Method m_PlayerSkillInfo_isUnlocked;
 	public final Method m_PlayerSkillInfo_lock;
+	
+	public final Class c_LockUnlockableEvent;
+	public final Method m_LockUnlockableEvent_getUnlockable;
 	
 	public final Class c_LockUnlockableEvent$Pre;
 	public final Constructor con_LockUnlockableEvent$Pre;
@@ -52,6 +58,7 @@ public class ReskillableReflect
 		f_ReskillableRegistries_UNLOCKABLES = ReflectUtil.findField(c_ReskillableRegistries, "UNLOCKABLES");
 		
 		c_Unlockable = Class.forName("codersafterdark.reskillable.api.unlockable.Unlockable");
+		m_Unlockable_getKey = ReflectUtil.findMethod(c_Unlockable, "getKey");
 		
 		c_PlayerData = Class.forName("codersafterdark.reskillable.api.data.PlayerData");
 		m_PlayerData_getSkillInfo = ReflectUtil.findMethod(c_PlayerData, "getSkillInfo");
@@ -63,11 +70,13 @@ public class ReskillableReflect
 		c_PlayerSkillInfo = Class.forName("codersafterdark.reskillable.api.data.PlayerSkillInfo");
 		m_PlayerSkillInfo_isUnlocked = ReflectUtil.findMethod(c_PlayerSkillInfo, "isUnlocked");
 		m_PlayerSkillInfo_lock = ReflectUtil.findMethod(c_PlayerSkillInfo, "lock");
+
+		c_LockUnlockableEvent = Class.forName("codersafterdark.reskillable.api.event.LockUnlockableEvent");
+		m_LockUnlockableEvent_getUnlockable = ReflectUtil.findMethod(c_LockUnlockableEvent, "getUnlockable");
 		
 		c_LockUnlockableEvent$Pre = Class.forName("codersafterdark.reskillable.api.event.LockUnlockableEvent$Pre");
 		con_LockUnlockableEvent$Pre = c_LockUnlockableEvent$Pre.getDeclaredConstructor(EntityPlayer.class, c_Unlockable);
 		
-
 		c_LockUnlockableEvent$Post = Class.forName("codersafterdark.reskillable.api.event.LockUnlockableEvent$Post");
 		con_LockUnlockableEvent$Post = c_LockUnlockableEvent$Post.getDeclaredConstructor(EntityPlayer.class, c_Unlockable);
 	}
@@ -120,5 +129,15 @@ public class ReskillableReflect
 	public void saveAndSyncPlayerData(Object playerData) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException
 	{
 		m_PlayerData_saveAndSync.invoke(playerData);
+	}
+	
+	public Object getUnlockableFromLockedEvent(Object lockedEvent) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException
+	{
+		return m_LockUnlockableEvent_getUnlockable.invoke(lockedEvent);
+	}
+	
+	public String getUnlockableName(Object unlockable) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException
+	{
+		return (String) m_Unlockable_getKey.invoke(unlockable);
 	}
 }

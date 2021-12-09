@@ -206,6 +206,20 @@ public abstract class Patch implements IPatch
 		return wrapper;
 	}
 	
+	protected void removePreviousInsn(MethodNode m, AbstractInsnNode node)
+	{
+		AbstractInsnNode toRemove = previousInsn(node);
+		if(toRemove != null)
+			m.instructions.remove(toRemove);
+	}
+	
+	protected void removeNextInsn(MethodNode m, AbstractInsnNode node)
+	{
+		AbstractInsnNode toRemove = nextInsn(node);
+		if(toRemove != null)
+			m.instructions.remove(toRemove);
+	}
+	
 	/** Inserts a list after a node in a method **/
 	protected void insert(MethodNode methodNode, AbstractInsnNode anchor, InsnList wrapOrList)
 	{

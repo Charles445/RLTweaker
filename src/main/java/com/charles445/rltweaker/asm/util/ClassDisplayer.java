@@ -12,6 +12,7 @@ import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
+import org.objectweb.asm.tree.LineNumberNode;
 import org.objectweb.asm.tree.LocalVariableNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
@@ -123,7 +124,8 @@ public class ClassDisplayer
 
 	protected String getLine(final AbstractInsnNode node)
 	{
-		return "l";
+		LineNumberNode line = (LineNumberNode)node;
+		return "Line "+line.line;
 	}
 
 	protected String getFrame(final AbstractInsnNode node)

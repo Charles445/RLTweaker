@@ -149,7 +149,14 @@ public class PatchConfig
 	@Config.RequiresMcRestart
 	@Config.Comment("Fixes hippocampus issues in Ice and Fire 1.7.1, do not enable this patch for other versions!")
 	@RLConfig.ImprovementsOnly("false")
-	@RLConfig.RLCraftTwoEightTwo("false")
+	@RLConfig.RLCraftTwoEightTwo("true")
 	@RLConfig.RLCraftTwoNine("true")
 	public boolean fixOldHippocampus = false;
+	
+	@Config.RequiresMcRestart
+	@Config.Comment("Fixes gorgon issues in Ice and Fire 1.7.1, do not enable this patch for other versions!")
+	@RLConfig.ImprovementsOnly("false")
+	@RLConfig.RLCraftTwoEightTwo("true")
+	@RLConfig.RLCraftTwoNine("true")
+	public boolean fixOldGorgon = false;
 }

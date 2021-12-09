@@ -49,4 +49,11 @@ public class ConfigIceAndFire
 	@RLConfig.RLCraftTwoEightTwo("false")
 	@RLConfig.RLCraftTwoNine("true")
 	public boolean deathwormEggsIgnoreLooting = false;
+	
+	@Config.Comment("Prevents gorgons from targeting player statues. The presence of player statues will still give their AI trouble.")
+	@Config.Name("Stop Gorgon Targeting Player Statues")
+	@RLConfig.ImprovementsOnly("true")
+	@RLConfig.RLCraftTwoEightTwo("false")
+	@RLConfig.RLCraftTwoNine("true")
+	public boolean stopGorgonTargetingPlayerStatues = true;
 }

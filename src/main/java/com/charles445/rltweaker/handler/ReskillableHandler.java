@@ -1,6 +1,8 @@
 package com.charles445.rltweaker.handler;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
@@ -8,18 +10,22 @@ import com.charles445.rltweaker.RLTweaker;
 import com.charles445.rltweaker.config.JsonConfig;
 import com.charles445.rltweaker.config.ModConfig;
 import com.charles445.rltweaker.config.json.JsonDoubleBlockState;
-import com.charles445.rltweaker.debug.DebugUtil;
 import com.charles445.rltweaker.network.IServerMessageReceiver;
 import com.charles445.rltweaker.network.MessageReskillableLockSkill;
 import com.charles445.rltweaker.network.ServerMessageHandler;
 import com.charles445.rltweaker.reflect.ReskillableReflect;
+import com.charles445.rltweaker.util.CompatUtil;
 import com.charles445.rltweaker.util.CriticalException;
 import com.charles445.rltweaker.util.ErrorUtil;
+import com.charles445.rltweaker.util.ReflectUtil;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -27,15 +33,20 @@ import net.minecraftforge.registries.IForgeRegistry;
 public class ReskillableHandler
 {
 	private ReskillableReflect reflector;
+	private ManualSubscriber manualSubscriber;
 	
 	public ReskillableHandler()
 	{
 		try
 		{
 			reflector = new ReskillableReflect();
+			manualSubscriber = new ManualSubscriber(reflector);
 			
 			if(ModConfig.server.reskillable.toggleableTraits)
+			{
 				ServerMessageHandler.registerMessage(MessageReskillableLockSkill.class, new LockSkillReceiver());
+				manualSubscriber.subscribeToggleableTraits();
+			}
 			
 			MinecraftForge.EVENT_BUS.register(this);
 		}
@@ -128,6 +139,152 @@ public class ReskillableHandler
 			{
 				e.printStackTrace();
 				ErrorUtil.logSilent("Reskillable LockSkillReceiver Invoke");
+			}
+		}
+	}
+	
+	public static class ManualSubscriber
+	{
+		private ReskillableReflect reflector;
+		
+		//ElenaiDodge caching
+		private boolean canReflectOldElenai = false;
+		private Class c_oldElenai_WalljumpProvider;
+		private Field f_oldElenai_WalljumpProvider_WALLJUMP_CAP;
+		private Class c_oldElenai_IWalljump;
+		private Method m_oldElenai_IWalljump_set;
+
+		private Class c_oldElenai_LedgegrabProvider;
+		private Field f_oldElenai_LedgegrabProvider_LEDGEGRAB_CAP;
+		private Class c_oldElenai_ILedgegrab;
+		private Method m_oldElenai_ILedgegrab_set;
+		
+		private Class c_oldElenai_DodgeProvider;
+		private Field f_oldElenai_DodgeProvider_DODGE_CAP;
+		private Class c_oldElenai_IDodge;
+		private Method m_oldElenai_IDodge_set;
+		
+		public ManualSubscriber(ReskillableReflect reflector)
+		{
+			this.reflector = reflector;
+			
+			//Old ElenaiDodge
+			try
+			{
+				c_oldElenai_WalljumpProvider = Class.forName("com.elenai.elenaidodge.modpacks.capability.walljump.WalljumpProvider");
+				f_oldElenai_WalljumpProvider_WALLJUMP_CAP = ReflectUtil.findField(c_oldElenai_WalljumpProvider, "WALLJUMP_CAP");
+				c_oldElenai_IWalljump = Class.forName("com.elenai.elenaidodge.modpacks.capability.walljump.IWalljump");
+				m_oldElenai_IWalljump_set = ReflectUtil.findMethod(c_oldElenai_IWalljump, "set");
+				
+				c_oldElenai_LedgegrabProvider = Class.forName("com.elenai.elenaidodge.modpacks.capability.ledgegrab.LedgegrabProvider");
+				f_oldElenai_LedgegrabProvider_LEDGEGRAB_CAP = ReflectUtil.findField(c_oldElenai_LedgegrabProvider, "LEDGEGRAB_CAP");
+				c_oldElenai_ILedgegrab = Class.forName("com.elenai.elenaidodge.modpacks.capability.ledgegrab.ILedgegrab");
+				m_oldElenai_ILedgegrab_set = ReflectUtil.findMethod(c_oldElenai_ILedgegrab, "set");
+				
+				c_oldElenai_DodgeProvider = Class.forName("com.elenai.elenaidodge.modpacks.capability.trait.TraitProvider");
+				f_oldElenai_DodgeProvider_DODGE_CAP = ReflectUtil.findField(c_oldElenai_DodgeProvider, "TRAIT_CAP");
+				c_oldElenai_IDodge = Class.forName("com.elenai.elenaidodge.modpacks.capability.trait.ITrait");
+				m_oldElenai_IDodge_set = ReflectUtil.findMethod(c_oldElenai_IDodge, "set");
+				
+				canReflectOldElenai = true;
+			}
+			catch(Exception e)
+			{
+				//Ignore
+			}
+			
+		}
+		
+		private void subscribeToggleableTraits() throws Exception
+		{
+			CompatUtil.subscribeEventManually(reflector.c_LockUnlockableEvent$Post, this,ReflectUtil.findMethod(this.getClass(), "onToggleableTraitLockedPost"));
+		}
+		
+		@SubscribeEvent
+		public void onToggleableTraitLockedPost(Object uncastedEvent)
+		{
+			if(uncastedEvent instanceof PlayerEvent)
+			{
+				PlayerEvent event = (PlayerEvent)uncastedEvent;
+				
+				try
+				{
+					String lockedName = reflector.getUnlockableName(reflector.getUnlockableFromLockedEvent(event));
+					if(lockedName != null && event.getEntityPlayer() != null)
+						synchronizeUnlockable(event.getEntityPlayer(), lockedName);
+				}
+				catch(Exception e)
+				{
+					ErrorUtil.logSilent("Reskillable Toggleable Trait Post Handler");
+				}
+			}
+		}
+		
+		public void synchronizeUnlockable(EntityPlayer player, String name)
+		{
+			//RLTweaker.logger.debug("Locked skill: "+name);
+			switch(name)
+			{
+				case "elenaidodge.dodgetrait":
+					clearOldElenaiDodgeTrait(player);
+					break;
+				case "elenaidodge.wallgrabtrait":
+					clearOldElenaiLedgeGrabTrait(player);
+					break;
+				case "elenaidodge.walljumptrait":
+					clearOldElenaiWallJumpTrait(player);
+					break;
+				default:
+					break;
+			}
+		}
+		
+		private void clearOldElenaiDodgeTrait(EntityPlayer player)
+		{
+			if(!canReflectOldElenai)
+				return;
+			
+			try
+			{
+				Object provided = player.getCapability((Capability<?>) f_oldElenai_DodgeProvider_DODGE_CAP.get(null), null);
+				m_oldElenai_IDodge_set.invoke(provided, false);
+				
+			}
+			catch (Exception e)
+			{
+				ErrorUtil.logSilent("Reskillable Toggleable Trait Old Elenai Dodge Dodge");
+			}
+		}
+		
+		private void clearOldElenaiLedgeGrabTrait(EntityPlayer player)
+		{
+			if(!canReflectOldElenai)
+				return;
+			
+			try
+			{
+				Object provided = player.getCapability((Capability<?>) f_oldElenai_LedgegrabProvider_LEDGEGRAB_CAP.get(null), null);
+				m_oldElenai_ILedgegrab_set.invoke(provided, false);
+			}
+			catch (Exception e)
+			{
+				ErrorUtil.logSilent("Reskillable Toggleable Trait Old Elenai Dodge Wall Grab");
+			}
+		}
+		
+		private void clearOldElenaiWallJumpTrait(EntityPlayer player)
+		{
+			if(!canReflectOldElenai)
+				return;
+			
+			try
+			{
+				Object provided = player.getCapability((Capability<?>) f_oldElenai_WalljumpProvider_WALLJUMP_CAP.get(null), null);
+				m_oldElenai_IWalljump_set.invoke(provided, false);
+			}
+			catch (Exception e)
+			{
+				ErrorUtil.logSilent("Reskillable Toggleable Trait Old Elenai Dodge Wall Jump");
 			}
 		}
 	}

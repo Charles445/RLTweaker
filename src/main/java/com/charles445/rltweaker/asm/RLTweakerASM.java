@@ -18,6 +18,7 @@ import com.charles445.rltweaker.asm.patch.PatchConcurrentParticles;
 import com.charles445.rltweaker.asm.patch.PatchDoorPathfinding;
 import com.charles445.rltweaker.asm.patch.PatchEnchant;
 import com.charles445.rltweaker.asm.patch.PatchEntityBlockDestroy;
+import com.charles445.rltweaker.asm.patch.PatchFixOldGorgon;
 import com.charles445.rltweaker.asm.patch.PatchFixOldHippocampus;
 import com.charles445.rltweaker.asm.patch.PatchHopper;
 import com.charles445.rltweaker.asm.patch.PatchItemFrameDupe;
@@ -262,6 +263,12 @@ public class RLTweakerASM implements IClassTransformer
 		if(ASMConfig.getBoolean("general.patches.fixOldHippocampus", false))
 		{
 			new PatchFixOldHippocampus();
+		}
+		
+		//fixOldGorgon
+		if(ASMConfig.getBoolean("general.patches.fixOldGorgon", false))
+		{
+			new PatchFixOldGorgon();
 		}
 		
 		//new PatchDebug();

@@ -59,6 +59,10 @@ public class ModConfig
 		@Config.Name("Charm")
 		public ConfigCharm charm = new ConfigCharm();
 		
+		@Config.Comment("Classy Hats tweaks")
+		@Config.Name("Classy Hats")
+		public ConfigClassyHats classyhats = new ConfigClassyHats();
+		
 		@Config.Comment("Grappling Hook Mod tweaks")
 		@Config.Name("Grappling Hook Mod")
 		public ConfigGrapplemod grapplemod = new ConfigGrapplemod();

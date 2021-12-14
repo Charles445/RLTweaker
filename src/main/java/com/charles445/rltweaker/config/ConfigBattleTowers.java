@@ -63,6 +63,13 @@ public class ConfigBattleTowers
 	@RLConfig.RLCraftTwoNine("true")
 	public boolean golemAnvilFix = false;
 	
+	@Config.Comment("Prevent golems taking damage from lycanites fluids")
+	@Config.Name("Golem Lycanites Fluid Fix")
+	@RLConfig.ImprovementsOnly("false")
+	@RLConfig.RLCraftTwoEightTwo("false")
+	@RLConfig.RLCraftTwoNine("true")
+	public boolean golemLycanitesFluidFix = false;
+	
 	@Config.Comment("Max Golem XZ movement to make using tools like fishing rods harder. Set to a negative number to disable")
 	@Config.Name("Golem Speed Cap")
 	@RLConfig.ImprovementsOnly("-1.0")

@@ -24,6 +24,7 @@ import com.charles445.rltweaker.handler.BaublesHandler;
 import com.charles445.rltweaker.handler.BetterSurvivalHandler;
 import com.charles445.rltweaker.handler.CarryOnHandler;
 import com.charles445.rltweaker.handler.CharmHandler;
+import com.charles445.rltweaker.handler.ClassyHatsHandler;
 import com.charles445.rltweaker.handler.GrapplemodHandler;
 import com.charles445.rltweaker.handler.IceAndFireHandler;
 import com.charles445.rltweaker.handler.LevelUpTwoHandler;
@@ -236,6 +237,11 @@ public class RLTweaker
 		if(Loader.isModLoaded(ModNames.LYCANITESMOBS) && ModConfig.server.lycanitesmobs.enabled)
 		{
 			handlers.put(ModNames.LYCANITESMOBS, new LycanitesHandler());
+		}
+		
+		if(Loader.isModLoaded(ModNames.CLASSYHATS) && ModConfig.server.classyhats.enabled)
+		{
+			handlers.put(ModNames.CLASSYHATS, new ClassyHatsHandler());
 		}
 		
 		/*

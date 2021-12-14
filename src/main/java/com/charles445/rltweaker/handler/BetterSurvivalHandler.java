@@ -12,12 +12,15 @@ import com.charles445.rltweaker.util.ModNames;
 import net.minecraft.block.Block;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.IEventListener;
@@ -32,8 +35,11 @@ public class BetterSurvivalHandler
 			if(ModConfig.server.bettersurvival.tunnelingBlacklistEnabled)
 			{
 				//Wrap the BreakEvent  handler
-				CompatUtil.wrapSpecificHandler("BSBreak", BSBreak::new, "com.mujmajnkraft.bettersurvival.eventhandlers.ModEnchantmentHandler", "onEvent(Lnet/minecraftforge/event/world/BlockEvent$BreakEvent;)");
+				CompatUtil.wrapSpecificHandler("BSBreak", BSBreak::new, "com.mujmajnkraft.bettersurvival.eventhandlers.ModEnchantmentHandler", "onEvent(Lnet/minecraftforge/event/world/BlockEvent$BreakEvent;)");			
 			}
+			
+			//Arrow handler
+			CompatUtil.wrapSpecificHandler("BSArrowSpawn", BSArrowSpawn::new, "com.mujmajnkraft.bettersurvival.eventhandlers.ModEnchantmentHandler", "onEvent(Lnet/minecraftforge/event/entity/EntityJoinWorldEvent;)");
 		}
 		catch (Exception e)
 		{
@@ -43,6 +49,49 @@ public class BetterSurvivalHandler
 			//Crash on Critical
 			if(e instanceof CriticalException)
 				throw new RuntimeException(e);
+		}
+	}
+	
+	public class BSArrowSpawn
+	{
+		private IEventListener handler;
+		public BSArrowSpawn(IEventListener handler)
+		{
+			this.handler = handler;
+			MinecraftForge.EVENT_BUS.register(this);
+		}
+		
+		@SubscribeEvent(priority=EventPriority.HIGHEST, receiveCanceled=true)
+		public void onArrowJoinWorld(EntityJoinWorldEvent event)
+		{
+			double rangeSpeedMultiplier = ModConfig.server.bettersurvival.rangeSpeedMultiplier; 
+			if(rangeSpeedMultiplier == 2.0d)
+			{
+				handler.invoke(event);
+				return;
+			}
+			
+			if(event.getEntity() instanceof EntityArrow && !event.getWorld().isRemote)
+			{
+				EntityArrow arrowEntity = (EntityArrow)event.getEntity();
+				
+				if(arrowEntity.shootingEntity instanceof EntityLivingBase)
+				{
+					//Passed enough checks, gather speed information
+					double cachedX = arrowEntity.motionX;
+					double cachedY = arrowEntity.motionY;
+					double cachedZ = arrowEntity.motionZ;
+					handler.invoke(event);
+					//Detect a difference
+					if(cachedX != arrowEntity.motionX || cachedY != arrowEntity.motionY || cachedZ != arrowEntity.motionZ)
+					{
+						//Override the speed change
+						arrowEntity.motionX = cachedX * rangeSpeedMultiplier;
+						arrowEntity.motionY = cachedY * rangeSpeedMultiplier;
+						arrowEntity.motionZ = cachedZ * rangeSpeedMultiplier;
+					}
+				}
+			}
 		}
 	}
 	

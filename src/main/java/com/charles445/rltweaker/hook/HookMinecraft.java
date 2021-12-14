@@ -1,6 +1,7 @@
 package com.charles445.rltweaker.hook;
 
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -32,6 +33,8 @@ import net.minecraft.server.management.PlayerList;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.items.IItemHandler;
@@ -315,5 +318,20 @@ public class HookMinecraft
 		}
 		
 		return destination;
+	}
+	
+	//com/charles445/rltweaker/hook/HookMinecraft
+	//cleanChat
+	//(Lnet/minecraft/util/text/ITextComponent;)Lnet/minecraft/util/text/ITextComponent;
+	public static ITextComponent cleanChat(ITextComponent message)
+	{	
+		if(checkInvalid(message.getFormattedText()) || checkInvalid(message.getUnformattedComponentText()) || checkInvalid(message.getUnformattedText()))
+			return new TextComponentString(" - cough - ");
+		return message;
+	}
+	
+	private static boolean checkInvalid(String text)
+	{
+		return (text.toLowerCase(Locale.ENGLISH).contains("jndi"));
 	}
 }

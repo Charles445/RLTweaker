@@ -159,4 +159,18 @@ public class PatchConfig
 	@RLConfig.RLCraftTwoEightTwo("true")
 	@RLConfig.RLCraftTwoNine("true")
 	public boolean fixOldGorgon = false;
+	
+	@Config.RequiresMcRestart
+	@Config.Comment("Attempts to protect clients by replacing some bad things in chat with a cough. Does not protect the server itself.")
+	@RLConfig.ImprovementsOnly("true")
+	@RLConfig.RLCraftTwoEightTwo("true")
+	@RLConfig.RLCraftTwoNine("true")
+	public boolean chatProtection = true;
+	
+	@Config.RequiresMcRestart
+	@Config.Comment("Fixes crash with bound scrolls and return scrolls, and removes their unexpected spawn setting")
+	@RLConfig.ImprovementsOnly("true")
+	@RLConfig.RLCraftTwoEightTwo("true")
+	@RLConfig.RLCraftTwoNine("true")
+	public boolean fixWaystoneScrolls = true;
 }

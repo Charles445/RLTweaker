@@ -35,4 +35,11 @@ public class ConfigBetterSurvival
 	@RLConfig.RLCraftTwoEightTwo("minecraft:chest")
 	@RLConfig.RLCraftTwoNine("minecraft:chest")
 	public String[] tunnelingBlacklist = {"minecraft:chest"};
+	
+	@Config.Comment("Speed multiplier for the Range enchantment. Default is 2")
+	@Config.Name("Range Speed Multiplier")
+	@RLConfig.ImprovementsOnly("2.0")
+	@RLConfig.RLCraftTwoEightTwo("2.0")
+	@RLConfig.RLCraftTwoNine("2.0")
+	public double rangeSpeedMultiplier = 2.0d;
 }

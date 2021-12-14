@@ -4,7 +4,7 @@ import com.charles445.rltweaker.config.annotation.RLConfig;
 
 import net.minecraftforge.common.config.Config;
 
-public class ConfigClassyHatsClient
+public class ConfigClassyHats
 {
 	@Config.Comment("Master switch for this mod compatibility")
 	@Config.Name("ENABLED")
@@ -14,19 +14,11 @@ public class ConfigClassyHatsClient
 	@RLConfig.RLCraftTwoNine("true")
 	public boolean enabled = true;
 	
-	@Config.Comment("Mo Bends Compatibility")
-	@Config.Name("Mo Bends Compatibility")
+	@Config.Comment("Fixes a hat dupe")
+	@Config.Name("Hat Dupe Fix")
 	@Config.RequiresMcRestart
 	@RLConfig.ImprovementsOnly("true")
 	@RLConfig.RLCraftTwoEightTwo("true")
 	@RLConfig.RLCraftTwoNine("true")
-	public boolean mobendsCompatibility = true;
-	
-	@Config.Comment("Fixes Bag Screen")
-	@Config.Name("Fix Bag Screen")
-	@Config.RequiresMcRestart
-	@RLConfig.ImprovementsOnly("true")
-	@RLConfig.RLCraftTwoEightTwo("true")
-	@RLConfig.RLCraftTwoNine("true")
-	public boolean fixBagScreen = true;
+	public boolean hatDupeFix = true;
 }

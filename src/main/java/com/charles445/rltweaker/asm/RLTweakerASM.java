@@ -14,6 +14,7 @@ import com.charles445.rltweaker.asm.patch.PatchAnvilDupe;
 import com.charles445.rltweaker.asm.patch.PatchBetterCombatCriticalsFix;
 import com.charles445.rltweaker.asm.patch.PatchBetterCombatMountFix;
 import com.charles445.rltweaker.asm.patch.PatchBroadcastSounds;
+import com.charles445.rltweaker.asm.patch.PatchChatProtection;
 import com.charles445.rltweaker.asm.patch.PatchConcurrentParticles;
 import com.charles445.rltweaker.asm.patch.PatchDoorPathfinding;
 import com.charles445.rltweaker.asm.patch.PatchEnchant;
@@ -29,6 +30,7 @@ import com.charles445.rltweaker.asm.patch.PatchOverlayMessage;
 import com.charles445.rltweaker.asm.patch.PatchPushReaction;
 import com.charles445.rltweaker.asm.patch.PatchRealBench;
 import com.charles445.rltweaker.asm.patch.PatchReducedSearchSize;
+import com.charles445.rltweaker.asm.patch.PatchWaystoneScroll;
 
 import net.minecraft.launchwrapper.IClassTransformer;
 
@@ -269,6 +271,18 @@ public class RLTweakerASM implements IClassTransformer
 		if(ASMConfig.getBoolean("general.patches.fixOldGorgon", false))
 		{
 			new PatchFixOldGorgon();
+		}
+		
+		//chatProtection
+		if(ASMConfig.getBoolean("general.patches.chatProtection", true))
+		{
+			new PatchChatProtection();
+		}
+		
+		//fixWaystoneScrolls
+		if(ASMConfig.getBoolean("general.patches.fixWaystoneScrolls", true))
+		{
+			new PatchWaystoneScroll();
 		}
 		
 		//new PatchDebug();

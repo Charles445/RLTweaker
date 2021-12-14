@@ -7,6 +7,7 @@ import java.util.Set;
 
 import com.charles445.rltweaker.RLTweaker;
 import com.charles445.rltweaker.config.ModConfig;
+import com.charles445.rltweaker.debug.DebugUtil;
 import com.charles445.rltweaker.reflect.BattleTowersReflect;
 import com.charles445.rltweaker.util.AIUtil;
 import com.charles445.rltweaker.util.CompatUtil;
@@ -19,6 +20,7 @@ import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -28,8 +30,9 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.event.entity.living.PotionEvent.PotionApplicableEvent;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.IEventListener;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -157,9 +160,10 @@ public class BattleTowersHandler
 		boolean suffocationFix = ModConfig.server.battletowers.golemSuffocatingFix;
 		boolean fallingBlockFix = ModConfig.server.battletowers.golemFallingBlockFix;
 		boolean anvilFix = ModConfig.server.battletowers.golemAnvilFix;
+		boolean lycanitesFluidFix = ModConfig.server.battletowers.golemLycanitesFluidFix;
 		
 		//Check applicable config
-		if(!suffocationFix && !fallingBlockFix && !anvilFix)
+		if(!suffocationFix && !fallingBlockFix && !anvilFix && !lycanitesFluidFix)
 			return;
 		
 		String damageType = event.getSource().getDamageType();
@@ -184,12 +188,25 @@ public class BattleTowersHandler
 			event.setCanceled(true);
 			return;
 		}
+		
+		//Lycanites Fluid
+		if(lycanitesFluidFix)
+		{
+			if(damageType.equals("acid") || damageType.equals("ooze"))
+			{
+				if(reflector.isEntityGolem(event.getEntityLiving()))
+				{
+					event.setCanceled(true);
+					return;
+				}
+			}
+		}
 	}
 	
 	@SubscribeEvent
 	public void onLivingUpdate(LivingUpdateEvent event)
 	{
-		//Golem Dormant Speed Fix / Golem Drowning Fix / Golem Speed Cap / Golem Dismount Fix
+		//Golem Dormant Speed Fix / Golem Drowning Fix / Golem Speed Cap / Golem Dismount Fix / Golem Lycanites Fluid Fix
 		boolean dormantSpeedFix = ModConfig.server.battletowers.golemDormantSpeedFix;
 		boolean drownFix = ModConfig.server.battletowers.golemDrowningFix;
 		double golemSpeedCap = ModConfig.server.battletowers.golemSpeedCap;
@@ -317,6 +334,23 @@ public class BattleTowersHandler
 				return;
 			}
 			
+		}
+	}
+	
+	@SubscribeEvent
+	public void onApplyPotion(PotionApplicableEvent event)
+	{
+		if(ModConfig.server.battletowers.golemLycanitesFluidFix && reflector.isEntityGolem(event.getEntityLiving()))
+		{
+			PotionEffect effect = event.getPotionEffect();
+			if(effect == null)
+				return;
+			
+			String effectName = effect.getEffectName();
+			if(effectName.equals("effect.plague"))
+			{
+				event.setResult(Event.Result.DENY);
+			}
 		}
 	}
 	

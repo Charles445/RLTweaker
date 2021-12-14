@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import com.charles445.rltweaker.network.MessageReskillableLockSkill;
 import com.charles445.rltweaker.network.NetworkHandler;
 import com.charles445.rltweaker.network.PacketHandler;
+import com.charles445.rltweaker.util.ErrorUtil;
 import com.charles445.rltweaker.util.ReflectUtil;
 
 import net.minecraft.client.gui.GuiScreen;
@@ -82,6 +83,7 @@ public class ReskillableGuiDelegate extends GuiDelegateBase
 			}
 			catch (Exception e)
 			{
+				ErrorUtil.logSilent("Reskillable Toggleable Traits Gui Delegate Invocation");
 				e.printStackTrace();
 			}
 		}

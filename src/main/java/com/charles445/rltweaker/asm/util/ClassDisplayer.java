@@ -25,6 +25,11 @@ public class ClassDisplayer
 	
 	private Map<Integer,String> opcodeToStringCache = new HashMap<Integer, String>();
 	
+	private void println(String s)
+	{
+		System.out.println(s);
+	}
+	
 	public ClassDisplayer()
 	{
 		try
@@ -44,7 +49,7 @@ public class ClassDisplayer
 		}
 		catch(Exception e)
 		{
-			System.out.println("Couldn't generate opcodeToString list in ClassDisplayer");
+			println("Couldn't generate opcodeToString list in ClassDisplayer");
 		}
 	}
 	
@@ -52,9 +57,9 @@ public class ClassDisplayer
 	{
 		for(MethodNode m : clazzNode.methods)
 		{
-			System.out.println(m.name+" : "+m.desc);
+			println(m.name+" : "+m.desc);
 			printMethod(m);
-			System.out.println("");
+			println("");
 		}
 	}
 	
@@ -63,7 +68,7 @@ public class ClassDisplayer
 		AbstractInsnNode anchor = methodNode.instructions.getFirst();
 		while(anchor!=null)
 		{
-			System.out.println(nodeToString(anchor));
+			println(nodeToString(anchor));
 			anchor = anchor.getNext();
 		}
 	}
@@ -86,7 +91,7 @@ public class ClassDisplayer
 				sb.append("(");
 				sb.append(lvn.desc);
 				sb.append(")");
-				System.out.println(sb.toString());
+				println(sb.toString());
 			}
 		}
 	}

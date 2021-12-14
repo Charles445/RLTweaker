@@ -14,7 +14,6 @@ import com.charles445.rltweaker.asm.patch.PatchAnvilDupe;
 import com.charles445.rltweaker.asm.patch.PatchBetterCombatCriticalsFix;
 import com.charles445.rltweaker.asm.patch.PatchBetterCombatMountFix;
 import com.charles445.rltweaker.asm.patch.PatchBroadcastSounds;
-import com.charles445.rltweaker.asm.patch.PatchChatProtection;
 import com.charles445.rltweaker.asm.patch.PatchConcurrentParticles;
 import com.charles445.rltweaker.asm.patch.PatchDoorPathfinding;
 import com.charles445.rltweaker.asm.patch.PatchEnchant;
@@ -271,12 +270,6 @@ public class RLTweakerASM implements IClassTransformer
 		if(ASMConfig.getBoolean("general.patches.fixOldGorgon", false))
 		{
 			new PatchFixOldGorgon();
-		}
-		
-		//chatProtection
-		if(ASMConfig.getBoolean("general.patches.chatProtection", true))
-		{
-			new PatchChatProtection();
 		}
 		
 		//fixWaystoneScrolls

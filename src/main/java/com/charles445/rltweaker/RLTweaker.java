@@ -69,7 +69,8 @@ import net.minecraftforge.fml.relauncher.Side;
 	name = RLTweaker.NAME, 
 	version = RLTweaker.VERSION,
 	acceptedMinecraftVersions = "[1.12, 1.13)",
-	acceptableRemoteVersions = "[0.3.0,)" //THIS IS NO LONGER USED
+	acceptableRemoteVersions = "[0.3.0,)", //THIS IS NO LONGER USED
+	dependencies = "required-after:forge@[14.23.5.2860,);"
 	//updateJSON = "https://raw.githubusercontent.com/Charles445/SimpleDifficulty/master/modupdatechecker.json"
 	
 )
@@ -77,7 +78,7 @@ public class RLTweaker
 {
 	public static final String MODID = "rltweaker";
 	public static final String NAME = "RLTweaker";
-	public static final String VERSION = "0.4.4";
+	public static final String VERSION = "0.4.5";
 	public static final VersionDelimiter VERSION_DELIMITER = new VersionDelimiter(VERSION);
 	public static final VersionDelimiter MINIMUM_VERSION = new VersionDelimiter("0.3.0");
 	

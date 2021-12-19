@@ -14,8 +14,11 @@ public class ModNames
 	public static final String DYNAMICTREES = "dynamictrees";
 	public static final String ELENAIDODGE = "elenaidodge";
 	public static final String FAMILIARFAUNA = "familiarfauna";
+	public static final String FANCYBLOCKPARTICLES = "fbp";
+	public static final String GOOGLYEYES = "googlyeyes";
 	public static final String GRAPPLEMOD = "grapplemod";
 	public static final String ICEANDFIRE = "iceandfire";
+	public static final String INFERNALMOBS = "infernalmobs";
 	public static final String ISEEDRAGONS = "iseedragons";
 	public static final String LEVELUPTWO = "levelup2";
 	public static final String LOSTCITIES = "lostcities";

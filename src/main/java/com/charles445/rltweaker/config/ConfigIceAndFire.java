@@ -56,4 +56,12 @@ public class ConfigIceAndFire
 	@RLConfig.RLCraftTwoEightTwo("false")
 	@RLConfig.RLCraftTwoNine("true")
 	public boolean stopGorgonTargetingPlayerStatues = true;
+	
+	@Config.Comment("Removes snow trade for RLCraft balancing. Only works in Ice and Fire 1.7.1")
+	@Config.Name("RLCraft Trade Balancing")
+	@Config.RequiresMcRestart
+	@RLConfig.ImprovementsOnly("false")
+	@RLConfig.RLCraftTwoEightTwo("false")
+	@RLConfig.RLCraftTwoNine("true")
+	public boolean rlcraftTradeBalancing = false;
 }

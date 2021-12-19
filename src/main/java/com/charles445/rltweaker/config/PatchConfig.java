@@ -1,6 +1,7 @@
 package com.charles445.rltweaker.config;
 
 import com.charles445.rltweaker.config.annotation.RLConfig;
+import com.charles445.rltweaker.config.annotation.SpecialEnum;
 
 import net.minecraftforge.common.config.Config;
 
@@ -29,9 +30,10 @@ public class PatchConfig
 	
 	@Config.RequiresMcRestart
 	@Config.Comment("Makes some entities stop checking for large entity collisions. Not needed without a max entity radius changing mod.")
-	@RLConfig.ImprovementsOnly("true")
-	@RLConfig.RLCraftTwoEightTwo("true")
-	@RLConfig.RLCraftTwoNine("true")
+	@RLConfig.SpecialSignature(value = SpecialEnum.MAX_ENTITY_RADIUS_HIGH, pass = "true", fail = "false")
+	//@RLConfig.ImprovementsOnly("true")
+	//@RLConfig.RLCraftTwoEightTwo("true")
+	//@RLConfig.RLCraftTwoNine("true")
 	public boolean lessCollisions = true;
 	
 	@Config.RequiresMcRestart
@@ -71,9 +73,10 @@ public class PatchConfig
 	
 	@Config.RequiresMcRestart
 	@Config.Comment("Reduces search size for finding some entities like players and items. Not needed without a max entity radius changing mod. Helps with Quark Monster Box lag.")
-	@RLConfig.ImprovementsOnly("false")
-	@RLConfig.RLCraftTwoEightTwo("false")
-	@RLConfig.RLCraftTwoNine("true")
+	@RLConfig.SpecialSignature(value = SpecialEnum.MAX_ENTITY_RADIUS_HIGH, pass = "true", fail = "false")
+	//@RLConfig.ImprovementsOnly("false")
+	//@RLConfig.RLCraftTwoEightTwo("false")
+	//@RLConfig.RLCraftTwoNine("true")
 	public boolean reducedSearchSize = false;
 	
 	@Config.RequiresMcRestart
@@ -159,13 +162,6 @@ public class PatchConfig
 	@RLConfig.RLCraftTwoEightTwo("true")
 	@RLConfig.RLCraftTwoNine("true")
 	public boolean fixOldGorgon = false;
-	
-	@Config.RequiresMcRestart
-	@Config.Comment("Attempts to protect clients by replacing some bad things in chat with a cough. Does not protect the server itself.")
-	@RLConfig.ImprovementsOnly("true")
-	@RLConfig.RLCraftTwoEightTwo("true")
-	@RLConfig.RLCraftTwoNine("true")
-	public boolean chatProtection = true;
 	
 	@Config.RequiresMcRestart
 	@Config.Comment("Fixes crash with bound scrolls and return scrolls, and removes their unexpected spawn setting")

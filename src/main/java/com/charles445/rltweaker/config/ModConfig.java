@@ -71,6 +71,10 @@ public class ModConfig
 		@Config.Name("Ice and Fire")
 		public ConfigIceAndFire iceandfire = new ConfigIceAndFire();
 		
+		@Config.Comment("Infernal Mobs tweaks")
+		@Config.Name("Infernal Mobs")
+		public ConfigInfernalMobs infernalmobs = new ConfigInfernalMobs();
+		
 		@Config.Comment("Level Up Reloaded tweaks")
 		@Config.Name("Level Up Reloaded")
 		public ConfigLevelUpTwo leveluptwo = new ConfigLevelUpTwo();
@@ -139,6 +143,14 @@ public class ModConfig
 		@Config.Comment("Classy Hats tweaks")
 		@Config.Name("Classy Hats")
 		public ConfigClassyHatsClient classyhats = new ConfigClassyHatsClient();
+		
+		@Config.Comment("Fancy Block Particles tweaks")
+		@Config.Name("Fancy Block Particles")
+		public ConfigFBPClient fbp = new ConfigFBPClient();
+		
+		@Config.Comment("Googly Eyes tweaks")
+		@Config.Name("Googly Eyes")
+		public ConfigGooglyEyesClient googlyeyes = new ConfigGooglyEyesClient();
 		
 		@Config.Comment("Mantle tweaks")
 		@Config.Name("Mantle")

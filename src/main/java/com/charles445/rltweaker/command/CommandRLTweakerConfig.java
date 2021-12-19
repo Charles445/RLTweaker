@@ -15,6 +15,7 @@ import javax.annotation.Nullable;
 import com.charles445.rltweaker.RLTweaker;
 import com.charles445.rltweaker.config.ModConfig;
 import com.charles445.rltweaker.config.annotation.RLConfig;
+import com.charles445.rltweaker.config.annotation.SpecialEnum;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -22,6 +23,7 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.world.World;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.common.config.FieldWrapper;
@@ -66,7 +68,7 @@ public class CommandRLTweakerConfig extends CommandBase
 			case "help": 
 				inform("/rltweakerconfig <type>", sender);
 				inform("Sets RLTweaker config to default values based on the config type given",sender);
-				inform("Available config types are:\nimprovementsonly\nrlcraft282\nrlcraft29",sender); //TODO loop
+				inform("Available config types are:\nimprovementsonly\nrlcraft282",sender); //TODO loop
 				break;
 			//case "rlcraft29": updateConfigDefaultsWithAnnotation(RLConfig.RLCraftTwoNine.class, sender); break;
 			case "rlcraft282": updateConfigDefaultsWithAnnotation(RLConfig.RLCraftTwoEightTwo.class, sender); break;
@@ -113,30 +115,49 @@ public class CommandRLTweakerConfig extends CommandBase
 			if(Modifier.isPublic(modifiers))
 			{
 				//public field
-				if(f.isAnnotationPresent(annotationClazz))
+				boolean hasSpecial = false;
+				if(f.isAnnotationPresent(RLConfig.SpecialSignature.class))
+				{
+					hasSpecial = true;
+				}
+				
+				if(hasSpecial || f.isAnnotationPresent(annotationClazz))
 				{
 					f.setAccessible(true);
-					Annotation annotation = annotationClazz.cast(f.getAnnotation(annotationClazz));
-					Method m = annotationClazz.getDeclaredMethod("value");
-					if(m == null)
+					
+					if(hasSpecial)
 					{
-						RLTweaker.logger.error("Null method for value in class: "+annotationClazz.getSimpleName()+" : "+instance.getClass().getSimpleName()+" : "+f.getType().getName()+" : "+f.getName());
-						continue;
+						RLConfig.SpecialSignature signature = RLConfig.SpecialSignature.class.cast(f.getAnnotation(RLConfig.SpecialSignature.class));
+						String annotationValue = testSpecial(signature.value(), signature.pass(), signature.fail());
+						
+						if(replaceFieldWithNewValue(instance, f, annotationValue, f.getType().getName()))
+						{
+							RLTweaker.logger.debug("Replaced field: "+instance.getClass().getSimpleName()+" : "+f.getName());
+						}
 					}
-					
-					String annotationValue = (String) m.invoke(annotation);
-					
-					if(annotationValue == null)
+					else
 					{
-						RLTweaker.logger.error("Null string for annotaton value in class: "+annotationClazz.getSimpleName()+" : "+instance.getClass().getSimpleName()+" : "+f.getType().getName()+" : "+f.getName());
-						continue;
+						Annotation annotation = annotationClazz.cast(f.getAnnotation(annotationClazz));
+						Method m = annotationClazz.getDeclaredMethod("value");
+						if(m == null)
+						{
+							RLTweaker.logger.error("Null method for value in class: "+annotationClazz.getSimpleName()+" : "+instance.getClass().getSimpleName()+" : "+f.getType().getName()+" : "+f.getName());
+							continue;
+						}
+						
+						String annotationValue = (String) m.invoke(annotation);
+						
+						if(annotationValue == null)
+						{
+							RLTweaker.logger.error("Null string for annotaton value in class: "+annotationClazz.getSimpleName()+" : "+instance.getClass().getSimpleName()+" : "+f.getType().getName()+" : "+f.getName());
+							continue;
+						}
+						
+						if(replaceFieldWithNewValue(instance, f, annotationValue, f.getType().getName()))
+						{
+							RLTweaker.logger.debug("Replaced field: "+instance.getClass().getSimpleName()+" : "+f.getName());
+						}
 					}
-					
-					if(replaceFieldWithNewValue(instance, f, annotationValue, f.getType().getName()))
-					{
-						RLTweaker.logger.debug("Replaced field: "+instance.getClass().getSimpleName()+" : "+f.getName());
-					}
-					
 				}
 				else if(FieldWrapper.hasWrapperFor(f))
 				{
@@ -148,6 +169,18 @@ public class CommandRLTweakerConfig extends CommandBase
 					diveInstance(f.get(instance), annotationClazz);
 				}
 			}
+		}
+	}
+	
+	private String testSpecial(SpecialEnum special, String pass, String fail)
+	{
+		switch(special)
+		{
+			case MAX_ENTITY_RADIUS_HIGH:
+				return World.MAX_ENTITY_RADIUS > 2.0 ? pass : fail;
+			default:
+				RLTweaker.logger.error("testSpecial failed, invalid case");
+				return fail;
 		}
 	}
 	

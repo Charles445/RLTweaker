@@ -27,6 +27,7 @@ import com.charles445.rltweaker.handler.CharmHandler;
 import com.charles445.rltweaker.handler.ClassyHatsHandler;
 import com.charles445.rltweaker.handler.GrapplemodHandler;
 import com.charles445.rltweaker.handler.IceAndFireHandler;
+import com.charles445.rltweaker.handler.InfernalMobsHandler;
 import com.charles445.rltweaker.handler.LevelUpTwoHandler;
 import com.charles445.rltweaker.handler.LostCitiesHandler;
 import com.charles445.rltweaker.handler.LycanitesHandler;
@@ -70,7 +71,7 @@ import net.minecraftforge.fml.relauncher.Side;
 	version = RLTweaker.VERSION,
 	acceptedMinecraftVersions = "[1.12, 1.13)",
 	acceptableRemoteVersions = "[0.3.0,)", //THIS IS NO LONGER USED
-	dependencies = "required-after:forge@[14.23.5.2860,);"
+	dependencies = "required-after:forge@[14.23.5.2859,);"
 	//updateJSON = "https://raw.githubusercontent.com/Charles445/SimpleDifficulty/master/modupdatechecker.json"
 	
 )
@@ -78,7 +79,7 @@ public class RLTweaker
 {
 	public static final String MODID = "rltweaker";
 	public static final String NAME = "RLTweaker";
-	public static final String VERSION = "0.4.5";
+	public static final String VERSION = "0.4.6";
 	public static final VersionDelimiter VERSION_DELIMITER = new VersionDelimiter(VERSION);
 	public static final VersionDelimiter MINIMUM_VERSION = new VersionDelimiter("0.3.0");
 	
@@ -243,6 +244,11 @@ public class RLTweaker
 		if(Loader.isModLoaded(ModNames.CLASSYHATS) && ModConfig.server.classyhats.enabled)
 		{
 			handlers.put(ModNames.CLASSYHATS, new ClassyHatsHandler());
+		}
+		
+		if(Loader.isModLoaded(ModNames.INFERNALMOBS) && ModConfig.server.infernalmobs.enabled)
+		{
+			handlers.put(ModNames.INFERNALMOBS, new InfernalMobsHandler());
 		}
 		
 		/*

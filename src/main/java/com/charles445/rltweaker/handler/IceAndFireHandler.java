@@ -1,7 +1,10 @@
 package com.charles445.rltweaker.handler;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import com.charles445.rltweaker.RLTweaker;
 import com.charles445.rltweaker.config.ModConfig;
@@ -10,11 +13,15 @@ import com.charles445.rltweaker.util.CompatUtil;
 import com.charles445.rltweaker.util.CriticalException;
 import com.charles445.rltweaker.util.ErrorUtil;
 import com.charles445.rltweaker.util.LootUtil.DoNothingFunction;
+import com.charles445.rltweaker.util.ModNames;
+import com.charles445.rltweaker.util.ReflectUtil;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.passive.EntityVillager.ITradeList;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
@@ -36,6 +43,8 @@ import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.IEventListener;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.EntityEntry;
+import net.minecraftforge.fml.common.registry.VillagerRegistry.VillagerCareer;
+import net.minecraftforge.fml.common.registry.VillagerRegistry.VillagerProfession;
 
 public class IceAndFireHandler 
 {
@@ -54,6 +63,9 @@ public class IceAndFireHandler
 				//1.8+
 				CompatUtil.wrapSpecificHandler("IAFUseItem", IAFUseItem::new, "com.github.alexthe666.iceandfire.event.ServerEvents", "onEntityUseItem");
 			}
+			
+			if(ModConfig.server.iceandfire.rlcraftTradeBalancing)
+				attemptRemoveRLCraftTrades();
 			
 			MinecraftForge.EVENT_BUS.register(this);
 		}
@@ -270,6 +282,90 @@ public class IceAndFireHandler
 			if(event.getEntityLiving() instanceof EntityLiving)
 			{
 				((EntityLiving)event.getEntityLiving()).setAttackTarget(null);
+			}
+		}
+	}
+	
+	private void attemptRemoveRLCraftTrades()
+	{
+		//Quickly verify that we're in the correct version of the mod
+		try
+		{
+			Class.forName("com.github.alexthe666.iceandfire.core.ModVillagers");
+		}
+		catch(Exception e)
+		{
+			return;
+		}
+		
+		try
+		{
+			Class c_ModVillagers = Class.forName("com.github.alexthe666.iceandfire.core.ModVillagers");
+			Object o_ModVillagers_INSTANCE = ReflectUtil.findField(c_ModVillagers, "INSTANCE").get(null);
+			Map<Integer, VillagerProfession> o_ModVillagers_professions = (Map<Integer, VillagerProfession>) ReflectUtil.findField(c_ModVillagers, "professions").get(o_ModVillagers_INSTANCE);
+			
+			//VillagerCareer fishermanCareer = o_ModVillagers_professions.get(0).getCareer(0);
+			VillagerCareer craftsmanCareer = o_ModVillagers_professions.get(1).getCareer(0);
+			
+			Field f_VillagerCareer_trades = ReflectUtil.findField(VillagerCareer.class, "trades");
+			
+			//Field f_itemToBuy = ReflectUtil.findField(Class.forName("com.github.alexthe666.iceandfire.core.ModVillagers$ListItemForSapphires"), "itemToBuy");
+			Field f_buyingItem = ReflectUtil.findField(Class.forName("com.github.alexthe666.iceandfire.core.ModVillagers$SapphireForItems"), "buyingItem");
+			
+			//removeAllListEmeraldWithBought(new ResourceLocation(ModNames.ICEANDFIRE, "fishing_spear"), (List<List<ITradeList>>)f_VillagerCareer_trades.get(fishermanCareer), f_itemToBuy);
+			removeAllSapphireForItemWithSold(new ResourceLocation("minecraft", "snow"), (List<List<ITradeList>>)f_VillagerCareer_trades.get(craftsmanCareer), f_buyingItem);
+		}
+		catch(Exception e)
+		{
+			RLTweaker.logger.error("Failed to remove RLCraft balancing trades", e);
+			ErrorUtil.logSilent("Ice and Fire RLCraft Trade Removal");
+		}
+	}
+	
+	private void removeAllListEmeraldWithBought(ResourceLocation itemRegistry, List<List<ITradeList>> trades, Field f_itemToBuy) throws IllegalArgumentException, IllegalAccessException
+	{
+		//com.github.alexthe666.iceandfire.core.ModVillagers$ListItemForSapphires
+		for(List<ITradeList> tradeLevel : trades)
+		{
+			Iterator<ITradeList> iterator = tradeLevel.iterator();
+			while(iterator.hasNext())
+			{
+				ITradeList tradeList = iterator.next();
+				
+				if(tradeList.getClass().getName().equals("com.github.alexthe666.iceandfire.core.ModVillagers$ListItemForSapphires"))
+				{
+					//Reflect and check the item
+					ItemStack stack = (ItemStack) f_itemToBuy.get(tradeList);
+					if(stack.getItem().getRegistryName().equals(itemRegistry))
+					{
+						iterator.remove();
+						RLTweaker.logger.info("Removed a snow villager trade: "+itemRegistry.toString());
+					}
+				}
+			}
+		}
+	}
+	
+	private void removeAllSapphireForItemWithSold(ResourceLocation itemRegistry, List<List<ITradeList>> trades, Field f_buyingItem) throws IllegalArgumentException, IllegalAccessException
+	{
+		//com.github.alexthe666.iceandfire.core.ModVillagers$SapphireForItems
+		for(List<ITradeList> tradeLevel : trades)
+		{
+			Iterator<ITradeList> iterator = tradeLevel.iterator();
+			while(iterator.hasNext())
+			{
+				ITradeList tradeList = iterator.next();
+				
+				if(tradeList.getClass().getName().equals("com.github.alexthe666.iceandfire.core.ModVillagers$SapphireForItems"))
+				{
+					//Reflect and check the item
+					Item item = (Item) f_buyingItem.get(tradeList);
+					if(item.getRegistryName().equals(itemRegistry))
+					{
+						iterator.remove();
+						RLTweaker.logger.info("Removed a snow villager trade: "+itemRegistry.toString());
+					}
+				}
 			}
 		}
 	}

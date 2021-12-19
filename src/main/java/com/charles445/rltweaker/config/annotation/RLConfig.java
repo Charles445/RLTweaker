@@ -21,6 +21,14 @@ public @interface RLConfig
 	}
 	
 	@Retention(RetentionPolicy.RUNTIME)
+	@interface SpecialSignature
+	{
+		SpecialEnum value();
+		String pass();
+		String fail();
+	}
+	
+	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.FIELD)
 	@interface ImprovementsOnly
 	{

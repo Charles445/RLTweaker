@@ -2,19 +2,17 @@ package com.charles445.rltweaker.proxy;
 
 import com.charles445.rltweaker.RLTweaker;
 import com.charles445.rltweaker.client.ClientCommandDebug;
-import com.charles445.rltweaker.client.FixedHatLayer;
-import com.charles445.rltweaker.client.gui.ClassyHatsGuiDelegate;
 import com.charles445.rltweaker.client.gui.GuiDelegator;
-import com.charles445.rltweaker.client.gui.IGuiDelegate;
 import com.charles445.rltweaker.config.ModConfig;
 import com.charles445.rltweaker.handler.ClassyHatsHandlerClient;
+import com.charles445.rltweaker.handler.FBPHandlerClient;
+import com.charles445.rltweaker.handler.GooglyEyesHandlerClient;
 import com.charles445.rltweaker.handler.MantleHandlerClient;
 import com.charles445.rltweaker.handler.PotionCoreHandlerClient;
 import com.charles445.rltweaker.handler.ReskillableHandlerClient;
 import com.charles445.rltweaker.util.ModNames;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.fml.common.Loader;
@@ -55,6 +53,16 @@ public class ClientProxy extends CommonProxy
 		if(Loader.isModLoaded(ModNames.MANTLE) && ModConfig.client.mantle.enabled)
 		{
 			RLTweaker.clientHandlers.put(ModNames.MANTLE, new MantleHandlerClient());
+		}
+		
+		if(Loader.isModLoaded(ModNames.FANCYBLOCKPARTICLES) && ModConfig.client.fbp.enabled)
+		{
+			RLTweaker.clientHandlers.put(ModNames.FANCYBLOCKPARTICLES, new FBPHandlerClient());
+		}
+		
+		if(Loader.isModLoaded(ModNames.GOOGLYEYES) && ModConfig.client.googlyeyes.enabled)
+		{
+			RLTweaker.clientHandlers.put(ModNames.GOOGLYEYES, new GooglyEyesHandlerClient());
 		}
 	}
 	

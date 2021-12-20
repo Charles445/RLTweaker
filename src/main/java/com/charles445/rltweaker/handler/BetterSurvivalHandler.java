@@ -1,5 +1,7 @@
 package com.charles445.rltweaker.handler;
 
+import java.util.UUID;
+
 import javax.annotation.Nullable;
 
 import com.charles445.rltweaker.RLTweaker;
@@ -12,7 +14,11 @@ import com.charles445.rltweaker.util.ModNames;
 import net.minecraft.block.Block;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.init.Blocks;
@@ -21,22 +27,27 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.IEventListener;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.registry.EntityEntry;
+import net.minecraftforge.fml.common.registry.EntityRegistry;
 
 public class BetterSurvivalHandler
 {
+	private final UUID UUID_BLINDNESS = UUID.fromString("a6107045-134f-4c14-a645-75c3ae5c7a27");
+	
 	public BetterSurvivalHandler()
 	{
 		try
 		{
-			if(ModConfig.server.bettersurvival.tunnelingBlacklistEnabled)
-			{
-				//Wrap the BreakEvent  handler
-				CompatUtil.wrapSpecificHandler("BSBreak", BSBreak::new, "com.mujmajnkraft.bettersurvival.eventhandlers.ModEnchantmentHandler", "onEvent(Lnet/minecraftforge/event/world/BlockEvent$BreakEvent;)");			
-			}
+			//Wrap the BreakEvent  handler
+			CompatUtil.wrapSpecificHandler("BSBreak", BSBreak::new, "com.mujmajnkraft.bettersurvival.eventhandlers.ModEnchantmentHandler", "onEvent(Lnet/minecraftforge/event/world/BlockEvent$BreakEvent;)");			
+			
+			//Nunchuk blindness handler
+			CompatUtil.wrapSpecificHandler("BSComboBlindness", BSComboBlindness::new, "com.mujmajnkraft.bettersurvival.eventhandlers.ModWeaponHandler", "onEvent(Lnet/minecraftforge/event/entity/living/LivingEvent$LivingUpdateEvent;)");
 			
 			//Arrow handler
 			CompatUtil.wrapSpecificHandler("BSArrowSpawn", BSArrowSpawn::new, "com.mujmajnkraft.bettersurvival.eventhandlers.ModEnchantmentHandler", "onEvent(Lnet/minecraftforge/event/entity/EntityJoinWorldEvent;)");
@@ -49,6 +60,58 @@ public class BetterSurvivalHandler
 			//Crash on Critical
 			if(e instanceof CriticalException)
 				throw new RuntimeException(e);
+		}
+	}
+	
+	public class BSComboBlindness
+	{
+		private IEventListener handler;
+		public BSComboBlindness(IEventListener handler)
+		{
+			this.handler = handler;
+			MinecraftForge.EVENT_BUS.register(this);
+		}
+		
+		@SubscribeEvent(priority=EventPriority.NORMAL, receiveCanceled=true)
+		public void onLivingUpdate(LivingUpdateEvent event)
+		{
+			handler.invoke(event);
+			
+			if(event.getEntityLiving() instanceof EntityLiving)
+			{
+				IAttributeInstance follow_range = ((EntityLiving) event.getEntityLiving()).getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE);
+				if(follow_range.getModifier(UUID_BLINDNESS) != null)
+				{
+					if(!ModConfig.server.bettersurvival.mobBlindness)
+					{
+						follow_range.removeModifier(UUID_BLINDNESS);
+						return;
+					}
+					
+					EntityEntry entityEntry = EntityRegistry.getEntry(event.getEntityLiving().getClass());
+					if(entityEntry != null)
+					{
+						String mobType = entityEntry.getRegistryName().toString();
+						String[] mobBlacklist = ModConfig.server.bettersurvival.mobBlindnessBlacklist;
+						for(int i=0; i < mobBlacklist.length; i++)
+						{
+							if(mobType.equals(mobBlacklist[i]))
+							{
+								follow_range.removeModifier(UUID_BLINDNESS);
+								return;
+							}
+						}
+					}
+					
+					double sightValue = ModConfig.server.bettersurvival.mobBlindnessPercentage;
+					if(sightValue != 80.0d)
+					{
+						follow_range.removeModifier(UUID_BLINDNESS);
+						sightValue *= -0.01d; //Adjust for percentage and modifier operation 1 (x * (1 + modifier))
+						follow_range.applyModifier(new AttributeModifier(UUID_BLINDNESS, "blind", sightValue, 1));
+					}
+				}
+			}
 		}
 	}
 	
@@ -108,11 +171,31 @@ public class BetterSurvivalHandler
 			MinecraftForge.EVENT_BUS.register(this);
 		}
 		
+		@SubscribeEvent(priority = EventPriority.LOWEST)
+		public void onBreakLowest(final BlockEvent.BreakEvent event)
+		{
+			if(!ModConfig.server.bettersurvival.tunnelingCancelable)
+				return;
+			
+			onBreakAny(event);
+		}
+		
 		@SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled=true)
-		public void onBreak(final BlockEvent.BreakEvent event)
+		public void onBreakHighCancel(final BlockEvent.BreakEvent event)
+		{
+			if(ModConfig.server.bettersurvival.tunnelingCancelable)
+				return;
+			
+			onBreakAny(event);
+		}
+		
+		public void onBreakAny(final BlockEvent.BreakEvent event)
 		{
 			if(disabled || !ModConfig.server.bettersurvival.tunnelingBlacklistEnabled)
+			{
+				handler.invoke(event);
 				return;
+			}
 			
 			if(tunneling == null)
 			{
@@ -122,6 +205,7 @@ public class BetterSurvivalHandler
 					RLTweaker.logger.warn("Couldn't find tunneling enchantment");
 					ErrorUtil.logSilent("Better Survival Missing Enchantment Tunneling");
 					disabled = true;
+					handler.invoke(event);
 					return;
 				}
 			}

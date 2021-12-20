@@ -16,7 +16,6 @@ public class ConfigBetterSurvival
 	
 	@Config.Comment("Enables blacklist for blocks with the tunneling enchantment")
 	@Config.Name("Tunneling Blacklist Enabled")
-	@Config.RequiresMcRestart
 	@RLConfig.ImprovementsOnly("false")
 	@RLConfig.RLCraftTwoEightTwo("false")
 	@RLConfig.RLCraftTwoNine("true")
@@ -36,10 +35,39 @@ public class ConfigBetterSurvival
 	@RLConfig.RLCraftTwoNine("minecraft:chest")
 	public String[] tunnelingBlacklist = {"minecraft:chest"};
 	
+	@Config.Comment("Whether tunneling should fail if the center block break event fails. By default, Better Survival has this false")
+	@Config.Name("Tunneling Cancelable")
+	@RLConfig.ImprovementsOnly("true")
+	@RLConfig.RLCraftTwoEightTwo("false")
+	@RLConfig.RLCraftTwoNine("true")
+	public boolean tunnelingCancelable = true;
+	
 	@Config.Comment("Speed multiplier for the Range enchantment. Default is 2")
 	@Config.Name("Range Speed Multiplier")
 	@RLConfig.ImprovementsOnly("2.0")
 	@RLConfig.RLCraftTwoEightTwo("2.0")
 	@RLConfig.RLCraftTwoNine("2.0")
 	public double rangeSpeedMultiplier = 2.0d;
+	
+	@Config.Comment("Whether blindness affects mobs at all")
+	@Config.Name("Mob Blindness")
+	@RLConfig.ImprovementsOnly("true")
+	@RLConfig.RLCraftTwoEightTwo("true")
+	@RLConfig.RLCraftTwoNine("true")
+	public boolean mobBlindness = true;
+	
+	@Config.Comment("How strong the reduced follow range for mobs is with blindness")
+	@Config.Name("Mob Blindness Percentage")
+	@RLConfig.ImprovementsOnly("80")
+	@RLConfig.RLCraftTwoEightTwo("80")
+	@RLConfig.RLCraftTwoNine("80")
+	@Config.RangeDouble(min=0.0d, max=100.0d)
+	public double mobBlindnessPercentage = 80.0d;
+	
+	@Config.Comment("Blacklist for mob blindness")
+	@Config.Name("Mob Blindness Blacklist")
+	@RLConfig.ImprovementsOnly("examplemod:mob")
+	@RLConfig.RLCraftTwoEightTwo("examplemod:mob")
+	@RLConfig.RLCraftTwoNine("examplemod:mob")
+	public String[] mobBlindnessBlacklist = new String[]{"examplemod:mob"};
 }

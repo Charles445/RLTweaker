@@ -22,7 +22,9 @@ import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.init.Blocks;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
@@ -191,7 +193,7 @@ public class BetterSurvivalHandler
 		
 		public void onBreakAny(final BlockEvent.BreakEvent event)
 		{
-			if(disabled || !ModConfig.server.bettersurvival.tunnelingBlacklistEnabled)
+			if(disabled)
 			{
 				handler.invoke(event);
 				return;
@@ -229,6 +231,7 @@ public class BetterSurvivalHandler
 			boolean tagUp = player.getTags().contains("up");
 			boolean tagDown = player.getTags().contains("down");
 			
+			boolean isBlacklistEnabled = ModConfig.server.bettersurvival.tunnelingBlacklistEnabled;
 			boolean isWhitelist = ModConfig.server.bettersurvival.tunnelingBlacklistIsWhitelist;
 			String[] blacklist = ModConfig.server.bettersurvival.tunnelingBlacklist;
 			
@@ -251,27 +254,39 @@ public class BetterSurvivalHandler
 									boolean isNotCenter = !(x == 0 && y == 0 && z == 0);
 									if(isInRadius && isNotCenter)
 									{
+										BlockPos newpos = event.getPos().add(x,y,z);
+										
+										if(!ModConfig.server.bettersurvival.tunnelingBreaksTileEntities)
+										{
+											//Check tile entity
+											if(world.getTileEntity(newpos) != null)
+												return;
+										}
+										
 										//Check if the block is blacklisted
-										Block block = world.getBlockState(event.getPos().add(x,y,z)).getBlock();
+										Block block = world.getBlockState(newpos).getBlock();
 										
 										//TODO issues with whitelist behavior due to it picking up all sorts of blocks that are normally skipped
 										//Skip air though for sure
 										if(block == Blocks.AIR)
 											continue;
 										
-										String blockRegistry = block.getRegistryName().toString();
-										boolean inBlacklist = false;
-										for(String entry : blacklist)
+										if(isBlacklistEnabled)
 										{
-											if(entry.equals(blockRegistry))
+											String blockRegistry = block.getRegistryName().toString();
+											boolean inBlacklist = false;
+											for(String entry : blacklist)
 											{
-												inBlacklist = true;
-												break;
+												if(entry.equals(blockRegistry))
+												{
+													inBlacklist = true;
+													break;
+												}
 											}
+											
+											if(inBlacklist != isWhitelist)
+												return;
 										}
-										
-										if(inBlacklist != isWhitelist)
-											return;
 									}
 								}
 							}

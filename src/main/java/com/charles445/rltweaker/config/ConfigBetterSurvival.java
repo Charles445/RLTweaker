@@ -42,6 +42,13 @@ public class ConfigBetterSurvival
 	@RLConfig.RLCraftTwoNine("true")
 	public boolean tunnelingCancelable = true;
 	
+	@Config.Comment("Whether tunneling can break tile entities")
+	@Config.Name("Tunneling Breaks Tile Entities")
+	@RLConfig.ImprovementsOnly("false")
+	@RLConfig.RLCraftTwoEightTwo("true")
+	@RLConfig.RLCraftTwoNine("false")
+	public boolean tunnelingBreaksTileEntities = false;
+	
 	@Config.Comment("Speed multiplier for the Range enchantment. Default is 2")
 	@Config.Name("Range Speed Multiplier")
 	@RLConfig.ImprovementsOnly("2.0")

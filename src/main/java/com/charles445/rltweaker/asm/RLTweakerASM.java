@@ -26,6 +26,7 @@ import com.charles445.rltweaker.asm.patch.PatchLessCollisions;
 import com.charles445.rltweaker.asm.patch.PatchLycanitesDupe;
 import com.charles445.rltweaker.asm.patch.PatchMyrmexQueenHiveSpam;
 import com.charles445.rltweaker.asm.patch.PatchOverlayMessage;
+import com.charles445.rltweaker.asm.patch.PatchPathfindingChunkCache;
 import com.charles445.rltweaker.asm.patch.PatchPushReaction;
 import com.charles445.rltweaker.asm.patch.PatchRealBench;
 import com.charles445.rltweaker.asm.patch.PatchReducedSearchSize;
@@ -276,6 +277,12 @@ public class RLTweakerASM implements IClassTransformer
 		if(ASMConfig.getBoolean("general.patches.fixWaystoneScrolls", true))
 		{
 			new PatchWaystoneScroll();
+		}
+		
+		//pathfindingChunkCacheFix
+		if(ASMConfig.getBoolean("general.patches.pathfindingChunkCacheFix", true))
+		{
+			new PatchPathfindingChunkCache();
 		}
 		
 		//new PatchDebug();

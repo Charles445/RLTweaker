@@ -169,4 +169,11 @@ public class PatchConfig
 	@RLConfig.RLCraftTwoEightTwo("true")
 	@RLConfig.RLCraftTwoNine("true")
 	public boolean fixWaystoneScrolls = true;
+	
+	@Config.RequiresMcRestart
+	@Config.Comment("Fixes ghost chunkloading when creating pathfinding chunk caches")
+	@RLConfig.ImprovementsOnly("true")
+	@RLConfig.RLCraftTwoEightTwo("true")
+	@RLConfig.RLCraftTwoNine("true")
+	public boolean pathfindingChunkCacheFix = true;
 }

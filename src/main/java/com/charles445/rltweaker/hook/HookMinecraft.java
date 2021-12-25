@@ -6,6 +6,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
+import javax.annotation.Nullable;
+
 import org.apache.commons.lang3.tuple.Pair;
 
 import com.charles445.rltweaker.RLTweaker;
@@ -28,6 +30,9 @@ import net.minecraft.inventory.ContainerRepair;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.SPacketEffect;
+import net.minecraft.pathfinding.Path;
+import net.minecraft.pathfinding.PathFinder;
+import net.minecraft.pathfinding.PathNavigate;
 import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.server.management.PlayerList;
 import net.minecraft.util.DamageSource;
@@ -35,8 +40,10 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.world.ChunkCache;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.items.IItemHandler;
 
 public class HookMinecraft
@@ -85,10 +92,10 @@ public class HookMinecraft
 		double maxDist = ModConfig.server.minecraft.broadcastedSoundsDistanceLimit;
 		maxDist *= maxDist;
 		for (EntityPlayerMP player : playerList.getPlayers())
-        {
+		{
 			if(player.getDistanceSq(pos) < maxDist)
 				player.connection.sendPacket(packet);
-        }
+		}
 	}
 	
 	public static void aggressiveMotionCheck(EntityLivingBase entity)
@@ -318,5 +325,26 @@ public class HookMinecraft
 		}
 		
 		return destination;
+	}
+	
+	//com/charles445/rltweaker/hook/HookDebug
+	//cacheGetChunkFromChunkCoords
+	//(Lnet/minecraft/world/World;IILnet/minecraft/world/ChunkCache;)Lnet/minecraft/world/chunk/Chunk;
+	@Nullable
+	public static Chunk cacheGetChunkFromChunkCoords(World world, int chunkX, int chunkZ, ChunkCache chunkCache)
+	{
+		//Don't really mess with chunk cache here as it's not fully initialized
+		
+		if(chunkCache instanceof NullableChunkCache)
+		{
+			if(world.isBlockLoaded(new BlockPos((chunkX << 4) + 8, 64, (chunkZ << 4) + 8)))
+				return world.getChunkFromChunkCoords(chunkX, chunkZ);
+			
+			return null;
+		}
+		else
+		{
+			return world.getChunkFromChunkCoords(chunkX, chunkZ);
+		}
 	}
 }

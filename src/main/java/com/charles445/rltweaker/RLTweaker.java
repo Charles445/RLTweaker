@@ -70,7 +70,7 @@ import net.minecraftforge.fml.relauncher.Side;
 	name = RLTweaker.NAME, 
 	version = RLTweaker.VERSION,
 	acceptedMinecraftVersions = "[1.12, 1.13)",
-	acceptableRemoteVersions = "[0.3.0,)", //THIS IS NO LONGER USED
+	acceptableRemoteVersions = "*",
 	dependencies = "required-after:forge@[14.23.5.2859,);"
 	//updateJSON = "https://raw.githubusercontent.com/Charles445/SimpleDifficulty/master/modupdatechecker.json"
 	
@@ -79,9 +79,8 @@ public class RLTweaker
 {
 	public static final String MODID = "rltweaker";
 	public static final String NAME = "RLTweaker";
-	public static final String VERSION = "0.4.7";
+	public static final String VERSION = "0.4.8";
 	public static final VersionDelimiter VERSION_DELIMITER = new VersionDelimiter(VERSION);
-	public static final VersionDelimiter MINIMUM_VERSION = new VersionDelimiter("0.3.0");
 	
 	@Mod.Instance(RLTweaker.MODID)
 	public static RLTweaker instance;
@@ -310,17 +309,17 @@ public class RLTweaker
 		{
 			//System.out.println("checkVersion CLIENT");
 			if(StringUtils.isEmpty(version))
-				return false;
+			{
+				RLTweaker.logger.trace("Client Version: "+new VersionDelimiter("0.0.0"));
+			}
+			else
+			{
+				RLTweaker.logger.trace("Client Version: "+new VersionDelimiter(version));
+			}
 			
-			VersionDelimiter clientvd = new VersionDelimiter(version);
-			
-			RLTweaker.logger.trace("Client Version: "+clientvd);
 			RLTweaker.logger.trace("Local Version: "+VERSION_DELIMITER);
 			
-			boolean result = clientvd.isSameOrNewerVersion(MINIMUM_VERSION);
-			RLTweaker.logger.trace("Result: "+result);
-			
-			return result;
+			return true;
 		}
 	}
 	

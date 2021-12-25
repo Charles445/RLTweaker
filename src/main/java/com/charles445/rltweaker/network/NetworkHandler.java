@@ -55,7 +55,7 @@ public class NetworkHandler
 		}
 		else
 		{
-			return RLTweaker.MINIMUM_VERSION.isSameOrNewerVersion(major, minor, patch);
+			return false;
 		}
 	}
 	

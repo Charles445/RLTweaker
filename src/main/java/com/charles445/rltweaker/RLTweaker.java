@@ -25,6 +25,7 @@ import com.charles445.rltweaker.handler.BetterSurvivalHandler;
 import com.charles445.rltweaker.handler.CarryOnHandler;
 import com.charles445.rltweaker.handler.CharmHandler;
 import com.charles445.rltweaker.handler.ClassyHatsHandler;
+import com.charles445.rltweaker.handler.DynamicSurroundingsHandler;
 import com.charles445.rltweaker.handler.GrapplemodHandler;
 import com.charles445.rltweaker.handler.IceAndFireHandler;
 import com.charles445.rltweaker.handler.InfernalMobsHandler;
@@ -49,6 +50,7 @@ import com.charles445.rltweaker.network.PacketHandler;
 import com.charles445.rltweaker.proxy.CommonProxy;
 import com.charles445.rltweaker.util.ErrorUtil;
 import com.charles445.rltweaker.util.ModNames;
+import com.charles445.rltweaker.util.ServerRunnable;
 import com.charles445.rltweaker.util.VersionDelimiter;
 
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -61,6 +63,7 @@ import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.minecraftforge.fml.common.network.NetworkCheckHandler;
 import net.minecraftforge.fml.relauncher.Side;
 
@@ -79,7 +82,7 @@ public class RLTweaker
 {
 	public static final String MODID = "rltweaker";
 	public static final String NAME = "RLTweaker";
-	public static final String VERSION = "0.4.8";
+	public static final String VERSION = "0.4.9";
 	public static final VersionDelimiter VERSION_DELIMITER = new VersionDelimiter(VERSION);
 	
 	@Mod.Instance(RLTweaker.MODID)
@@ -96,6 +99,7 @@ public class RLTweaker
 	public static Map<String, Object> handlers = new HashMap<>();
 	public static Map<String, Object> clientHandlers = new HashMap<>();
 	
+	public static Map<String, ServerRunnable> serverRunnables = new HashMap<>();
 	
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event)
@@ -250,6 +254,11 @@ public class RLTweaker
 			handlers.put(ModNames.INFERNALMOBS, new InfernalMobsHandler());
 		}
 		
+		if(Loader.isModLoaded(ModNames.DYNAMICSURROUNDINGS) && ModConfig.server.dynamicsurroundings.enabled)
+		{
+			handlers.put(ModNames.DYNAMICSURROUNDINGS, new DynamicSurroundingsHandler());
+		}
+		
 		/*
 		if(Loader.isModLoaded(ModNames.VARIEDCOMMODITIES) && ModConfig.server.variedcommodities.enabled)
 		{
@@ -273,6 +282,14 @@ public class RLTweaker
 		event.registerServerCommand(new CommandDebug());
 		event.registerServerCommand(new CommandErrorReport());
 		event.registerServerCommand(new CommandRLTweakerConfig());
+		
+		this.serverRunnables.values().forEach(runnable -> runnable.onServerStarting());
+	}
+	
+	@Mod.EventHandler
+	public void serverStopping(FMLServerStoppingEvent event)
+	{
+		this.serverRunnables.values().forEach(runnable -> runnable.onServerStopping());
 	}
 	
 	@NetworkCheckHandler

@@ -63,6 +63,22 @@ public class ConfigBetterSurvival
 	@RLConfig.RLCraftTwoNine("true")
 	public boolean mobBlindness = true;
 	
+	@Config.Comment("Replaces the blindness and combo handler entirely for performance")
+	@Config.Name("Replace Combo Handler")
+	@Config.RequiresMcRestart
+	@RLConfig.ImprovementsOnly("true")
+	@RLConfig.RLCraftTwoEightTwo("true")
+	@RLConfig.RLCraftTwoNine("true")
+	public boolean replaceComboHandler = true;
+	
+	@Config.Comment("Replaces the enchantment handler entirely for performance")
+	@Config.Name("Replace Enchantment Handler")
+	@Config.RequiresMcRestart
+	@RLConfig.ImprovementsOnly("true")
+	@RLConfig.RLCraftTwoEightTwo("true")
+	@RLConfig.RLCraftTwoNine("true")
+	public boolean replaceEnchantmentHandler = true;
+	
 	@Config.Comment("How strong the reduced follow range for mobs is with blindness")
 	@Config.Name("Mob Blindness Percentage")
 	@RLConfig.ImprovementsOnly("80")

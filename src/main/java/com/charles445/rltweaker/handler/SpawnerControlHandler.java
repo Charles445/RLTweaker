@@ -1,10 +1,7 @@
 package com.charles445.rltweaker.handler;
 
-import java.util.Collections;
-
 import com.charles445.rltweaker.RLTweaker;
 import com.charles445.rltweaker.config.ModConfig;
-import com.charles445.rltweaker.handler.BetterSurvivalHandler.BSBreak;
 import com.charles445.rltweaker.util.CompatUtil;
 import com.charles445.rltweaker.util.CriticalException;
 import com.charles445.rltweaker.util.ErrorUtil;

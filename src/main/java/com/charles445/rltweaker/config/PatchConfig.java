@@ -176,4 +176,11 @@ public class PatchConfig
 	@RLConfig.RLCraftTwoEightTwo("true")
 	@RLConfig.RLCraftTwoNine("true")
 	public boolean pathfindingChunkCacheFix = true;
+	
+	@Config.RequiresMcRestart
+	@Config.Comment("Attempt to be compatible with alternative server software")
+	@RLConfig.ImprovementsOnly("true")
+	@RLConfig.RLCraftTwoEightTwo("true")
+	@RLConfig.RLCraftTwoNine("true")
+	public boolean serverCompatibility = true;
 }

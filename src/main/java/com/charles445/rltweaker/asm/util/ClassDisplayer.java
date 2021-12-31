@@ -10,6 +10,7 @@ import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.IincInsnNode;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.IntInsnNode;
+import org.objectweb.asm.tree.InvokeDynamicInsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.LineNumberNode;
@@ -27,7 +28,7 @@ public class ClassDisplayer
 	
 	private void println(String s)
 	{
-		System.out.println(s);
+		ASMLogger.info(s);
 	}
 	
 	public ClassDisplayer()
@@ -36,7 +37,7 @@ public class ClassDisplayer
 		{
 			for(Field f : OpcodesHidden.class.getDeclaredFields())
 			{
-				//System.out.println(f.get(null));
+				//logger.info(f.get(null));
 				Object o = f.get(null);
 				if(o instanceof Integer)
 				{
@@ -179,7 +180,29 @@ public class ClassDisplayer
 
 	protected String getInvokeDynamicInsn(final AbstractInsnNode node)
 	{
-		return "getInvokeDynamicInsn";
+		InvokeDynamicInsnNode n = (InvokeDynamicInsnNode)node;
+		StringBuilder sb = new StringBuilder(); 
+		sb.append(opcodeToString(n.getOpcode()));
+		sb.append(" ");
+		sb.append(n.name);
+		sb.append(" ");
+		sb.append(n.desc);
+		sb.append(" ");
+		sb.append(n.bsm == null?"null":n.bsm.getOwner() + " " + n.bsm.getName() + " " + n.bsm.getDesc());
+		sb.append(" - - - ");
+		if(n.bsmArgs == null)
+		{
+			sb.append("null");
+		}
+		else
+		{
+			for(Object o : n.bsmArgs)
+			{
+				sb.append(o == null ? "null" : o.toString());
+				sb.append(" ");
+			}
+		}
+		return sb.toString();
 	}
 
 	protected String getMethodInsn(final AbstractInsnNode node)

@@ -6,6 +6,7 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
+import com.charles445.rltweaker.asm.util.ASMLogger;
 import com.charles445.rltweaker.asm.util.ClassDisplayer;
 import com.charles445.rltweaker.asm.util.TransformUtil;
 
@@ -29,7 +30,7 @@ public class PatchReducedSearchSize extends PatchManager
 					MethodInsnNode getAABBCall = TransformUtil.findNextCallWithOpcodeAndName(first(m_getEntitiesWithinAABB), Opcodes.INVOKEVIRTUAL, "func_175647_a","getEntitiesWithinAABB");
 					if(getAABBCall == null)
 					{
-						System.out.println("Unexpected error, please show the below wall of text to the RLTweaker developer, thanks! Couldn't find getEntitiesWithinAABB or func_175647_a");
+						ASMLogger.warn("Unexpected error, please show the below wall of text to the RLTweaker developer, thanks! Couldn't find getEntitiesWithinAABB or func_175647_a");
 						ClassDisplayer.instance.printMethod(m_getEntitiesWithinAABB);
 						throw new RuntimeException("Couldn't find getEntitiesInAABBexcluding or func_175647_a");
 					}

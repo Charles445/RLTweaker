@@ -63,6 +63,10 @@ public class ModConfig
 		@Config.Name("Classy Hats")
 		public ConfigClassyHats classyhats = new ConfigClassyHats();
 		
+		@Config.Comment("Dynamic Surroundings tweaks")
+		@Config.Name("Dynamic Surroundings")
+		public ConfigDynamicSurroundings dynamicsurroundings = new ConfigDynamicSurroundings();
+		
 		@Config.Comment("Grappling Hook Mod tweaks")
 		@Config.Name("Grappling Hook Mod")
 		public ConfigGrapplemod grapplemod = new ConfigGrapplemod();

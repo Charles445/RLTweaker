@@ -32,7 +32,7 @@ public class PatchFixOldGorgon extends PatchManager
 				{
 					//We're not erroring, as there's a lot of versions of IAF with different interactions
 					this.cancelled = true;
-					System.out.println("Couldn't find func_70636_d or onLivingUpdate in EntityGorgon, skipping");
+					announce("Couldn't find func_70636_d or onLivingUpdate in EntityGorgon, skipping");
 					return;
 				}
 				
@@ -46,14 +46,14 @@ public class PatchFixOldGorgon extends PatchManager
 				if(soundField == null)
 				{
 					this.cancelled = true;
-					System.out.println("Couldn't find any GORGON_ATTACK in EntityGorgon, skipping");
+					announce("Couldn't find any GORGON_ATTACK in EntityGorgon, skipping");
 					return;
 				}
 				
 				if(!soundField.owner.equals("com/github/alexthe666/iceandfire/core/ModSounds"))
 				{
 					this.cancelled = true;
-					System.out.println("GORGON_ATTACK was not owned by ModSounds in onLivingUpdate in EntityGorgon, skipping");
+					announce("GORGON_ATTACK was not owned by ModSounds in onLivingUpdate in EntityGorgon, skipping");
 					return;
 				}
 				
@@ -64,14 +64,14 @@ public class PatchFixOldGorgon extends PatchManager
 					if(!((TypeInsnNode)anchor).desc.equals("com/github/alexthe666/iceandfire/entity/EntityStoneStatue"))
 					{
 						this.cancelled = true;
-						System.out.println("First instantiation found was not EntityStoneStatue in onLivingUpdate in EntityGorgon, patcher is confused, skipping");
+						announce("First instantiation found was not EntityStoneStatue in onLivingUpdate in EntityGorgon, patcher is confused, skipping");
 						return;
 					}
 				}
 				else
 				{
 					this.cancelled = true;
-					System.out.println("Couldn't find an instantiation at all in onLivingUpdate in EntityGorgon, skipping");
+					announce("Couldn't find an instantiation at all in onLivingUpdate in EntityGorgon, skipping");
 					return;
 				}
 				

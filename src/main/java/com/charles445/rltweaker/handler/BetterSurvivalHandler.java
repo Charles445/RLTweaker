@@ -1,11 +1,13 @@
 package com.charles445.rltweaker.handler;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
 
 import com.charles445.rltweaker.RLTweaker;
 import com.charles445.rltweaker.config.ModConfig;
+import com.charles445.rltweaker.reflect.BetterSurvivalReflect;
 import com.charles445.rltweaker.util.CompatUtil;
 import com.charles445.rltweaker.util.CriticalException;
 import com.charles445.rltweaker.util.ErrorUtil;
@@ -22,7 +24,7 @@ import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.init.Blocks;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.init.MobEffects;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -40,11 +42,17 @@ import net.minecraftforge.fml.common.registry.EntityRegistry;
 public class BetterSurvivalHandler
 {
 	private final UUID UUID_BLINDNESS = UUID.fromString("a6107045-134f-4c14-a645-75c3ae5c7a27");
+	private final UUID UUID_COMPENSATION = UUID.fromString("a6107045-134f-4c04-a645-75c3ae5c7a27");
+	private final UUID UUID_SPEED = UUID.fromString("e6107045-134f-4c54-a645-75c3ae5c7a27");
+	
+	BetterSurvivalReflect reflector;
 	
 	public BetterSurvivalHandler()
 	{
 		try
 		{
+			reflector = new BetterSurvivalReflect();
+			
 			//Wrap the BreakEvent  handler
 			CompatUtil.wrapSpecificHandler("BSBreak", BSBreak::new, "com.mujmajnkraft.bettersurvival.eventhandlers.ModEnchantmentHandler", "onEvent(Lnet/minecraftforge/event/world/BlockEvent$BreakEvent;)");			
 			
@@ -53,6 +61,9 @@ public class BetterSurvivalHandler
 			
 			//Arrow handler
 			CompatUtil.wrapSpecificHandler("BSArrowSpawn", BSArrowSpawn::new, "com.mujmajnkraft.bettersurvival.eventhandlers.ModEnchantmentHandler", "onEvent(Lnet/minecraftforge/event/entity/EntityJoinWorldEvent;)");
+		
+			//Enchantment handler
+			CompatUtil.wrapSpecificHandler("BSEnchantment", BSEnchantment::new, "com.mujmajnkraft.bettersurvival.eventhandlers.ModEnchantmentHandler", "onEvent(Lnet/minecraftforge/event/entity/living/LivingEvent$LivingUpdateEvent;)");
 		}
 		catch (Exception e)
 		{
@@ -65,19 +76,149 @@ public class BetterSurvivalHandler
 		}
 	}
 	
+	public class BSEnchantment
+	{
+		private IEventListener handler;
+		private boolean replaceEnchantment;
+		public BSEnchantment(IEventListener handler)
+		{
+			this.handler = handler;
+			this.replaceEnchantment = ModConfig.server.bettersurvival.replaceEnchantmentHandler;
+			MinecraftForge.EVENT_BUS.register(this);
+		}
+		
+		private void replacedEnchantment(LivingUpdateEvent event)
+		{
+			EntityLivingBase living = event.getEntityLiving();
+			
+			if(reflector.o_ConfigHandler_agilitylevel > 0)
+			{
+				int agilityLevel = EnchantmentHelper.getMaxEnchantmentLevel(reflector.o_ModEnchantments_agility, living);
+				if(agilityLevel > 0)
+				{
+					IAttributeInstance movement_speed = living.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED);				
+					double strength = 0.01 * agilityLevel;
+					AttributeModifier modifier = new AttributeModifier(UUID_SPEED, "agility", strength, 0);
+					
+					if(!movement_speed.hasModifier(modifier))
+					{
+						movement_speed.applyModifier(modifier);
+					}
+					else if(movement_speed.getModifier(UUID_SPEED).getAmount() != strength)
+					{
+						movement_speed.removeModifier(UUID_SPEED);
+						movement_speed.applyModifier(modifier);
+					}
+				}
+				else
+				{
+					living.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).removeModifier(UUID_SPEED);
+				}
+			}
+			else
+			{
+				living.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).removeModifier(UUID_SPEED);
+			}
+			
+			if(reflector.o_ConfigHandler_vitalitylevel > 0 && living instanceof EntityPlayer)
+			{
+				int vitalityLevel = EnchantmentHelper.getMaxEnchantmentLevel(reflector.o_ModEnchantments_vitality, living);
+				
+				if(vitalityLevel > 0)
+				{
+					EntityPlayer player = (EntityPlayer)living;
+					if(player.getFoodStats().getFoodLevel() >= 18 && player.getEntityWorld().getGameRules().getBoolean("naturalRegeneration"))
+					{
+						if(player.getHealth() < player.getMaxHealth() && player.ticksExisted % (40 / vitalityLevel) == 0)
+						{
+							player.heal(1.0f);
+						}
+					}
+				}
+			}
+		}
+		
+		@SubscribeEvent(priority=EventPriority.HIGHEST, receiveCanceled=true)
+		public void onLivingUpdate(LivingUpdateEvent event)
+		{
+			if(replaceEnchantment)
+			{
+				this.replacedEnchantment(event);
+			}
+			else
+			{
+				handler.invoke(event);
+			}
+		}
+	}
+	
 	public class BSComboBlindness
 	{
 		private IEventListener handler;
+		private boolean replaceComboHandler;
 		public BSComboBlindness(IEventListener handler)
 		{
 			this.handler = handler;
+			this.replaceComboHandler = ModConfig.server.bettersurvival.replaceComboHandler;
 			MinecraftForge.EVENT_BUS.register(this);
+		}
+		
+		private void replacedComboHandler(LivingUpdateEvent event)
+		{
+			if(event.getEntityLiving() instanceof EntityLiving)
+			{
+				EntityLiving living = (EntityLiving) event.getEntityLiving();
+				
+				living.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).removeModifier(UUID_BLINDNESS);
+				
+				if(living.getActivePotionEffect(MobEffects.BLINDNESS) != null)
+				{
+					AttributeModifier modifier = new AttributeModifier(UUID_BLINDNESS, "blind", -0.8, 1);
+					living.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).applyModifier(modifier);
+				}
+			}
+			else if(event.getEntityLiving() instanceof EntityPlayer)
+			{
+				EntityPlayer player = (EntityPlayer) event.getEntityLiving();
+				
+				player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).removeModifier(UUID_COMPENSATION);
+				
+				//nunchaku
+				if(reflector.hasINunchakuCombo(player))
+				{
+					Object combo = reflector.getINunchakuCombo(player);
+					
+					try
+					{
+						if(reflector.c_ItemNunchaku.isInstance(player.getHeldItemMainhand().getItem()))
+						{
+							if(reflector.getComboPower(combo) > 0)
+								reflector.countDown(combo);
+						}
+						else
+						{
+							reflector.setComboTime(combo, 0);
+						}
+					}
+					catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
+					{
+						ErrorUtil.logSilent("BetterSurvival Nunchaku Combo Invocation");
+					}
+				}
+			}
 		}
 		
 		@SubscribeEvent(priority=EventPriority.NORMAL, receiveCanceled=true)
 		public void onLivingUpdate(LivingUpdateEvent event)
 		{
-			handler.invoke(event);
+			if(replaceComboHandler)
+			{
+				this.replacedComboHandler(event);
+			}
+			else
+			{
+				handler.invoke(event);
+			}
 			
 			if(event.getEntityLiving() instanceof EntityLiving)
 			{

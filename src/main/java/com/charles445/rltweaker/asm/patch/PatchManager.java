@@ -1,6 +1,7 @@
 package com.charles445.rltweaker.asm.patch;
 
 import com.charles445.rltweaker.asm.RLTweakerASM;
+import com.charles445.rltweaker.asm.util.ASMLogger;
 
 public abstract class PatchManager implements IPatchManager
 {
@@ -13,7 +14,7 @@ public abstract class PatchManager implements IPatchManager
 	
 	public PatchManager(String name)
 	{
-		System.out.println("RLTweakerASM PatchManager: "+name);
+		ASMLogger.info("RLTweakerASM PatchManager: "+name);
 		this.name = name;
 	}
 	

@@ -9,6 +9,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.charles445.rltweaker.asm.util.ASMLogger;
+
 //FoamFix loads these three classes... Seems to work fine?
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
@@ -37,7 +39,7 @@ public class ASMConfig
 			if(prop == null)
 			{
 				//Warn
-				System.out.println("WARNING: unknown config request: "+id);
+				ASMLogger.warn("WARNING: unknown config request: "+id);
 				return _default;
 			}
 			
@@ -67,7 +69,7 @@ public class ASMConfig
 		
 		setup = true;
 		
-		System.out.println("ConfigSetup is running.");
+		ASMLogger.info("ConfigSetup is running.");
 		
 		//Look for the RLTweaker config
 		Path path = getConfig("rltweaker");
@@ -83,17 +85,17 @@ public class ASMConfig
 	{
 		if(config != null)
 		{
-			//System.out.println("Processing configuration");
+			//logger.info("Processing configuration");
 			
 			/*
-			System.out.println("CATEGORIES");
+			logger.info"CATEGORIES");
 			for(String s : config.getCategoryNames())
 			{
-				System.out.println(s);
+				logger.info(s);
 			}
 			*/
 			
-			//System.out.println("Populating configMap");
+			//logger.info("Populating configMap");
 			
 			for(String s : config.getCategoryNames())
 			{
@@ -101,11 +103,11 @@ public class ASMConfig
 			}
 			
 			/*
-			System.out.println("Dumping configuration keys");
+			logger.info("Dumping configuration keys");
 			
 			for(String s : configMap.keySet())
 			{
-				System.out.println(s);
+				logger.info(s);
 			}
 			*/
 			
@@ -113,7 +115,7 @@ public class ASMConfig
 		}
 		else
 		{
-			System.out.println("Config does not exist, patcher will assume defaults");
+			ASMLogger.info("Config does not exist, patcher will assume defaults");
 		}
 	}
 	
@@ -124,7 +126,7 @@ public class ASMConfig
 			String key = header + "." + entry.getKey();
 			if(configMap.containsKey(key))
 			{
-				System.out.println("WARNING: Duplicate key for: "+key);
+				ASMLogger.warn("WARNING: Duplicate key for: "+key);
 			}
 			
 			configMap.put(key, entry.getValue());

@@ -9,6 +9,8 @@ import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import com.charles445.rltweaker.asm.helper.ASMHelper;
+import com.charles445.rltweaker.asm.util.ASMInfo;
+import com.charles445.rltweaker.asm.util.ASMLogger;
 import com.charles445.rltweaker.asm.util.TransformUtil;
 
 public class PatchPathfindingChunkCache extends PatchManager
@@ -22,6 +24,13 @@ public class PatchPathfindingChunkCache extends PatchManager
 			@Override
 			public void patch(ClassNode clazzNode)
 			{
+				if(ASMInfo.hasSponge)
+				{
+					ASMLogger.info("Sponge was detected, skipping patch");
+					this.cancelled = true;
+					return;
+				}
+				
 				MethodNode m_init = this.findMethod(clazzNode, "<init>");
 				
 				if(m_init == null)
@@ -47,6 +56,13 @@ public class PatchPathfindingChunkCache extends PatchManager
 			@Override
 			public void patch(ClassNode clazzNode)
 			{
+				if(ASMInfo.hasSponge)
+				{
+					ASMLogger.info("Sponge was detected, skipping patch");
+					this.cancelled = true;
+					return;
+				}
+				
 				if(true)
 				{
 					MethodNode m_getPathToPos = this.findMethod(clazzNode, "func_179680_a", "getPathToPos");

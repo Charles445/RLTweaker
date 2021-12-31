@@ -1,17 +1,27 @@
 package com.charles445.rltweaker.asm.patch;
 
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 import javax.annotation.Nullable;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
+import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
 import com.charles445.rltweaker.asm.helper.ASMHelper;
+import com.charles445.rltweaker.asm.util.ASMLogger;
+import com.charles445.rltweaker.asm.util.ModTransformer;
 
 public abstract class Patch implements IPatch
 {
+	public static Set<String> loadedTransformers = ConcurrentHashMap.newKeySet();
+	
+	
 	protected String target;
 	protected int flags;
 	protected IPatchManager manager;
@@ -23,6 +33,19 @@ public abstract class Patch implements IPatch
 		this.target = target;
 		this.flags = flags;
 		this.cancelled = false;
+	}
+	
+	public boolean hasModTransformer(ModTransformer mod)
+	{
+		String search = mod.getTransformerClassName();
+		
+		for(String transformer : loadedTransformers)
+		{
+			if(transformer.contains(search))
+				return true;
+		}
+		
+		return false;
 	}
 	
 	@Override
@@ -56,7 +79,7 @@ public abstract class Patch implements IPatch
 	
 	protected void announce(String s)
 	{
-		System.out.println("RLTweakerASM: "+s);
+		ASMLogger.info(s);
 	}
 	
 	//FIND FIRST METHOD (by string)
@@ -254,5 +277,27 @@ public abstract class Patch implements IPatch
 	protected void insertInsnBefore(MethodNode methodNode, AbstractInsnNode anchor, int opcode)
 	{
 		methodNode.instructions.insertBefore(anchor, new InsnNode(opcode));
+	}
+	
+	/** Whether the method references a specific owner at any point, for compatibility purposes **/
+	protected boolean methodReferencesOwner(MethodNode m, String owner)
+	{
+		AbstractInsnNode node = m.instructions.getFirst();
+		while(node != null)
+		{
+			if(node.getType() == AbstractInsnNode.METHOD_INSN)
+			{
+				if(((MethodInsnNode)node).owner.equals(owner))
+					return true;
+			}
+			else if(node.getType() == AbstractInsnNode.FIELD_INSN)
+			{
+				if(((FieldInsnNode)node).owner.equals(owner))
+					return true;
+			}
+			node = node.getNext();
+		}
+		
+		return false;
 	}
 }

@@ -1,7 +1,12 @@
 package com.charles445.rltweaker.util;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+
+import javax.annotation.Nullable;
+
+import com.charles445.rltweaker.RLTweaker;
 
 public class ReflectUtil
 {
@@ -68,5 +73,93 @@ public class ReflectUtil
 		}
 		
 		return fields;
+	}
+	
+	@Nullable
+	public static Class toArrayClass(Class clazz)
+	{
+		if(clazz == null)
+			return null;
+		
+		return Array.newInstance(clazz, 0).getClass();	
+	}
+	
+	//Nullable
+
+	@Nullable
+	public static Field findFieldAnyOrNull(Class clazz, String nameA, String nameB)
+	{
+		try
+		{
+			try
+			{
+				return findField(clazz, nameA);
+			}
+			catch(Exception e)
+			{
+				return findField(clazz, nameB);
+			}
+		}
+		catch(Exception e)
+		{
+			RLTweaker.logger.error("findFieldAnyOrNull failure for: "+nameA+" and "+nameB);
+			return null;
+		}
+	}
+	
+	@Nullable
+	public static Field findFieldOrNull(Class clazz, String nameA)
+	{
+		try
+		{
+			return findField(clazz, nameA);
+		}
+		catch(Exception e)
+		{
+			RLTweaker.logger.error("findFieldOrNull failure for: "+nameA);
+			return null;
+		}
+	}
+	
+	@Nullable
+	public static Class findClassOrNull(String cfn)
+	{
+		try
+		{
+			return Class.forName(cfn);
+		}
+		catch(Exception e)
+		{
+			RLTweaker.logger.error("findClassOrNull failure for: "+cfn);
+			return null;
+		}
+	}
+	
+	@Nullable
+	public static Method findMethodOrNull(Class clazz, String name)
+	{
+		try
+		{
+			return findMethod(clazz, name);
+		}
+		catch(Exception e)
+		{
+			RLTweaker.logger.error("findMethodOrNull failure for: "+clazz==null?"null":clazz.getName()+" "+name);
+			return null;
+		}
+	}
+	
+	@Nullable
+	public static Method findMethodOrNull(Class clazz, String name, Class... params)
+	{
+		try
+		{
+			return findMethod(clazz, name, params);
+		}
+		catch(Exception e)
+		{
+			RLTweaker.logger.error("findMethodOrNull failure for: "+clazz==null?"null":clazz.getName()+" "+name);
+			return null;
+		}
 	}
 }

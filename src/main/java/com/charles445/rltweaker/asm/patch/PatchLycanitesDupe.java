@@ -15,10 +15,7 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import com.charles445.rltweaker.asm.helper.ObfHelper;
-import com.charles445.rltweaker.asm.util.ClassDisplayer;
 import com.charles445.rltweaker.asm.util.TransformUtil;
-
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 public class PatchLycanitesDupe extends PatchManager
 {
@@ -33,8 +30,8 @@ public class PatchLycanitesDupe extends PatchManager
 			@Override
 			public void patch(ClassNode clazzNode)
 			{
-				System.out.println("Patching InventoryCreature");
-				System.out.println("If your game crashes immediately after this, change the config rltweaker/patches/lycanitesPetDupeFix to false!");
+				announce("Patching InventoryCreature");
+				announce("If your game crashes immediately after this, change the config rltweaker/patches/lycanitesPetDupeFix to false!");
 				
 				AbstractInsnNode anchor = null;
 				

@@ -9,6 +9,7 @@ import org.objectweb.asm.tree.ClassNode;
 
 import com.charles445.rltweaker.asm.helper.ASMHelper;
 import com.charles445.rltweaker.asm.patch.IPatch;
+import com.charles445.rltweaker.asm.patch.Patch;
 import com.charles445.rltweaker.asm.patch.PatchAggressiveMotionChecker;
 import com.charles445.rltweaker.asm.patch.PatchAnvilDupe;
 import com.charles445.rltweaker.asm.patch.PatchBetterCombatCriticalsFix;
@@ -31,12 +32,22 @@ import com.charles445.rltweaker.asm.patch.PatchPushReaction;
 import com.charles445.rltweaker.asm.patch.PatchRealBench;
 import com.charles445.rltweaker.asm.patch.PatchReducedSearchSize;
 import com.charles445.rltweaker.asm.patch.PatchWaystoneScroll;
+import com.charles445.rltweaker.asm.patch.compat.PatchBrokenTransformers;
+import com.charles445.rltweaker.asm.patch.compat.PatchCatServer;
+import com.charles445.rltweaker.asm.patch.compat.PatchCraftBukkit;
+import com.charles445.rltweaker.asm.patch.compat.PatchSponge;
+import com.charles445.rltweaker.asm.util.ASMInfo;
+import com.charles445.rltweaker.asm.util.ASMLogger;
+import com.charles445.rltweaker.asm.util.ServerType;
 
 import net.minecraft.launchwrapper.IClassTransformer;
+import net.minecraft.launchwrapper.LaunchClassLoader;
 
 public class RLTweakerASM implements IClassTransformer
 {
 	private boolean run = true;
+	
+	private boolean firstrun = false;
 	
 	//private boolean debug = true;
 	
@@ -46,15 +57,19 @@ public class RLTweakerASM implements IClassTransformer
 	{
 		super();
 		
+		ASMInfo.cacheServerType(this.getClass().getClassLoader());
+		
+		ASMLogger.info("Server Type: "+ASMInfo.serverType.name());
+		
 		this.run = ASMConfig.getBoolean("general.patches.ENABLED", true);
 		
 		if(this.run)
 		{
-			System.out.println("Patcher is enabled");
+			ASMLogger.info("Patcher is enabled");
 		}
 		else
 		{
-			System.out.println("Patcher has been disabled");
+			ASMLogger.info("Patcher has been disabled");
 			return;
 		}
 		
@@ -64,8 +79,36 @@ public class RLTweakerASM implements IClassTransformer
 	@Override
 	public byte[] transform(String name, String transformedName, byte[] basicClass)
 	{
+		if(true)
+		{
+			//Test to compute frames on EVERYTHING, although this test skips RLTweaker transformers entirely
+			//return ASMHelper.writeClassToBytes(ASMHelper.readClassFromBytes(basicClass), ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
+		}
+		
 		if(!this.run)
 			return basicClass;
+		
+		if(!firstrun)
+		{
+			firstrun = true;
+			
+			//Gather up loaded transformers in order to make informed decisions later
+			if(this.getClass().getClassLoader() instanceof LaunchClassLoader)
+			{
+				LaunchClassLoader loader = (LaunchClassLoader)this.getClass().getClassLoader();
+				for(IClassTransformer transformer : loader.getTransformers())
+				{
+					if(transformer != null)
+					{
+						Patch.loadedTransformers.add(transformer.getClass().getName());
+					}
+				}
+			}
+			else
+			{
+				ASMLogger.warn("WARNING: RLTweaker transformer firstrun is not loaded by LaunchClassLoader! Some mod and server compatibility will fail!");
+			}
+		}
 		
 		//if(this.debug)
 		//	PatchDebug.transformAll(basicClass);
@@ -73,7 +116,7 @@ public class RLTweakerASM implements IClassTransformer
 		//Check for patches
 		if(transformMap.containsKey(transformedName))
 		{
-			System.out.println("Patch exists for "+transformedName);
+			ASMLogger.info("Patch exists for "+transformedName);
 			int flags = 0;
 			int oldFlags = 0;
 			
@@ -100,9 +143,9 @@ public class RLTweakerASM implements IClassTransformer
 				}
 				catch(Exception e)
 				{
-					System.out.println("Failed at patch "+patch.getPatchManager().getName());
-					System.out.println("Failed to write "+transformedName);
-					e.printStackTrace();
+					ASMLogger.warn("Failed at patch "+patch.getPatchManager().getName());
+					ASMLogger.warn("Failed to write "+transformedName);
+					ASMLogger.error("Failed Patch Trace: ", e);
 					return basicClass;
 				}
 			}
@@ -110,13 +153,13 @@ public class RLTweakerASM implements IClassTransformer
 			//TODO verbose
 			if(ranAnyPatch)
 			{
-				System.out.println("Writing class "+transformedName+" with flags "+flagsAsString(flags));
+				ASMLogger.info("Writing class "+transformedName+" with flags "+flagsAsString(flags));
 				return ASMHelper.writeClassToBytes(clazzNode, flags);
 				//return ASMHelper.writeClassToBytes(clazzNode, ClassWriter.COMPUTE_FRAMES|ClassWriter.COMPUTE_MAXS);
 			}
 			else
 			{
-				System.out.println("All patches for class "+transformedName+" were cancelled, skipping...");
+				ASMLogger.info("All patches for class "+transformedName+" were cancelled, skipping...");
 				return basicClass;
 			}
 			
@@ -284,6 +327,28 @@ public class RLTweakerASM implements IClassTransformer
 		{
 			new PatchPathfindingChunkCache();
 		}
+		
+		//serverCompatibility
+		if(ASMConfig.getBoolean("general.patches.serverCompatibility", true))
+		{
+			if(ASMInfo.hasSponge)
+			{
+				new PatchSponge();
+			}
+			
+			if(ASMInfo.serverType == ServerType.CATSERVER)
+			{
+				new PatchBrokenTransformers();
+				new PatchCatServer();
+				new PatchCraftBukkit();
+			}
+			else if(ASMInfo.serverType == ServerType.MOHIST)
+			{
+				new PatchBrokenTransformers();
+				new PatchCraftBukkit();
+			}
+		}
+		
 		
 		//new PatchDebug();
 		

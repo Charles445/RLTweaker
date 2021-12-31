@@ -36,6 +36,8 @@ import com.google.common.collect.Sets;
  * From the very helpful ASMHelper pack
  * 
  * https://github.com/squeek502/ASMHelper
+ * 
+ * Modified to interact with ComputeClassWriter by Eric Bruneton
  */
 public class ASMHelper
 {
@@ -137,10 +139,12 @@ public class ASMHelper
 
 	/**
 	 * Overload of {@link #writeClassToBytesNoDeobf(ClassNode)} with a flags parameter.
+	 * 
+	 * Modified to use ComputeClassWriter
 	 */
 	public static byte[] writeClassToBytesNoDeobf(ClassNode classNode, int flags)
 	{
-		ClassWriter writer = new ClassWriter(flags);
+		ClassWriter writer = new ComputeClassWriter(flags);
 		classNode.accept(writer);
 		return writer.toByteArray();
 	}

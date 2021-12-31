@@ -11,6 +11,7 @@ public class ModNames
 	public static final String CHARM = "charm";
 	public static final String CLASSYHATS = "classyhats";
 	public static final String DEFILEDLANDS = "defiledlands";
+	public static final String DYNAMICSURROUNDINGS = "dsurround";
 	public static final String DYNAMICTREES = "dynamictrees";
 	public static final String ELENAIDODGE = "elenaidodge";
 	public static final String FAMILIARFAUNA = "familiarfauna";
@@ -33,6 +34,7 @@ public class ModNames
 	public static final String ROGUELIKEDUNGEONS = "roguelike";
 	public static final String RUINS = "ruins";
 	public static final String RUSTIC = "rustic";
+	public static final String SERENESEASONS = "sereneseasons";
 	public static final String SOMANYENCHANTMENTS = "somanyenchantments";
 	public static final String SPAWNERCONTROL = "spawnercontrol";
 	public static final String SRPARASITES = "srparasites";

@@ -25,7 +25,7 @@ public class PatchFixOldHippocampus extends PatchManager
 				{
 					//We're not erroring, as there's a lot of versions of IAF with different interactions
 					this.cancelled = true;
-					System.out.println("Couldn't find openGUI in EntityHippocampus, skipping");
+					announce("Couldn't find openGUI in EntityHippocampus, skipping");
 					return;
 				}
 				
@@ -38,7 +38,7 @@ public class PatchFixOldHippocampus extends PatchManager
 				if(anchor == null)
 				{
 					this.cancelled = true;
-					System.out.println("Couldn't find isRemote in EntityHippocampus, skipping");
+					announce("Couldn't find isRemote in EntityHippocampus, skipping");
 					return;
 				}
 				
@@ -47,7 +47,7 @@ public class PatchFixOldHippocampus extends PatchManager
 				if(anchor == null)
 				{
 					this.cancelled = true;
-					System.out.println("Unexpected end of method in EntityHippocampus, skipping");
+					announce("Unexpected end of method in EntityHippocampus, skipping");
 					return;
 				}
 				
@@ -55,7 +55,7 @@ public class PatchFixOldHippocampus extends PatchManager
 				if(anchor.getType() != AbstractInsnNode.JUMP_INSN)
 				{
 					this.cancelled = true;
-					System.out.println("Remote check was not a jump, skipping");
+					announce("Remote check was not a jump, skipping");
 					return;
 				}
 				
@@ -64,7 +64,7 @@ public class PatchFixOldHippocampus extends PatchManager
 				if(remoteJump.getOpcode() != Opcodes.IFEQ)
 				{
 					this.cancelled = true;
-					System.out.println("Remote check was server, skipping");
+					announce("Remote check was server, skipping");
 					return;
 				}
 				

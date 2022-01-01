@@ -21,4 +21,12 @@ public class ConfigSpawnerControl
 	@RLConfig.RLCraftTwoEightTwo("true")
 	@RLConfig.RLCraftTwoNine("true")
 	public boolean synchronizeSpawnerIteration = true;
+	
+	@Config.Comment("Removes world ticks, which are used to create smoke particles and remove obsolete spawners, to save performance.")
+	@Config.Name("Remove World Ticks")
+	@Config.RequiresMcRestart
+	@RLConfig.ImprovementsOnly("true")
+	@RLConfig.RLCraftTwoEightTwo("true")
+	@RLConfig.RLCraftTwoNine("true")
+	public boolean removeWorldTicks = true;
 }

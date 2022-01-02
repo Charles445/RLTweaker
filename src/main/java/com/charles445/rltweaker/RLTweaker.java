@@ -124,11 +124,6 @@ public class RLTweaker
 			handlers.put(ModNames.ROGUELIKEDUNGEONS, new RoguelikeHandler());
 		}
 		
-		if(Loader.isModLoaded(ModNames.RUINS) && ModConfig.server.ruins.enabled)
-		{
-			handlers.put(ModNames.RUINS, new RuinsHandler());
-		}
-		
 		if(Loader.isModLoaded(ModNames.WAYSTONES) && ModConfig.server.waystones.enabled)
 		{
 			handlers.put(ModNames.WAYSTONES, new WaystonesHandler());
@@ -199,6 +194,11 @@ public class RLTweaker
 		if(Loader.isModLoaded(ModNames.BAUBLES) && ModConfig.server.baubles.enabled)
 		{
 			handlers.put(ModNames.BAUBLES, new BaublesHandler());
+		}
+		
+		if(Loader.isModLoaded(ModNames.RUINS) && ModConfig.server.ruins.enabled)
+		{
+			handlers.put(ModNames.RUINS, new RuinsHandler());
 		}
 		
 		JsonConfig.init();

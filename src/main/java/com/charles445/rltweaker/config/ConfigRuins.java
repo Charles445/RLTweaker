@@ -28,4 +28,12 @@ public class ConfigRuins
 	@RLConfig.RLCraftTwoEightTwo("20000")
 	@RLConfig.RLCraftTwoNine("20000")
 	public int chunkThreshold = 20000;
+	
+	@Config.Comment("Removes the RUINSTRIGGER tag for custom ruins structures as it is very resource intensive and no custom ruins seem to use it.")
+	@Config.Name("Remove RUINSTRIGGER Functionality")
+	@Config.RequiresMcRestart
+	@RLConfig.ImprovementsOnly("true")
+	@RLConfig.RLCraftTwoEightTwo("true")
+	@RLConfig.RLCraftTwoNine("true")
+	public boolean removeRUINSTRIGGERFunctionality = true;
 }

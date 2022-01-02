@@ -3,9 +3,12 @@ package com.charles445.rltweaker.hook;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 import javax.annotation.Nullable;
 
+import com.charles445.rltweaker.RLTweaker;
+import com.charles445.rltweaker.util.ErrorUtil;
 import com.charles445.rltweaker.util.ReflectUtil;
 
 import mcp.MethodsReturnNonnullByDefault;
@@ -124,6 +127,7 @@ public class HookRealBench
 	{
 		//Almost full remake to avoid final stackResult value yet keep extension
 		//Considering using an access transformer instead...
+		//Now uses reflection to try and avoid using an alternative stack result that breaks on certain servers
 		
 		//Code snippets taken from RealBench, as expected
 		
@@ -131,11 +135,81 @@ public class HookRealBench
 		private TileEntity mTile;
 		private NonNullList<ItemStack> _stackResult = NonNullList.<ItemStack>withSize(1, ItemStack.EMPTY);
 		
+		//Compatibility
+		private static boolean setupReflection = false;
+		private static boolean reflectedSuccessfully = false;
+		private static Field f_Field_modifiers = null;
+		private static Field f_InventoryCraftResult_stackResult = null;
+		
 		public Result(Container con)
 		{
 			super(); //there isn't one
+			
+			//Setup reflection for compatibility
+			if(!setupReflection)
+				setupReflection();
+			
 			this.setup(con);
 		}
+		
+		private void setupReflection()
+		{
+			setupReflection = true;
+			
+			try
+			{
+				//Cache reflection and remove final from field
+				f_Field_modifiers = ReflectUtil.findField(Field.class, "modifiers");		
+				f_InventoryCraftResult_stackResult = ReflectUtil.findFieldAny(InventoryCraftResult.class, "field_70467_a", "stackResult");
+				f_Field_modifiers.setInt(f_InventoryCraftResult_stackResult, f_InventoryCraftResult_stackResult.getModifiers() & ~Modifier.FINAL);
+				reflectedSuccessfully = true;
+				RLTweaker.logger.info("HookRealBench reflected successfully!");
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+				ErrorUtil.logSilent("RealBench Compatibility Reflection Setup");
+			}
+		}
+		
+		//Compatibility getter and setter
+		private NonNullList<ItemStack> getStackResult()
+		{
+			if(reflectedSuccessfully)
+			{
+				try
+				{
+					return (NonNullList<ItemStack>) f_InventoryCraftResult_stackResult.get(this);
+				}
+				catch (IllegalArgumentException | IllegalAccessException e)
+				{
+					ErrorUtil.logSilent("RealBench Compatibility Reflection Invocation Get");
+				}
+			}
+			
+			return _stackResult;
+		}
+		
+		private void setStackResult(NonNullList<ItemStack> stack)
+		{
+			if(reflectedSuccessfully)
+			{
+				try
+				{
+					f_InventoryCraftResult_stackResult.set(this, stack);
+					return;
+				}
+				catch (IllegalArgumentException | IllegalAccessException e)
+				{
+					ErrorUtil.logSilent("RealBench Compatibility Reflection Invocation Set");
+				}
+			}
+			
+			this._stackResult = stack;
+		}
+		
+		//DO NOT REFERENCE _stackResult DIRECTLY!
+		//Use the compatibility setters and getters!
 		
 		private void setup(Container con)
 		{
@@ -153,7 +227,7 @@ public class HookRealBench
 			if(stackGet == null)
 				return;
 			
-			this._stackResult = stackGet;
+			setStackResult(stackGet);
 		}
 		
 		@Override
@@ -174,7 +248,7 @@ public class HookRealBench
 		@Override
 		public void setInventorySlotContents(final int index, @Nullable final ItemStack stack)
 		{
-			this._stackResult.set(0, stack);
+			this.getStackResult().set(0, stack);
 			this.markDirty();
 		}
 		
@@ -184,7 +258,7 @@ public class HookRealBench
 		{
 			try
 			{
-				return ItemStackHelper.getAndRemove(this._stackResult, 0);
+				return ItemStackHelper.getAndRemove(this.getStackResult(), 0);
 			}
 			finally
 			{
@@ -195,7 +269,7 @@ public class HookRealBench
 		@Override
 		public boolean isEmpty()
 		{
-			for (ItemStack itemstack : this._stackResult)
+			for (ItemStack itemstack : this.getStackResult())
 			{
 				if (!itemstack.isEmpty())
 					return false;
@@ -207,19 +281,19 @@ public class HookRealBench
 		@Override
 		public ItemStack getStackInSlot(int index)
 		{
-			return this._stackResult.get(0);
+			return this.getStackResult().get(0);
 		}
 		
 		@Override
 		public ItemStack removeStackFromSlot(int index)
 		{
-			return ItemStackHelper.getAndRemove(this._stackResult, 0);
+			return ItemStackHelper.getAndRemove(this.getStackResult(), 0);
 		}
 		
 		@Override
 		public void clear()
 		{
-			this._stackResult.clear();
+			this.getStackResult().clear();
 		}
 	}
 }

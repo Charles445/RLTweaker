@@ -7,6 +7,7 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
@@ -125,6 +126,32 @@ public class PatchRealBench extends PatchManager
 				
 				//announce("CLASS DISPLAYER: ContainerWorkbench");
 				//(new ClassDisplayer()).printMethod(m_init);
+			}
+		});
+		
+		add(new Patch(this, "pw.prok.realbench.WorkbenchInventory", ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES)
+		{
+
+			@Override
+			public void patch(ClassNode clazzNode)
+			{
+				//RealBench has default support for CraftBukkit weirdness
+				//But it's broken because you cannot initialize WorkbenchInventory without a capacity
+				//So the function call needs to be tweaked
+				
+				MethodNode m_init = this.findMethodWithDesc(clazzNode, "(Lnet/minecraft/inventory/Container;IILnet/minecraft/entity/player/EntityPlayer;)V", "<init>");
+				
+				MethodInsnNode toCall = TransformUtil.findNextCallWithOpcodeAndName(first(m_init), Opcodes.INVOKEVIRTUAL, "initRealBench");
+				toCall.desc = "(I)V"; //Everything else is correct
+				
+				//Now we need to add that integer to the stack
+				//Which is actually the result of multiplying the two integer parameters
+				
+				InsnList inject = new InsnList();
+				inject.add(new VarInsnNode(Opcodes.ILOAD, 2));
+				inject.add(new VarInsnNode(Opcodes.ILOAD, 3));
+				inject.add(new InsnNode(Opcodes.IMUL));
+				this.insertBefore(m_init, toCall, inject);
 			}
 		});
 	}

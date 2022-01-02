@@ -8,10 +8,10 @@ import com.charles445.rltweaker.reflect.RuinsReflect;
 import com.charles445.rltweaker.util.CompatUtil;
 import com.charles445.rltweaker.util.CriticalException;
 import com.charles445.rltweaker.util.ErrorUtil;
-import com.charles445.rltweaker.util.ReflectUtil;
 
 import net.minecraft.world.World;
 import net.minecraft.world.storage.WorldSavedData;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
@@ -25,8 +25,10 @@ public class RuinsHandler
 		{
 			reflector = new RuinsReflect();
 			
-			//Register
-			CompatUtil.subscribeEventManually(WorldEvent.Load.class, this, ReflectUtil.findMethod(this.getClass(), "onWorldLoad"));
+			if(ModConfig.server.ruins.removeRUINSTRIGGERFunctionality)
+				CompatUtil.findAndRemoveHandlerFromEventBus("atomicstryker.ruins.common.RuinsMod", "onEntityEnteringChunk");
+			
+			MinecraftForge.EVENT_BUS.register(this);
 		}
 		catch(Exception e)
 		{

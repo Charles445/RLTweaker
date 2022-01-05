@@ -183,4 +183,11 @@ public class PatchConfig
 	@RLConfig.RLCraftTwoEightTwo("true")
 	@RLConfig.RLCraftTwoNine("true")
 	public boolean serverCompatibility = true;
+	
+	@Config.RequiresMcRestart
+	@Config.Comment("Enables features for ticking chunk blocks")
+	@RLConfig.ImprovementsOnly("true")
+	@RLConfig.RLCraftTwoEightTwo("true")
+	@RLConfig.RLCraftTwoNine("true")
+	public boolean chunkTicks = true;
 }

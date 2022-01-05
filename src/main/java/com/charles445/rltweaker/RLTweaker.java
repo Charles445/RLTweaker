@@ -42,6 +42,7 @@ import com.charles445.rltweaker.handler.RuinsHandler;
 import com.charles445.rltweaker.handler.RusticHandler;
 import com.charles445.rltweaker.handler.SMEHandler;
 import com.charles445.rltweaker.handler.SRParasitesHandler;
+import com.charles445.rltweaker.handler.SereneSeasonsHandler;
 import com.charles445.rltweaker.handler.SpawnerControlHandler;
 import com.charles445.rltweaker.handler.TANHandler;
 import com.charles445.rltweaker.handler.WaystonesHandler;
@@ -257,6 +258,11 @@ public class RLTweaker
 		if(Loader.isModLoaded(ModNames.DYNAMICSURROUNDINGS) && ModConfig.server.dynamicsurroundings.enabled)
 		{
 			handlers.put(ModNames.DYNAMICSURROUNDINGS, new DynamicSurroundingsHandler());
+		}
+		
+		if(Loader.isModLoaded(ModNames.SERENESEASONS) && ModConfig.server.sereneseasons.enabled)
+		{
+			handlers.put(ModNames.SERENESEASONS, new SereneSeasonsHandler());
 		}
 		
 		/*

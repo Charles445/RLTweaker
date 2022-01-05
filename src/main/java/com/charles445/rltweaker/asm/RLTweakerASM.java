@@ -15,6 +15,7 @@ import com.charles445.rltweaker.asm.patch.PatchAnvilDupe;
 import com.charles445.rltweaker.asm.patch.PatchBetterCombatCriticalsFix;
 import com.charles445.rltweaker.asm.patch.PatchBetterCombatMountFix;
 import com.charles445.rltweaker.asm.patch.PatchBroadcastSounds;
+import com.charles445.rltweaker.asm.patch.PatchChunkTicks;
 import com.charles445.rltweaker.asm.patch.PatchConcurrentParticles;
 import com.charles445.rltweaker.asm.patch.PatchDoorPathfinding;
 import com.charles445.rltweaker.asm.patch.PatchEnchant;
@@ -35,7 +36,7 @@ import com.charles445.rltweaker.asm.patch.PatchWaystoneScroll;
 import com.charles445.rltweaker.asm.patch.compat.PatchBrokenTransformers;
 import com.charles445.rltweaker.asm.patch.compat.PatchCatServer;
 import com.charles445.rltweaker.asm.patch.compat.PatchCraftBukkit;
-import com.charles445.rltweaker.asm.patch.compat.PatchSponge;
+import com.charles445.rltweaker.asm.patch.compat.PatchLootManagement;
 import com.charles445.rltweaker.asm.util.ASMInfo;
 import com.charles445.rltweaker.asm.util.ASMLogger;
 import com.charles445.rltweaker.asm.util.ServerType;
@@ -78,6 +79,12 @@ public class RLTweakerASM implements IClassTransformer
 	
 	@Override
 	public byte[] transform(String name, String transformedName, byte[] basicClass)
+	{
+		byte[] result = doTransform(name, transformedName, basicClass);
+		return result;
+	}
+	
+	public byte[] doTransform(String name, String transformedName, byte[] basicClass)
 	{
 		if(true)
 		{
@@ -331,26 +338,34 @@ public class RLTweakerASM implements IClassTransformer
 		//serverCompatibility
 		if(ASMConfig.getBoolean("general.patches.serverCompatibility", true))
 		{
-			if(ASMInfo.hasSponge)
+			boolean hasSponge = ASMInfo.hasSponge;
+			boolean catServer = ASMInfo.serverType == ServerType.CATSERVER;
+			boolean mohist = ASMInfo.serverType == ServerType.MOHIST;
+			
+			if(hasSponge || catServer || mohist)
 			{
-				new PatchSponge();
+				new PatchLootManagement();
 			}
 			
-			if(ASMInfo.serverType == ServerType.CATSERVER)
+			//Craftbukkit
+			if(catServer || mohist)
 			{
 				new PatchBrokenTransformers();
-				new PatchCatServer();
 				new PatchCraftBukkit();
 			}
-			else if(ASMInfo.serverType == ServerType.MOHIST)
+			
+			//CatServer
+			if(catServer)
 			{
-				new PatchBrokenTransformers();
-				new PatchCraftBukkit();
+				new PatchCatServer();
 			}
 		}
 		
-		
-		//new PatchDebug();
+		//chunkTicks
+		if(ASMConfig.getBoolean("general.patches.chunkTicks", true))
+		{
+			new PatchChunkTicks();
+		}
 		
 		//new PatchForgeNetwork();
 	}

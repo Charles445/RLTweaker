@@ -28,4 +28,11 @@ public class ConfigCharm
 	@RLConfig.RLCraftTwoEightTwo("true")
 	@RLConfig.RLCraftTwoNine("true")
 	public boolean fixSalvageTrade = true;
+	
+	@Config.Comment("Fix charged emeralds crashing when being fired from a dispenser")
+	@Config.Name("Fix Charged Emerald Crash")
+	@RLConfig.ImprovementsOnly("true")
+	@RLConfig.RLCraftTwoEightTwo("true")
+	@RLConfig.RLCraftTwoNine("true")
+	public boolean fixChargedEmeraldCrash = true;
 }

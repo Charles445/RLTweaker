@@ -63,13 +63,35 @@ public class CommandRLTweakerConfig extends CommandBase
 			return;
 		}
 		
-		switch(args[0].toLowerCase(Locale.ENGLISH))
+		String firstArgument = args[0].toLowerCase(Locale.ENGLISH);
+		
+		if(firstArgument.equals("help"))
 		{
-			case "help": 
-				inform("/rltweakerconfig <type>", sender);
-				inform("Sets RLTweaker config to default values based on the config type given",sender);
-				inform("Available config types are:\nimprovementsonly\nrlcraft282",sender); //TODO loop
+			inform("/rltweakerconfig <type>", sender);
+			inform("Sets RLTweaker config to default values based on the config type given",sender);
+			inform("Available config types are:\nimprovementsonly\nrlcraft282",sender); //TODO loop
+			inform("WARNING, this replaces all rltweaker config! Add --confirm to the end of the command to confirm", sender);
+			return;
+		}
+		
+		boolean confirm = false;
+		for(int i=0;i<args.length;i++)
+		{
+			if(args[i].equals("--confirm"))
+			{
+				confirm = true;
 				break;
+			}
+		}
+		
+		if(!confirm)
+		{
+			inform("WARNING, this replaces all rltweaker config! Add --confirm to the end of the command to confirm", sender);
+			return;
+		}
+		
+		switch(firstArgument)
+		{
 			//case "rlcraft29": updateConfigDefaultsWithAnnotation(RLConfig.RLCraftTwoNine.class, sender); break;
 			case "rlcraft282": updateConfigDefaultsWithAnnotation(RLConfig.RLCraftTwoEightTwo.class, sender); break;
 			case "improvementsonly": updateConfigDefaultsWithAnnotation(RLConfig.ImprovementsOnly.class, sender); break;

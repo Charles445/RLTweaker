@@ -11,11 +11,11 @@ import net.minecraft.world.World;
 import net.minecraft.world.storage.loot.LootTableManager;
 import net.minecraftforge.common.DimensionManager;
 
-public class HookSponge
+public class HookLootManagement
 {
 	private static Field f_LootTableManager_baseFolder = ReflectUtil.findFieldAnyOrNull(LootTableManager.class, "field_186528_d", "baseFolder");
 	
-	//com/charles445/rltweaker/hook/compat/HookSponge
+	//com/charles445/rltweaker/hook/compat/HookLootManagement
 	//fixLootFilePath
 	//(Ljava/io/File;Lnet/minecraft/util/ResourceLocation;)Ljava/io/File;
 	public static File fixLootFilePath(File file, ResourceLocation resource)
@@ -24,7 +24,7 @@ public class HookSponge
 		{
 			if(f_LootTableManager_baseFolder == null)
 			{
-				ErrorUtil.logSilent("Sponge LootTableManager baseFolder Setup");
+				ErrorUtil.logSilent("Loot Management LootTableManager baseFolder Setup");
 				return file;
 			}
 			
@@ -51,7 +51,7 @@ public class HookSponge
 			}
 			catch (IllegalArgumentException | IllegalAccessException e)
 			{
-				ErrorUtil.logSilent("Sponge LootTableManager baseFolder Invoke");
+				ErrorUtil.logSilent("Loot Management LootTableManager baseFolder Invoke");
 			}
 		}
 		

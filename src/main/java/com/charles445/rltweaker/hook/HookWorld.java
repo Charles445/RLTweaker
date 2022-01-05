@@ -16,6 +16,8 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
+import net.minecraft.world.chunk.Chunk;
 
 public class HookWorld
 {
@@ -105,4 +107,56 @@ public class HookWorld
 	//com/charles445/rltweaker/hook/HookWorld
 	//getAABExcludingSizeFor
 	//(Lnet/minecraft/world/World;Lnet/minecraft/entity/Entity;)D
+	
+	/////////////////
+	//ChunkTick
+	/////////////////
+	
+	public static boolean chunkTickPatchEnabled = false;
+	
+	//Serene Seasons
+	public static IChunkTickPost sereneSeasonsPost = null;
+	
+	//com/charles445/rltweaker/hook/HookWorld
+		//onPreUpdateBlocks
+		//(Lnet/minecraft/world/WorldServer;)Lcom/charles445/rltweaker/hook/HookWorld$ChunkTickContainer;
+	public static ChunkTickContainer onPreUpdateBlocks(WorldServer world)
+	{
+		if(!chunkTickPatchEnabled)
+			chunkTickPatchEnabled = true;
+		
+		return new ChunkTickContainer(world);
+	}
+	
+	//com/charles445/rltweaker/hook/HookWorld
+	//postBlockTickChunk
+	//(Lnet/minecraft/world/chunk/Chunk;Lcom/charles445/rltweaker/hook/HookWorld$ChunkTickContainer;)V
+	public static void postBlockTickChunk(Chunk chunk, ChunkTickContainer container)
+	{
+		if(container.sereneSeasonsCompanionPost != null)
+			sereneSeasonsPost.invoke(chunk, container.sereneSeasonsCompanionPost);
+	}
+	
+	public static class ChunkTickContainer
+	{
+		public Object sereneSeasonsCompanionPost;
+		
+		public ChunkTickContainer(WorldServer world)
+		{
+			sereneSeasonsCompanionPost = sereneSeasonsPost == null ? null : sereneSeasonsPost.preUpdate(world);
+		}
+	}
+	
+	public static interface IChunkTickPost<T>
+	{
+		@Nullable
+		public T preUpdate(WorldServer world);
+		
+		public void invoke(Chunk c, T companion);
+	}
+
+	/////////////////
+	/////////////////
+	
+	
 }

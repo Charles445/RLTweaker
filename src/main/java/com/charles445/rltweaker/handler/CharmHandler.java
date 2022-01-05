@@ -1,6 +1,8 @@
 package com.charles445.rltweaker.handler;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -15,14 +17,23 @@ import com.charles445.rltweaker.util.ModNames;
 import com.charles445.rltweaker.util.ReflectUtil;
 import com.google.common.base.Predicate;
 
+import net.minecraft.block.BlockDispenser;
+import net.minecraft.dispenser.BehaviorDefaultDispenseItem;
+import net.minecraft.dispenser.BehaviorProjectileDispense;
+import net.minecraft.dispenser.IPosition;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnumEnchantmentType;
+import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.passive.EntityVillager.ITradeList;
+import net.minecraft.entity.projectile.EntitySnowball;
+import net.minecraft.entity.projectile.EntityThrowable;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTool;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.RegistryNamespaced;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.EnumHelper;
 import net.minecraftforge.fml.common.registry.VillagerRegistry;
 import net.minecraftforge.fml.common.registry.VillagerRegistry.VillagerCareer;
@@ -39,8 +50,64 @@ public class CharmHandler
 		
 		if(ModConfig.server.charm.fixSalvageTrade)
 			fixSalvageTrade();
+
+		if(ModConfig.server.charm.fixChargedEmeraldCrash)
+			fixChargedEmeraldCrash();
 		
 		//No event bus registration yet
+	}
+	
+	private void fixChargedEmeraldCrash()
+	{
+		boolean replace = false;
+		Item itemRef = null;
+		
+		//Rainy Afternoon crashed public server with this
+		
+		for(Item item : BlockDispenser.DISPENSE_BEHAVIOR_REGISTRY.getKeys())
+		{
+			if(item != null && item.getClass().getName().equals("svenhjol.charm.world.item.ItemChargedEmerald"))
+			{
+				itemRef = item;
+				replace = true;
+				break;
+			}
+		}
+		
+		if(replace)
+		{
+			RLTweaker.logger.info("Fixing Charged Emerald Crash");
+			
+			try
+			{
+				Class c_EntityChargedEmerald = Class.forName("svenhjol.charm.world.entity.EntityChargedEmerald");
+				Constructor con_EntityChargedEmerald = c_EntityChargedEmerald.getDeclaredConstructor(World.class);
+				
+				BlockDispenser.DISPENSE_BEHAVIOR_REGISTRY.putObject(itemRef, new BehaviorProjectileDispense()
+				{
+					@Override
+					protected IProjectile getProjectileEntity(World world, IPosition position, ItemStack stack)
+					{
+						try
+						{
+							EntityThrowable throwable = (EntityThrowable) con_EntityChargedEmerald.newInstance(world);
+							throwable.setPosition(position.getX(), position.getY(), position.getZ());
+							return throwable;
+						}
+						catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
+						{
+							ErrorUtil.logSilent("Charm Charged Emerald Construction");
+							return new EntitySnowball(world, position.getX(), position.getY(), position.getZ());
+						}
+					}
+				});
+			}
+			catch (ClassNotFoundException | NoSuchMethodException | SecurityException e)
+			{
+				ErrorUtil.logSilent("Charm Charged Emerald Invocation");
+				BlockDispenser.DISPENSE_BEHAVIOR_REGISTRY.putObject(itemRef, new BehaviorDefaultDispenseItem());
+			}
+		}
 	}
 	
 	private void fixIncorrectItemEnchantments()

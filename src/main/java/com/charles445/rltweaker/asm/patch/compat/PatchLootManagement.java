@@ -14,13 +14,13 @@ import com.charles445.rltweaker.asm.patch.Patch;
 import com.charles445.rltweaker.asm.patch.PatchManager;
 import com.charles445.rltweaker.asm.util.TransformUtil;
 
-public class PatchSponge extends PatchManager
+public class PatchLootManagement extends PatchManager
 {
-	public PatchSponge()
+	public PatchLootManagement()
 	{
-		super("Sponge");
+		super("Loot Management");
 		
-		//Fix loot table path because sponge breaks LootTweaker
+		//Fix loot table path because some servers break LootTweaker
 		add(new Patch(this, "net.minecraft.world.storage.loot.LootTableManager$Loader", ClassWriter.COMPUTE_MAXS)
 		{
 			@Override
@@ -60,7 +60,7 @@ public class PatchSponge extends PatchManager
 					inject.add(new VarInsnNode(Opcodes.ALOAD, lvn_file1.index));
 					inject.add(new VarInsnNode(Opcodes.ALOAD, 1));
 					inject.add(new MethodInsnNode(Opcodes.INVOKESTATIC,
-							"com/charles445/rltweaker/hook/compat/HookSponge",
+							"com/charles445/rltweaker/hook/compat/HookLootManagement",
 							"fixLootFilePath",
 							"(Ljava/io/File;Lnet/minecraft/util/ResourceLocation;)Ljava/io/File;",
 							false

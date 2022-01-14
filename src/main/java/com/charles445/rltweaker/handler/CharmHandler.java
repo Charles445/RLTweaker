@@ -12,6 +12,8 @@ import javax.annotation.Nullable;
 
 import com.charles445.rltweaker.RLTweaker;
 import com.charles445.rltweaker.config.ModConfig;
+import com.charles445.rltweaker.util.CompatUtil;
+import com.charles445.rltweaker.util.CriticalException;
 import com.charles445.rltweaker.util.ErrorUtil;
 import com.charles445.rltweaker.util.ModNames;
 import com.charles445.rltweaker.util.ReflectUtil;
@@ -45,14 +47,32 @@ public class CharmHandler
 	
 	public CharmHandler()
 	{
-		if(ModConfig.server.charm.fixIncorrectItemEnchantments)
-			fixIncorrectItemEnchantments();
-		
-		if(ModConfig.server.charm.fixSalvageTrade)
-			fixSalvageTrade();
-
-		if(ModConfig.server.charm.fixChargedEmeraldCrash)
-			fixChargedEmeraldCrash();
+		try
+		{
+			if(ModConfig.server.charm.fixIncorrectItemEnchantments)
+				fixIncorrectItemEnchantments();
+			
+			if(ModConfig.server.charm.fixSalvageTrade)
+				fixSalvageTrade();
+	
+			if(ModConfig.server.charm.fixChargedEmeraldCrash)
+				fixChargedEmeraldCrash();
+			
+			if(ModConfig.server.charm.disableMagneticEnchantment)
+			{
+				RLTweaker.logger.info("Disabling the Magnetic enchantment");
+				CompatUtil.findAndRemoveHandlerFromEventBus("svenhjol.charm.enchanting.feature.Magnetic");
+			}
+		}
+		catch (Exception e)
+		{
+			RLTweaker.logger.error("Failed to setup CharmHandler!", e);
+			ErrorUtil.logSilent("Charm Critical Setup Failure");
+			
+			//Crash on Critical
+			if(e instanceof CriticalException)
+				throw new RuntimeException(e);
+		}
 		
 		//No event bus registration yet
 	}

@@ -24,14 +24,17 @@ public class BattleTowersReflect
 	public final Class c_AS_BattleTowersCore;
 	public final Method m_AS_BattleTowersCore_getTowerDestroyers;
 	public final Field f_AS_BattleTowersCore_instance;
+	public final Object o_AS_BattleTowersCore_instance;
 	public final Field f_AS_BattleTowersCore_minDistanceFromSpawn;
 	public final Field f_AS_BattleTowersCore_minDistanceBetweenTowers;
+	public final Field f_AS_BattleTowersCore_towerDestroyerEnabled;
 	
 	public final Class c_AS_EntityGolem;
 	public final Method m_AS_EntityGolem_getIsDormant;
 	
 	public final Class c_AS_TowerDestroyer;
 	public final Field f_AS_TowerDestroyer_player;
+	public final Field f_AS_TowerDestroyer_deleteMe;
 	
 	public final Class c_AS_EntityGolemFireball;
 	public final Field f_AS_EntityGolemFireball_shooterEntity;
@@ -52,7 +55,6 @@ public class BattleTowersReflect
 	
 	public final Class c_WorldGenHandler$WorldHandle;
 	public final Field f_WorldGenHandler$WorldHandle_disableGenerationHook;
-	
 	
 	//Lycanites Mobs
 	private boolean isLycanitesAvailable;
@@ -80,14 +82,17 @@ public class BattleTowersReflect
 		c_AS_BattleTowersCore = Class.forName("atomicstryker.battletowers.common.AS_BattleTowersCore");
 		m_AS_BattleTowersCore_getTowerDestroyers = ReflectUtil.findMethod(c_AS_BattleTowersCore, "getTowerDestroyers");
 		f_AS_BattleTowersCore_instance = ReflectUtil.findField(c_AS_BattleTowersCore, "instance");
+		o_AS_BattleTowersCore_instance = f_AS_BattleTowersCore_instance.get(null);
 		f_AS_BattleTowersCore_minDistanceFromSpawn = ReflectUtil.findField(c_AS_BattleTowersCore, "minDistanceFromSpawn");
 		f_AS_BattleTowersCore_minDistanceBetweenTowers = ReflectUtil.findField(c_AS_BattleTowersCore, "minDistanceBetweenTowers");
+		f_AS_BattleTowersCore_towerDestroyerEnabled = ReflectUtil.findField(c_AS_BattleTowersCore, "towerDestroyerEnabled");
 		
 		c_AS_EntityGolem = Class.forName("atomicstryker.battletowers.common.AS_EntityGolem");
 		m_AS_EntityGolem_getIsDormant = ReflectUtil.findMethod(c_AS_EntityGolem, "getIsDormant");
 		
 		c_AS_TowerDestroyer = Class.forName("atomicstryker.battletowers.common.AS_TowerDestroyer");
 		f_AS_TowerDestroyer_player = ReflectUtil.findField(c_AS_TowerDestroyer, "player");
+		f_AS_TowerDestroyer_deleteMe = ReflectUtil.findField(c_AS_TowerDestroyer, "deleteMe");
 		
 		c_AS_EntityGolemFireball = Class.forName("atomicstryker.battletowers.common.AS_EntityGolemFireball");
 		f_AS_EntityGolemFireball_shooterEntity = ReflectUtil.findField(c_AS_EntityGolemFireball, "shooterEntity");
@@ -152,6 +157,16 @@ public class BattleTowersReflect
 		f_AS_TowerDestroyer_player.set(towerDestroyer, entityToSet);
 	}
 	
+	public boolean getDestroyerDeleteMe(Object towerDestroyer) throws IllegalArgumentException, IllegalAccessException
+	{
+		return f_AS_TowerDestroyer_deleteMe.getBoolean(towerDestroyer);
+	}
+	
+	public void setDestroyerDeleteMe(Object towerDestroyer, boolean deleteMe) throws IllegalArgumentException, IllegalAccessException
+	{
+		f_AS_TowerDestroyer_deleteMe.setBoolean(towerDestroyer, deleteMe);
+	}
+	
 	public boolean isEntityGolemFireball(Entity entity)
 	{
 		return c_AS_EntityGolemFireball.isInstance(entity);
@@ -212,9 +227,9 @@ public class BattleTowersReflect
 		return (int) m_WorldGenHandler_getSurfaceBlockHeight.invoke(worldGenHandler, world, x, z);
 	}
 	
-	public Object getModInstance() throws IllegalArgumentException, IllegalAccessException
+	public Object getModInstance()
 	{
-		return f_AS_BattleTowersCore_instance.get(null);
+		return o_AS_BattleTowersCore_instance;
 	}
 	
 	public int getMinDistanceFromSpawn() throws IllegalArgumentException, IllegalAccessException
@@ -225,6 +240,16 @@ public class BattleTowersReflect
 	public int getMinDistanceBetweenTowers() throws IllegalArgumentException, IllegalAccessException
 	{
 		return (int) f_AS_BattleTowersCore_minDistanceBetweenTowers.get(getModInstance());
+	}
+	
+	public int getTowerDestroyerEnabled() throws IllegalArgumentException, IllegalAccessException
+	{
+		return (int) f_AS_BattleTowersCore_towerDestroyerEnabled.getInt(getModInstance());
+	}
+	
+	public void setTowerDestroyerEnabled(int val) throws IllegalArgumentException, IllegalAccessException
+	{
+		f_AS_BattleTowersCore_towerDestroyerEnabled.setInt(getModInstance(), val);
 	}
 	
 	public Object newTowerPosition(Object worldGenHandler, int x, int y, int z, int type, boolean underground) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException

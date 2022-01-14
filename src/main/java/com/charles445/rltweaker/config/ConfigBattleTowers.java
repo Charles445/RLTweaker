@@ -153,5 +153,17 @@ public class ConfigBattleTowers
 	@RLConfig.RLCraftTwoNine("false")
 	public boolean consistentTowerGeneration = false;
 	
+	@Config.Comment("Removes tower destroyers from unloaded worlds. Prevents potential leaks and crashes.")
+	@Config.Name("Remove Unloaded Tower Destroyers")
+	@RLConfig.ImprovementsOnly("true")
+	@RLConfig.RLCraftTwoEightTwo("true")
+	@RLConfig.RLCraftTwoNine("true")
+	public boolean removeUnloadedTowerDestroyers = true;
 	
+	@Config.Comment("Prevents clients from changing the tower destruction config")
+	@Config.Name("Enforce Tower Destruction Config")
+	@RLConfig.ImprovementsOnly("true")
+	@RLConfig.RLCraftTwoEightTwo("true")
+	@RLConfig.RLCraftTwoNine("true")
+	public boolean enforceTowerDestructionConfig = true;
 }

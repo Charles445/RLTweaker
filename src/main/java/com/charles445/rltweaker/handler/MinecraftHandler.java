@@ -257,7 +257,7 @@ public class MinecraftHandler
 	
 	//Capabilities
 	
-	@SubscribeEvent
+	@SubscribeEvent(priority = EventPriority.LOW)
 	public void onAttachCapability(AttachCapabilitiesEvent event)
 	{
 		//Find player

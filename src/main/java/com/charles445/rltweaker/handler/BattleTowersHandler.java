@@ -7,7 +7,6 @@ import java.util.Set;
 
 import com.charles445.rltweaker.RLTweaker;
 import com.charles445.rltweaker.config.ModConfig;
-import com.charles445.rltweaker.debug.DebugUtil;
 import com.charles445.rltweaker.reflect.BattleTowersReflect;
 import com.charles445.rltweaker.util.AIUtil;
 import com.charles445.rltweaker.util.CompatUtil;
@@ -44,6 +43,8 @@ public class BattleTowersHandler
 	
 	BattleTowersReflect reflector;
 	
+	public int cachedTowerDestroyerConfig;
+	
 	public BattleTowersHandler()
 	{
 		try
@@ -66,6 +67,8 @@ public class BattleTowersHandler
 				BTWorldGenerator generator = new BTWorldGenerator();
 				generator = CompatUtil.tryWrapWorldGenerator(generator, reflector.c_WorldGenHandler);
 			}
+			
+			cachedTowerDestroyerConfig = reflector.getTowerDestroyerEnabled();
 			
 			MinecraftForge.EVENT_BUS.register(this);
 		}
@@ -296,44 +299,59 @@ public class BattleTowersHandler
 	@SubscribeEvent(priority = EventPriority.HIGH)
 	public void onTick(TickEvent.WorldTickEvent tick)
 	{
-		//Tower Explosion Credit
-		
-		if(!ModConfig.server.battletowers.towerExplosionNoCredit)
-			return;
-		
-		if(System.currentTimeMillis() > tickedTime) 
+		if(tick.phase == TickEvent.Phase.START && ModConfig.server.battletowers.enforceTowerDestructionConfig)
 		{
-			tickedTime = System.currentTimeMillis() + 14000L; // its a fourteen second timer ZZZ
-			
-			//It takes 15000L for the tower destroyer to run its first explosion, so this will intervene before then
-			//If the game gets paused while these timers are counting down, due to priority this will run before the tower starts exploding
-			//Really shouldn't be pausing the game during these anyway...
-			
+			//Enforce config
 			try
 			{
-				Set<Object> towerDestroyers = reflector.getTowerDestroyers();
-				
-				if(towerDestroyers!=null && towerDestroyers.size() > 0)
+				if(reflector.getTowerDestroyerEnabled() != cachedTowerDestroyerConfig)
 				{
-					Iterator<Object> iterator = towerDestroyers.iterator();
-					while(iterator.hasNext())
+					RLTweaker.logger.info("Fixing Tower Destroyer Config");
+					reflector.setTowerDestroyerEnabled(cachedTowerDestroyerConfig);
+				}
+			}
+			catch (IllegalArgumentException | IllegalAccessException e)
+			{
+				ErrorUtil.logSilent("BT enforceTowerDestructionConfig Invocation");
+			}
+		}
+		
+		//Tower Explosion Credit
+		
+		if(ModConfig.server.battletowers.towerExplosionNoCredit)
+		{
+			if(System.currentTimeMillis() > tickedTime) 
+			{
+				tickedTime = System.currentTimeMillis() + 14000L; // its a fourteen second timer ZZZ
+				
+				//It takes 15000L for the tower destroyer to run its first explosion, so this will intervene before then
+				//If the game gets paused while these timers are counting down, due to priority this will run before the tower starts exploding
+				//Really shouldn't be pausing the game during these anyway...
+				
+				try
+				{
+					Set<Object> towerDestroyers = reflector.getTowerDestroyers();
+					
+					if(towerDestroyers!=null && towerDestroyers.size() > 0)
 					{
-						Object destroyer = iterator.next();
-						if(destroyer!=null)
+						Iterator<Object> iterator = towerDestroyers.iterator();
+						while(iterator.hasNext())
 						{
-							//TODO is null safe? There have been some recoil issues with null targets, does this apply here?
-							reflector.setDestroyerPlayer(destroyer, null);
+							Object destroyer = iterator.next();
+							if(destroyer!=null)
+							{
+								//TODO is null safe? There have been some recoil issues with null targets, does this apply here?
+								reflector.setDestroyerPlayer(destroyer, null);
+							}
 						}
 					}
 				}
+				catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
+				{
+					//Just quietly put it in the rlerrorreport and call it a day
+					ErrorUtil.logSilent("BT getTowerDestroyers Invocation");
+				}
 			}
-			catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
-			{
-				//Just quietly put it in the rlerrorreport and call it a day
-				ErrorUtil.logSilent("BT getTowerDestroyers Invocation");
-				return;
-			}
-			
 		}
 	}
 	
@@ -350,6 +368,39 @@ public class BattleTowersHandler
 			if(effectName.equals("effect.plague"))
 			{
 				event.setResult(Event.Result.DENY);
+			}
+		}
+	}
+	
+	@SubscribeEvent
+	public void onWorldUnload(WorldEvent.Unload event)
+	{
+		if(event.getWorld() != null)
+		{
+			if(ModConfig.server.battletowers.removeUnloadedTowerDestroyers)
+			{
+				try
+				{
+					Set<Object> towerDestroyers = reflector.getTowerDestroyers();
+					if(towerDestroyers!=null && towerDestroyers.size() > 0)
+					{
+						Iterator<Object> iterator = towerDestroyers.iterator();
+						while(iterator.hasNext())
+						{
+							Object destroyer = iterator.next();
+							if(destroyer!=null && !reflector.getDestroyerDeleteMe(destroyer))
+							{
+								RLTweaker.logger.info("Removing tower destroyer for unloaded world");
+								reflector.setDestroyerDeleteMe(destroyer, true);
+							}
+						}
+					}
+				}
+				catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
+				{
+					// TODO Auto-generated catch block
+					ErrorUtil.logSilent("BT removeUnloadedTowerDestroyers Invocation");
+				}
 			}
 		}
 	}

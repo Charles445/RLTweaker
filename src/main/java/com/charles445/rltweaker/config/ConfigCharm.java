@@ -35,4 +35,13 @@ public class ConfigCharm
 	@RLConfig.RLCraftTwoEightTwo("true")
 	@RLConfig.RLCraftTwoNine("true")
 	public boolean fixChargedEmeraldCrash = true;
+	
+	@Config.Comment("Disables the effect of Magnetic without unregistering it to avoid packet issues. Do this if you experience dupes with the enchantment.")
+	@Config.Name("Disable Magnetic Enchantment")
+	@Config.RequiresMcRestart
+	@RLConfig.ImprovementsOnly("false")
+	@RLConfig.RLCraftTwoEightTwo("false")
+	@RLConfig.RLCraftTwoNine("false")
+	public boolean disableMagneticEnchantment = false;
+	
 }

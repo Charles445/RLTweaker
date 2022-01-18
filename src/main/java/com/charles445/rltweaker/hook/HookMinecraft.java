@@ -94,7 +94,7 @@ public class HookMinecraft
 		}
 	}
 	
-	public static void aggressiveMotionCheck(EntityLivingBase entity)
+	public static void aggressiveMotionCheck(Entity entity)
 	{
 		if(!ModConfig.server.minecraft.motionChecker)
 			return;
@@ -132,7 +132,7 @@ public class HookMinecraft
 		}
 	}
 	
-	private static boolean testAngle(float angle, EntityLivingBase entity)
+	private static boolean testAngle(float angle, Entity entity)
 	{
 		if(!Float.isFinite(angle))
 		{
@@ -154,7 +154,7 @@ public class HookMinecraft
 		return false;
 	}
 	
-	private static boolean testMotion(double motion, EntityLivingBase entity)
+	private static boolean testMotion(double motion, Entity entity)
 	{
 		if(motion > ModConfig.server.minecraft.motionCheckerSpeedCap || motion < (-ModConfig.server.minecraft.motionCheckerSpeedCap) || !Double.isFinite(motion))
 		{
@@ -176,7 +176,7 @@ public class HookMinecraft
 		return false;
 	}
 	
-	private static String dumpEntity(EntityLivingBase entity)
+	private static String dumpEntity(Entity entity)
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append(entity.getClass().getName());
@@ -192,8 +192,11 @@ public class HookMinecraft
 		sb.append(entity.motionY);
 		sb.append(" ");
 		sb.append(entity.motionZ);
-		sb.append(" hurt time:");
-		sb.append(entity.hurtTime);
+		if(entity instanceof EntityLivingBase)
+		{
+			sb.append(" hurt time:");		
+			sb.append(((EntityLivingBase)entity).hurtTime);
+		}
 		sb.append(" dead:");
 		sb.append(entity.isDead);
 		sb.append(" pitch:");

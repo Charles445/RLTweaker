@@ -9,6 +9,7 @@ import com.charles445.rltweaker.config.ModConfig;
 import com.charles445.rltweaker.debug.DebugUtil;
 import com.charles445.rltweaker.util.ErrorUtil;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.DamageSource;
@@ -35,6 +36,7 @@ public class MotionCheckHandler
 		handleLivingUpdate(event, EventPriority.HIGHEST);
 	}
 	
+	/*
 	@SubscribeEvent(priority = EventPriority.HIGH)
 	public void onLivingUpdateHigh(LivingUpdateEvent event)
 	{
@@ -52,6 +54,7 @@ public class MotionCheckHandler
 	{
 		handleLivingUpdate(event, EventPriority.LOW);
 	}
+	*/
 	
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void onLivingUpdateLowest(LivingUpdateEvent event)
@@ -140,7 +143,7 @@ public class MotionCheckHandler
 		return false;
 	}
 	
-	private boolean testMotion(double motion, EntityLivingBase entity, EventPriority priority)
+	private boolean testMotion(double motion, Entity entity, EventPriority priority)
 	{
 		if(motion > ModConfig.server.minecraft.motionCheckerSpeedCap || motion < (-ModConfig.server.minecraft.motionCheckerSpeedCap) || !Double.isFinite(motion))
 		{
@@ -162,7 +165,7 @@ public class MotionCheckHandler
 		return false;
 	}
 	
-	private String dumpEntity(EntityLivingBase entity)
+	private String dumpEntity(Entity entity)
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append(entity.getClass().getName());
@@ -178,8 +181,11 @@ public class MotionCheckHandler
 		sb.append(entity.motionY);
 		sb.append(" ");
 		sb.append(entity.motionZ);
-		sb.append(" hurt time:");
-		sb.append(entity.hurtTime);
+		if(entity instanceof EntityLivingBase)
+		{
+			sb.append(" hurt time:");
+			sb.append(((EntityLivingBase)entity).hurtTime);
+		}
 		sb.append(" dead:");
 		sb.append(entity.isDead);
 		sb.append(" pitch:");

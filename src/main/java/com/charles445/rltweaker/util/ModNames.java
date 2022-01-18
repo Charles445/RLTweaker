@@ -26,6 +26,7 @@ public class ModNames
 	public static final String LYCANITESMOBS = "lycanitesmobs";
 	public static final String MANTLE = "mantle";
 	public static final String MINECRAFT = "minecraft";
+	public static final String MULTIMINE = "multimine";
 	public static final String OVERLOADEDARMORBAR = "overpoweredarmorbar";
 	public static final String POTIONCORE = "potioncore";
 	public static final String QUARK = "quark";

@@ -24,10 +24,10 @@ public class ConfigMinecraft
 	@Config.Comment("Speed cap for the motion checker, living entities are not allowed to move faster than this")
 	@Config.Name("Motion Checker Speed Cap")
 	@Config.RangeDouble(min=1.0D)
-	@RLConfig.ImprovementsOnly("48.0")
+	@RLConfig.ImprovementsOnly("96.0")
 	@RLConfig.RLCraftTwoEightTwo("48.0")
-	@RLConfig.RLCraftTwoNine("48.0")
-	public double motionCheckerSpeedCap = 48.0D;
+	@RLConfig.RLCraftTwoNine("96.0")
+	public double motionCheckerSpeedCap = 96.0D;
 	
 	@Config.Comment("Synchronizes dismounts with players more aggressively")
 	@Config.Name("Player Dismount Sync")
@@ -170,4 +170,12 @@ public class ConfigMinecraft
 	@RLConfig.RLCraftTwoEightTwo("false") //Already handled by ISeeDragons
 	@RLConfig.RLCraftTwoNine("false") //Already handled by ISeeDragons
 	public boolean lightningDestroysItems = true;
+	
+	@Config.Comment("Enables watchdog related features")
+	@Config.Name("Watchdog")
+	@Config.RequiresMcRestart
+	@RLConfig.ImprovementsOnly("true")
+	@RLConfig.RLCraftTwoEightTwo("true")
+	@RLConfig.RLCraftTwoNine("true")
+	public boolean watchdog = true;
 }

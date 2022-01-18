@@ -34,6 +34,7 @@ import com.charles445.rltweaker.handler.LostCitiesHandler;
 import com.charles445.rltweaker.handler.LycanitesHandler;
 import com.charles445.rltweaker.handler.MinecraftHandler;
 import com.charles445.rltweaker.handler.MotionCheckHandler;
+import com.charles445.rltweaker.handler.MultiMineHandler;
 import com.charles445.rltweaker.handler.QuarkHandler;
 import com.charles445.rltweaker.handler.RecurrentHandler;
 import com.charles445.rltweaker.handler.ReskillableHandler;
@@ -53,6 +54,7 @@ import com.charles445.rltweaker.util.ErrorUtil;
 import com.charles445.rltweaker.util.ModNames;
 import com.charles445.rltweaker.util.ServerRunnable;
 import com.charles445.rltweaker.util.VersionDelimiter;
+import com.charles445.rltweaker.util.Watchdog;
 
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -83,7 +85,7 @@ public class RLTweaker
 {
 	public static final String MODID = "rltweaker";
 	public static final String NAME = "RLTweaker";
-	public static final String VERSION = "0.4.9";
+	public static final String VERSION = "0.5.0";
 	public static final VersionDelimiter VERSION_DELIMITER = new VersionDelimiter(VERSION);
 	
 	@Mod.Instance(RLTweaker.MODID)
@@ -255,6 +257,11 @@ public class RLTweaker
 			handlers.put(ModNames.INFERNALMOBS, new InfernalMobsHandler());
 		}
 		
+		if(Loader.isModLoaded(ModNames.MULTIMINE) && ModConfig.server.multimine.enabled)
+		{
+			handlers.put(ModNames.MULTIMINE, new MultiMineHandler());
+		}
+		
 		if(Loader.isModLoaded(ModNames.DYNAMICSURROUNDINGS) && ModConfig.server.dynamicsurroundings.enabled)
 		{
 			handlers.put(ModNames.DYNAMICSURROUNDINGS, new DynamicSurroundingsHandler());
@@ -276,6 +283,12 @@ public class RLTweaker
 		
 		//Motion Check Handler runs after everything else, that way the priority listed will always be after
 		handlers.put("MotionCheckHandler", new MotionCheckHandler());
+		
+		//Start up the watchdog
+		if(ModConfig.server.minecraft.watchdog)
+		{
+			Watchdog.init();
+		}
 		
 		//Run any loadComplete debug routines
 		DebugUtil.loadCompleteDebugRoutine();

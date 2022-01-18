@@ -3,12 +3,14 @@ package com.charles445.rltweaker.handler;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.charles445.rltweaker.RLTweaker;
 import com.charles445.rltweaker.config.ModConfig;
 import com.charles445.rltweaker.reflect.InfernalMobsReflect;
 import com.charles445.rltweaker.util.CriticalException;
 import com.charles445.rltweaker.util.ErrorUtil;
+import com.charles445.rltweaker.util.Watchdog;
 
 import net.minecraft.enchantment.Enchantment;
 
@@ -24,6 +26,9 @@ public class InfernalMobsHandler
 			
 			if(ModConfig.server.infernalmobs.useEnchantmentBlacklist)
 				tryRemoveBlacklistedEnchantments();
+			
+			if(ModConfig.server.infernalmobs.stallWatchdog)
+				Watchdog.addRoutine("InfernalMobs Stall", new InfernalMobsStallRoutine());
 		}
 		catch(Exception e)
 		{
@@ -65,6 +70,31 @@ public class InfernalMobsHandler
 		catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e)
 		{
 			ErrorUtil.logSilent("Infernal Mobs Remove Blacklisted Enchantments Invocation");
+		}
+	}
+	
+	public class InfernalMobsStallRoutine extends Watchdog.Routine
+	{
+		private AtomicInteger semaphoreCount = new AtomicInteger(0);
+
+		//Runs on a separate thread
+		@Override
+		public void run() throws Exception
+		{
+			if(reflector.getSemaphor())
+			{
+				int sem = this.semaphoreCount.incrementAndGet();
+				if(sem > 5)
+				{
+					Watchdog.logger.warn("InfernalMobs may be stalling, attempting recovery");
+					reflector.setSemaphor(false);
+					this.semaphoreCount.set(0);
+				}
+			}
+			else
+			{
+				this.semaphoreCount.set(0);
+			}
 		}
 	}
 }

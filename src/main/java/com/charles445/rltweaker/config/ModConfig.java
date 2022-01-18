@@ -91,6 +91,10 @@ public class ModConfig
 		@Config.Name("Lycanites Mobs")
 		public ConfigLycanites lycanitesmobs = new ConfigLycanites();
 		
+		@Config.Comment("Multi Mine tweaks")
+		@Config.Name("Multi Mine")
+		public ConfigMultiMine multimine = new ConfigMultiMine();
+		
 		@Config.Comment("Quark tweaks")
 		@Config.Name("Quark")
 		public ConfigQuark quark = new ConfigQuark();

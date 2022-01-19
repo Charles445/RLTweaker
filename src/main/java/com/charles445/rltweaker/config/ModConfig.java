@@ -99,6 +99,10 @@ public class ModConfig
 		@Config.Name("Quark")
 		public ConfigQuark quark = new ConfigQuark();
 		
+		@Config.Comment("Potion Core tweaks")
+		@Config.Name("Potion Core")
+		public ConfigPotionCore potioncore = new ConfigPotionCore();
+		
 		@Config.Comment("Recurrent Complex tweaks")
 		@Config.Name("Recurrent Complex")
 		public ConfigRecurrent recurrentcomplex = new ConfigRecurrent();

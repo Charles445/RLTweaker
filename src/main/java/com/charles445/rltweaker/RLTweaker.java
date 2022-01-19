@@ -35,6 +35,7 @@ import com.charles445.rltweaker.handler.LycanitesHandler;
 import com.charles445.rltweaker.handler.MinecraftHandler;
 import com.charles445.rltweaker.handler.MotionCheckHandler;
 import com.charles445.rltweaker.handler.MultiMineHandler;
+import com.charles445.rltweaker.handler.PotionCoreHandler;
 import com.charles445.rltweaker.handler.QuarkHandler;
 import com.charles445.rltweaker.handler.RecurrentHandler;
 import com.charles445.rltweaker.handler.ReskillableHandler;
@@ -270,6 +271,11 @@ public class RLTweaker
 		if(Loader.isModLoaded(ModNames.SERENESEASONS) && ModConfig.server.sereneseasons.enabled)
 		{
 			handlers.put(ModNames.SERENESEASONS, new SereneSeasonsHandler());
+		}
+		
+		if(Loader.isModLoaded(ModNames.POTIONCORE) && ModConfig.server.potioncore.enabled)
+		{
+			handlers.put(ModNames.POTIONCORE, new PotionCoreHandler());
 		}
 		
 		/*

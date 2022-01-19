@@ -17,6 +17,7 @@ import com.charles445.rltweaker.asm.patch.PatchBetterCombatMountFix;
 import com.charles445.rltweaker.asm.patch.PatchBroadcastSounds;
 import com.charles445.rltweaker.asm.patch.PatchChunkTicks;
 import com.charles445.rltweaker.asm.patch.PatchConcurrentParticles;
+import com.charles445.rltweaker.asm.patch.PatchDebug;
 import com.charles445.rltweaker.asm.patch.PatchDoorPathfinding;
 import com.charles445.rltweaker.asm.patch.PatchEnchant;
 import com.charles445.rltweaker.asm.patch.PatchEntityBlockDestroy;
@@ -46,9 +47,11 @@ import net.minecraft.launchwrapper.LaunchClassLoader;
 
 public class RLTweakerASM implements IClassTransformer
 {
-	private boolean run = true;
+	private static boolean run = true;
 	
-	private boolean firstrun = false;
+	private static boolean setup = false;
+	
+	private static boolean firstrun = false;
 	
 	//private boolean debug = true;
 	
@@ -57,6 +60,11 @@ public class RLTweakerASM implements IClassTransformer
 	public RLTweakerASM()
 	{
 		super();
+		
+		if(setup)
+			return;
+		
+		setup = true;
 		
 		ASMInfo.cacheServerType(this.getClass().getClassLoader());
 		

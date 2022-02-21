@@ -14,11 +14,11 @@ public class ConfigPotionCore
 	@RLConfig.RLCraftTwoNine("true")
 	public boolean enabled = true;
 	
-	@Config.Comment("Prevent invalid jump boosts from having an effect")
+	@Config.Comment("Attempt to prevent invalid jump boosts from taking effect, and tweaks controllable jump boost. Fixes some mods, but breaks others. Not recommended for use.")
 	@Config.Name("Cap Jump Boost")
 	@Config.RequiresMcRestart
-	@RLConfig.ImprovementsOnly("true")
-	@RLConfig.RLCraftTwoEightTwo("true")
-	@RLConfig.RLCraftTwoNine("true")
-	public boolean capJumpBoost = true;
+	@RLConfig.ImprovementsOnly("false")
+	@RLConfig.RLCraftTwoEightTwo("false")
+	@RLConfig.RLCraftTwoNine("false")
+	public boolean capJumpBoost = false;
 }

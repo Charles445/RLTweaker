@@ -144,6 +144,7 @@ public class MinecraftHandler
 		
 		if(ModConfig.server.minecraft.cleanupMineshaftWorldgenFiles)
 		{
+			//TODO fix checkIsLoaded to handle invalid structures
 			cleanMapGenStructureData(world, "Mineshaft", false, true);
 			//cleanMapGenStructureData(world, "Village", false, true);
 			//cleanMapGenStructureData(world, "Fortress", false, true);
@@ -165,6 +166,10 @@ public class MinecraftHandler
 		
 		for (String s : structureDataCompound.getKeySet())
 		{
+			toRemove.add(s);
+			
+			//Load check routine removed
+			/*
 			NBTBase structureNestedBase = structureDataCompound.getTag(s);
 			 if (structureNestedBase.getId() == 10)
 			 {
@@ -217,6 +222,8 @@ public class MinecraftHandler
 						 toRemove.add(s);
 				 }
 			 }
+			 
+			 */
 		}
 		
 		for(String remove : toRemove)
